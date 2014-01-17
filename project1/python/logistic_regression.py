@@ -59,7 +59,7 @@ def prob(y, x, betas):
     p = sigmoid((x * betas).sum())
     if y == 0:
         p = 1 - p
-    if p == 0:
+    if p == 0:  # TODO: this is a hack
         p = 1e-9
     return p
 
