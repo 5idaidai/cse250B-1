@@ -78,42 +78,36 @@ def update(betas, x, y, lambda_, mu):
     return result
 
 
-def lr_sgd(data, labels, mu=1, alpha=1):
+def lr_sgd(data, labels, mu=1, alpha=1, max_iters=1000):
     """Logistic regression via SGD
 
     mu: float
         Regularization coefficient.
 
     alpha: float
-        Step size of SGD is calculated as ``alpha / epoch``.
+        Step size of SGD is calculated as ``alpha / (epoch + 1)``.
 
     """
     # FIXME: needs better learning rate schedule
+    # TODO: check for convergence during epoch
     data = preprocess_data(data)
     labels = preprocess_labels(labels)
 
-    n, k = data.shape
     # shuffle data
+    n, k = data.shape
     idx = np.arange(n)
     np.random.shuffle(idx)
     data = data[idx]
     labels = labels[idx]
 
-    # initial guess
     betas = np.zeros(k)
-
-    # iterate until convergence
-    converged = False
-    epoch = 1
-    while not converged:
+    for epoch in range(max_iters):
         old = betas.copy()
-        lambda_ = alpha / epoch
+        lambda_ = alpha / (epoch + 1)
         for x, y in zip(data, labels):
-            # update betas
             betas = update(betas, x, y, lambda_, mu)
-        # update step size
-        epoch += 1
-        converged = np.linalg.norm(betas - old, ord=2) < 1e-5
+        if np.linalg.norm(betas - old, ord=2) < 1e-5:
+            break  # converged
     return betas
 
 
