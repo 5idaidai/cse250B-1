@@ -69,7 +69,7 @@ def prob(y, x, betas):
 ###############################
 
 def update(betas, x, y, lambda_, mu):
-    """single lambda_ in SGD"""
+    """single step in SGD"""
     # TODO: skip sparse calculations
     p = prob(1, x, betas)
     result = betas + lambda_ * ((y - p) * x - 2 * mu * betas)
