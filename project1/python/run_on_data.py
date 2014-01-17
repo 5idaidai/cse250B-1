@@ -27,11 +27,11 @@ def read_file(filename):
     return samples, labels
 
 
-data, labels = read_file('../data/train')
+data, labels = read_file('../1571/train')
 data_train, data_valid, labels_train, labels_valid = \
     train_test_split(data, labels)
 
-data_test, labels_test = read_file('../data/test')
+data_test, labels_test = read_file('../1571/test')
 
 mus = list(10 ** x for x in range(-1, 5))
 alphas = [1]
