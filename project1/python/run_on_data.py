@@ -17,6 +17,7 @@ def process_line(line):
 
 
 def read_file(filename):
+    """Read a data file and return data matrix and labels"""
     f = open(filename)
     lines = f.read().split('\n')
     pairs = list(process_line(i) for i in lines if len(i.strip()) > 0)
@@ -27,30 +28,37 @@ def read_file(filename):
     return samples, labels
 
 
+# read data and split training data into training and validation sets
 data, labels = read_file('../1571/train')
 data_train, data_valid, labels_train, labels_valid = \
     train_test_split(data, labels)
 
 data_test, labels_test = read_file('../1571/test')
 
-mus = list(10 ** x for x in range(-1, 5))
+# hyperparameters to try
+# mus = list(10 ** x for x in range(-1, 5))
+mus = [10e-1]
 alphas = [1]
 
-results = {}
-
-print "starting grid search"
+print "starting grid search for SGD"
+validation_results = {}
 for mu in mus:
     for alpha in alphas:
         print "trying mu={} alpha={}".format(mu, alpha)
         betas = lr.lr_sgd(data_train, labels_train, mu=mu, alpha=alpha)
         prediction = lr.predict(data_valid, betas)
         score = accuracy_score(labels_valid, prediction)
-        results[(mu, alpha)] = score
+        validation_results[(mu, alpha)] = score
         print "  score: {}".format(score)
 
-mu, alpha = max(results, key=results.get)
-betas = lr.lr_sgd(data_train, labels_train, mu=mu, alpha=alpha)
-prediction = lr.predict(data_test, betas)
-sgd_score = accuracy_score(labels_valid, prediction)
+print "evaluating on test set"
 
-print "SGD score: {}".format(sgd_score)
+# get hyperparameters for highest accuracy on validation set
+mu, alpha = max(validation_results, key=validation_results.get)
+
+# train on entire train set and predict on test set
+betas = lr.lr_sgd(data, labels, mu=mu, alpha=alpha)
+prediction = lr.predict(data_test, betas)
+sgd_score = accuracy_score(labels_test, prediction)
+
+print "SGD test score: {}".format(sgd_score)
