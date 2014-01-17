@@ -82,10 +82,10 @@ def lr_sgd(data, labels, mu=1, alpha=1):
     """Logistic regression via SGD
 
     mu: float
-        regularization coefficient
+        Regularization coefficient.
 
-    t0: float
-        step size of SGD is calculated as ``mu / (t0 + epoch)``.
+    alpha: float
+        Step size of SGD is calculated as ``alpha / epoch``.
 
     """
     # FIXME: needs better learning rate schedule
