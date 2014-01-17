@@ -31,13 +31,12 @@ def read_file(filename):
 # read data and split training data into training and validation sets
 data, labels = read_file('../1571/train')
 data_train, data_valid, labels_train, labels_valid = \
-    train_test_split(data, labels)
+    train_test_split(data, labels, test_size=0.3)
 
 data_test, labels_test = read_file('../1571/test')
 
 # hyperparameters to try
-# mus = list(10 ** x for x in range(-1, 5))
-mus = [10e-1]
+mus = list(10 ** x for x in range(-1, 5))
 alphas = [1]
 
 print "starting grid search for SGD"
