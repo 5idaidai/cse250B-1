@@ -1,10 +1,9 @@
-function [logLikelihood, grad] = costFunction(weights, X, y)
+function [logLikelihood, grad] = costFunction(weights, X, y, mu)
 %COSTFUNCTION Compute cost (log-likelihood) and gradient
 %   for logistic regression
 
 m = length(y);
 n = size(weights);
-mu = 0;
 
 grad = zeros(size(weights));
 

@@ -17,6 +17,6 @@ function [] = lbfgs()
 %	minFunc(@(t)(costFunction(t, X, y)), initial_theta, options2);
 
     
-    [x,f,exitflag,output] = minFunc(@(t)(costFunction(t, X, y)),initial_theta,options,varargin)
+    [x,f,exitflag,output] = minFunc(@(t)(costFunction(t, X, y, mu)),initial_theta,options,varargin)
 end
 
