@@ -48,7 +48,7 @@ for mu in mus:
         prediction = lr.predict(data_valid, betas)
         score = accuracy_score(labels_valid, prediction)
         validation_results[(mu, alpha)] = score
-        print "  score: {}".format(score)
+        print " score: {}".format(score)
 
 print "evaluating on test set"
 
