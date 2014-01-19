@@ -122,7 +122,8 @@ def lcl(data, labels, betas):
 
 def rlcl(data, labels, betas, mu):
     """regularized log conditional likelihood"""
-    return lcl(data, labels, betas) - mu * np.linalg.norm(betas[1:], ord=2)
+    #return lcl(data, labels, betas) - mu * np.linalg.norm(betas[1:], ord=2)
+    return lcl(data, labels, betas) - mu * sum(np.power(betas[1:], 2))
 
 
 def lcl_prime(data, labels, betas):
@@ -151,6 +152,7 @@ def lr_lbfgs(data, labels, mu=1):
     x0 = np.zeros(data.shape[1])
 
     result = fmin_l_bfgs_b(f, x0, fprime)
+    print result[2]['warnflag'], result[2]['task'], result[2]['grad']
     return result[0]
 
 
