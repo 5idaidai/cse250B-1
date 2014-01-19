@@ -29,11 +29,11 @@ def read_file(filename):
 
 
 # read data and split training data into training and validation sets
-data, labels = read_file('../1571/train')
+data, labels = read_file('../1571/train.txt')
 data_train, data_valid, labels_train, labels_valid = \
     train_test_split(data, labels, test_size=0.3)
 
-data_test, labels_test = read_file('../1571/test')
+data_test, labels_test = read_file('../1571/test.txt')
 
 # hyperparameters to try
 mus = list(10 ** x for x in range(-1, 5))
