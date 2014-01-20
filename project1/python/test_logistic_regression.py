@@ -30,14 +30,14 @@ def test_primes():
     f = lambda b: lr.lcl(data, labels, b)
     fprime = lambda b: lr.lcl_prime(data, labels, b)
     for bs in betas:
-        print check_grad(f, fprime, bs)
+        check_grad(f, fprime, bs)
         #assert abs(check_grad(f, fprime, bs)) < 0.1
 
     print "\nChecking RLCL"
     f = lambda b: lr.rlcl(data, labels, b, mu=1)
     fprime = lambda b: lr.rlcl_prime(data, labels, b, mu=1)
     for bs in betas:
-        print check_grad(f, fprime, bs)
+        check_grad(f, fprime, bs)
         #assert abs(check_grad(f, fprime, bs)) < 0.1
         
 
