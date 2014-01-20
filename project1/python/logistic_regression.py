@@ -1,5 +1,6 @@
 from __future__ import division
 
+import collections
 import numpy as np
 from scipy.optimize import fmin_l_bfgs_b
 
@@ -49,13 +50,23 @@ def preprocess_labels(labels):
 # common functions #
 ####################
 
+def _sigmoid(z):
+    if z < 0:
+        z = -np.log10(abs(z))
+    elif z > 0:
+        z = np.log10(abs(z))
+    return 1 / (1+np.exp(-z))
+
 def sigmoid(z):
-    for n in np.nditer(z):
-        if n < 0:
-            n = -np.log10(abs(n))
-        elif n > 0:
-            n = np.log10(abs(n))
-        return 1 / (1+np.exp(-n))
+    if not isinstance(z,collections.Iterable):
+        return _sigmoid(z)
+    else:
+        ret = np.zeros(z.shape)
+        cnt = 0
+        for n in np.nditer(z):
+            ret[cnt] = _sigmoid(n)
+            cnt = cnt + 1
+        return ret
 
 
 def prob(y, x, betas):

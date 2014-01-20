@@ -46,15 +46,17 @@ def test_logistic_regression():
 
     betas = lr.lr_sgd(data, labels)
     predictions = lr.predict(data, betas)
-    assert (accuracy_score(labels, predictions) > 0.9), "lr: Fail"
-    if accuracy_score(labels, predictions) > 0.9:
-        return "lr: Pass"
+    score = accuracy_score(labels, predictions)
+    assert (score > 0.9), "lr_sgd: Fail {}".format(score)
+    if score > 0.9:
+        print "lr_sgd: Pass {}".format(score)
         
     betas = lr.lr_lbfgs(data, labels)
     predictions = lr.predict(data, betas)
-    assert (accuracy_score(labels, predictions) > 0.9), "lr: Fail"
-    if accuracy_score(labels, predictions) > 0.9:
-        return "lr: Pass"
+    score = accuracy_score(labels, predictions)
+    assert (score > 0.9), "lr_lbfgs: Fail {}".format(score)
+    if score > 0.9:
+        print "lr_lbfgs: Pass {}".format(score)
 
 	
 #testarr = range(6)
