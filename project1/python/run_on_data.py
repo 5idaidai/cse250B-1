@@ -46,6 +46,8 @@ def sgd(mus, alphas, data, labels, data_train, labels_train,
     # get hyperparameters for highest accuracy on validation set
     mu, alpha = max(validation_results, key=validation_results.get)
     
+    print "Using mu of {} and alpha of {}".format(mu, alpha)
+    
     # train on entire train set and predict on test set
     betas = lr.lr_sgd(data, labels, mu=mu, alpha=alpha)
     prediction = lr.predict(data_test, betas)
@@ -72,6 +74,8 @@ def lbfgs(mus, data, labels, data_train, labels_train,
     
     # get hyperparameters for highest accuracy on validation set
     mu = max(validation_results, key=validation_results.get)
+    
+    print "Using mu of {}".format(mu)
     
     # train on entire train set and predict on test set
     betas = lr.lr_lbfgs(data, labels, mu=mu)
