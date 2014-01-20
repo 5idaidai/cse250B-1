@@ -50,8 +50,12 @@ def preprocess_labels(labels):
 ####################
 
 def sigmoid(z):
-    # FIXME: fix over/underflow
-    return 1 / (1 + np.exp(-z))
+    for n in np.nditer(z):
+        if n < 0:
+            n = -np.log10(abs(n))
+        elif n > 0:
+            n = np.log10(abs(n))
+        return 1 / (1+np.exp(-n))
 
 
 def prob(y, x, betas):
@@ -59,7 +63,7 @@ def prob(y, x, betas):
     p = sigmoid((x * betas).sum())
     if y == 0:
         p = 1 - p
-    if p == 0:  # TODO: this is a hack
+    if p == 0: # TODO: this is a hack
         p = 1e-9
     return p
 
@@ -81,13 +85,13 @@ def update(betas, x, y, lambda_, mu):
 def lr_sgd(data, labels, mu=1, alpha=1, max_iters=1000):
     """Logistic regression via SGD
 
-    mu: float
-        Regularization coefficient.
+mu: float
+Regularization coefficient.
 
-    alpha: float
-        Step size of SGD is calculated as ``alpha / (epoch + 1)``.
+alpha: float
+Step size of SGD is calculated as ``alpha / (epoch + 1)``.
 
-    """
+"""
     # FIXME: needs better learning rate schedule
     # TODO: check for convergence during epoch
     data = preprocess_data(data)
@@ -107,7 +111,7 @@ def lr_sgd(data, labels, mu=1, alpha=1, max_iters=1000):
         for x, y in zip(data, labels):
             betas = update(betas, x, y, lambda_, mu)
         if np.linalg.norm(betas - old, ord=2) < 1e-5:
-            break  # converged
+            break # converged
     return betas
 
 
@@ -122,8 +126,8 @@ def lcl(data, labels, betas):
 
 def rlcl(data, labels, betas, mu):
     """regularized log conditional likelihood"""
-    #return lcl(data, labels, betas) - mu * np.linalg.norm(betas[1:], ord=2)
-    return lcl(data, labels, betas) - mu * sum(np.power(betas[1:], 2))
+    return lcl(data, labels, betas) - mu * np.linalg.norm(betas[1:], ord=2)
+    #return lcl(data, labels, betas) - mu * sum(np.power(betas[1:], 2))
 
 
 def lcl_prime(data, labels, betas):
@@ -137,7 +141,7 @@ def rlcl_prime(data, labels, betas, mu):
     """gradient of rlcl"""
     grad = lcl_prime(data, labels, betas)
     result = grad - 2 * mu * betas
-    result[0] = grad[0]  # do not regularize intercept
+    result[0] = grad[0] # do not regularize intercept
     return result
 
 
