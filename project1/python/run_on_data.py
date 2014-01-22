@@ -42,8 +42,8 @@ def sgd(mus, alphas, data, labels, data_train, labels_train,
             validation_results[(mu, alpha)] = score
             print "  score: {}".format(score)
             print "  error rate: {}".format(1 - score)
-            print "evaluating on test set"
 
+    print "evaluating on test set"
     # get hyperparameters for highest accuracy on validation set
     mu, alpha = max(validation_results, key=validation_results.get)
 
