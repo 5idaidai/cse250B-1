@@ -3,7 +3,7 @@ import numpy as np
 from sklearn.cross_validation import train_test_split
 from sklearn.metrics import accuracy_score
 
-import logistic_regression as lr
+from logistic_regression import LogisticRegression
 
 
 def process_line(line):
@@ -25,80 +25,83 @@ def read_file(filename):
     samples, labels = zip(*pairs)
     samples = np.array(samples)
     labels = np.array(labels)
-    samples = lr.preprocess_data(samples)
-    labels = lr.preprocess_labels(labels)
     return samples, labels
 
 
-def sgd(mus, alphas, data, labels, data_train, labels_train, 
+def sgd(mus, alphas, data, labels, data_train, labels_train,
         data_valid, labels_valid, data_test, labels_test):
     print "starting grid search for SGD"
     validation_results = {}
     for mu in mus:
         for alpha in alphas:
             print "trying mu={} alpha={}".format(mu, alpha)
-            betas = lr.lr_sgd(data_train, labels_train, mu=mu, alpha=alpha)
-            prediction = lr.predict(data_valid, betas)
-            score = accuracy_score(lr.preprocess_labels(labels_valid), prediction)
+            model = LogisticRegression(method="sgd", mu=mu, alpha=alpha)
+            model.fit(data_train, labels_train)
+            prediction = model.predict(data_valid)
+            score = accuracy_score(labels_valid, prediction)
             validation_results[(mu, alpha)] = score
             print "  score: {}".format(score)
-            print "  error rate: {}".format(1-score)
+            print "  error rate: {}".format(1 - score)
             print "evaluating on test set"
-    
+
     # get hyperparameters for highest accuracy on validation set
     mu, alpha = max(validation_results, key=validation_results.get)
-    
-    print "Using mu of {} and alpha of {}".format(mu, alpha)
-    
-    # train on entire train set and predict on test set
-    betas = lr.lr_sgd(data, labels, mu=mu, alpha=alpha)
-    prediction = lr.predict(data_test, betas)
-    sgd_score = accuracy_score(labels_test, prediction)
-    
-    print "SGD test score: {}, error rate: {}".format(sgd_score, 1-sgd_score)
-    
 
-def lbfgs(mus, data, labels, data_train, labels_train, 
-        data_valid, labels_valid, data_test, labels_test):
+    print "Using mu of {} and alpha of {}".format(mu, alpha)
+
+    # train on entire train set and predict on test set
+    model = LogisticRegression(method="sgd", mu=mu, alpha=alpha)
+    model.fit(data, labels)
+    prediction = model.predict(data_test)
+    sgd_score = accuracy_score(labels_test, prediction)
+
+    print "SGD test score: {}, error rate: {}".format(sgd_score, 1 - sgd_score)
+
+
+def lbfgs(mus, data, labels, data_train, labels_train,
+          data_valid, labels_valid, data_test, labels_test):
     print "starting grid search for L-BFGS"
     validation_results = {}
     for mu in mus:
-        for alpha in alphas:
-            print "trying mu={} alpha={}".format(mu, alpha)
-            betas = lr.lr_lbfgs(data_train, labels_train, mu=mu)
-            prediction = lr.predict(data_valid, betas)
-            score = accuracy_score(lr.preprocess_labels(labels_valid), prediction)
-            validation_results[(mu, alpha)] = score
-            print "  score: {}".format(score)
-            print "  error rate: {}".format(1-score)
-    
+        print "trying mu={}".format(mu)
+        model = LogisticRegression(method="lbfgs", mu=mu)
+        model.fit(data_train, labels_train)
+        prediction = model.predict(data_valid)
+        score = accuracy_score(labels_valid, prediction)
+        validation_results[mu] = score
+        print "  score: {}".format(score)
+        print "  error rate: {}".format(1 - score)
+
     print "evaluating on test set"
-    
+
     # get hyperparameters for highest accuracy on validation set
     mu = max(validation_results, key=validation_results.get)
-    
-    print "Using mu of {}".format(mu)
-    
-    # train on entire train set and predict on test set
-    betas = lr.lr_lbfgs(data, labels, mu=mu)
-    prediction = lr.predict(data_test, betas)
-    score = accuracy_score(labels_test, prediction)
-    
-    print "L-BFGS test score: {}, error rate: {}".format(score, 1-score)    
 
-    
+    print "Using mu of {}".format(mu)
+
+    # train on entire train set and predict on test set
+    model = LogisticRegression(method="lbfgs", mu=mu)
+    model.fit(data, labels)
+    prediction = model.predict(data_test)
+    score = accuracy_score(labels_test, prediction)
+
+    print "L-BFGS test score: {}, error rate: {}".format(score, 1 - score)
+
+
 if __name__ == "__main__":
     # read data and split training data into training and validation sets
     data, labels = read_file('../1571/train.txt')
     data_train, data_valid, labels_train, labels_valid = \
         train_test_split(data, labels, test_size=0.3)
-    
+
     data_test, labels_test = read_file('../1571/test.txt')
-    
+
     # hyperparameters to try
     mus = list(10 ** x for x in range(-5, 1))
-    alphas = list(10 ** x for x in range(-5, 1))
-    
+    alphas = [1]
+
     sgd(mus, alphas, data, labels, data_train, labels_train,
         data_valid, labels_valid, data_test, labels_test)
 
+    lbfgs(mus, data, labels, data_train, labels_train,
+          data_valid, labels_valid, data_test, labels_test)
