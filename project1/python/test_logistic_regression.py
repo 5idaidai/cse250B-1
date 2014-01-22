@@ -22,7 +22,7 @@ class TestPrimes(unittest.TestCase):
         self.data = lr.LogisticRegression._preprocess_data(data)
         self.labels, _ = lr.LogisticRegression._preprocess_labels(labels)
         state = np.random.RandomState(0)
-        self.betas = state.uniform(-1, 1, size=(n_betas, data.shape[1]))
+        self.betas = state.uniform(-10, 10, size=(n_betas, data.shape[1]))
 
     def _test(self, f, fprime):
         for b in self.betas:
@@ -42,17 +42,6 @@ class TestPrimes(unittest.TestCase):
 
 class TestLogisticRegression(unittest.TestCase):
 
-    def test_sigmoid(self):
-        data = np.array(range(-50000, 0, 10))
-        data2 = np.array(range(0, 50000, 10))
-
-        negs = lr.sigmoid(data)
-        pos = lr.sigmoid(data2)
-
-        assert max(negs) <= 0.5
-        assert min(negs) > 0
-        assert min(pos) >= 0.5
-        assert max(pos) < 1
 
     def test_preprocess_labels(self):
         labels = [-1, 1, -1]
@@ -68,19 +57,6 @@ class TestLogisticRegression(unittest.TestCase):
         model.fit(data, labels)
         predictions = model.predict(data)
         self.assertTrue(np.all(predictions == labels))
-
-    def test_rlcl(self):
-        data = [[40000, 0, 1],
-                [1, 1, -40000]]
-        labels = [0, 1]
-        betas = np.array([1, 1, 1])
-        mu = 2
-        result = lr.rlcl(data, labels, betas, mu)
-        s1 = lr.sigmoid(40001)
-        s2 = lr.sigmoid(-39998)
-        expected = (np.log(1 - s1) + np.log(s2) -
-                    mu * 2)
-        self.assertEquals(result, expected)
 
     def test_sgd(self):
         data, labels = make_blobs(n_features=5, centers=2)

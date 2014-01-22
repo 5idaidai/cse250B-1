@@ -1,43 +1,31 @@
 from __future__ import division
 
-import collections
-
 import numpy as np
 from scipy.optimize import fmin_l_bfgs_b
 
 from sklearn.utils.random import check_random_state
 
 
-def _sigmoid(z):
-    if z > 36:
-        return 1 - 1e-9
-    elif z < -709:
-        return 1e-9
-    else:
-        return 1 / (1 + np.exp(-z))
+def log_sum_exp(x):
+    m = x.max()
+    x = x - m
+    return m + np.log(np.exp(x).sum())
 
 
-def sigmoid(z):
-    if isinstance(z, collections.Iterable):
-        return np.array(list(_sigmoid(n) for n in np.nditer(z)))
-    else:
-        return _sigmoid(z)
+def log_prob(y, xb):
+    """returns log prob(Y=y)
 
+    xb = np.dot(X, betas)
 
-def prob(y, x, betas):
-    """prob(Y=y | X=x, betas)"""
-    p = sigmoid((x * betas).sum())
-    if y == 0:
-        p = 1 - p
-    if p == 0:  # TODO: this is a hack
-        raise Exception('this should never happen')
-        p = 1e-9
-    return p
+    """
+    if y == 1:
+        xb = -xb
+    return -log_sum_exp(np.array([0, xb]))
 
 
 def lcl(data, labels, betas):
     """log conditional likelihood"""
-    return sum(np.log(prob(y, x, betas)) for x, y in zip(data, labels))
+    return sum(log_prob(y, np.dot(x, betas)) for x, y in zip(data, labels))
 
 
 def rlcl(data, labels, betas, mu):
@@ -48,7 +36,7 @@ def rlcl(data, labels, betas, mu):
 
 def lcl_prime(data, labels, betas):
     """gradient of lcl"""
-    coeffs = np.array(list(y - prob(1, x, betas)
+    coeffs = np.array(list(y - np.exp(log_prob(1, np.dot(x, betas)))
                            for x, y in zip(data, labels)))
     return coeffs.dot(data)
 
@@ -140,8 +128,10 @@ class LogisticRegression(object):
         self._validate_args()
         X = self._preprocess_data(X)
         X = self._normalize_data(X)
-        z = self.intercept_ + np.dot(X, self.coefficients_)
-        probs = sigmoid(z)
+        XB = self.intercept_ + np.dot(X, self.coefficients_)
+        XB = XB.reshape(-1, 1)
+        f = lambda z: log_prob(1, z)
+        probs = np.exp(np.apply_along_axis(f, axis=1, arr=XB))
         neg, pos = self.old_labels_
         return np.where(probs.ravel() >= 0.5, pos, neg)
 
@@ -173,7 +163,7 @@ class LogisticRegression(object):
 
     def _sgd_update(self, betas, x, y, lambda_):
         """single step in SGD"""
-        p = prob(1, x, betas)
+        p = np.exp(log_prob(1, np.dot(x, betas)))
         result = betas + lambda_ * ((y - p) * x - 2 * self.mu * betas)
         # do not regularize intercept
         result[0] = betas[0] + lambda_ * ((y - p) * x[0])
