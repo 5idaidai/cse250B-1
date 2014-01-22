@@ -164,8 +164,8 @@ def lr_lbfgs(data, labels, mu=1):
     data = preprocess_data(data)
     labels = preprocess_labels(labels)
 
-    f = lambda b: rlcl(data, labels, b, mu)
-    fprime = lambda b: rlcl_prime(data, labels, b, mu)
+    f = lambda b: -rlcl(data, labels, b, mu)
+    fprime = lambda b: -rlcl_prime(data, labels, b, mu)
 
     x0 = np.zeros(data.shape[1])
 
