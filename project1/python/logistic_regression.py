@@ -100,6 +100,9 @@ class LogisticRegression(object):
             raise Exception("invalid decay: {}."
                             " should be in (0, 1]".format(self.decay))
 
+        if self.max_iters <= 0:
+            raise Exception("invalid max_iters: {}".format(self.max_iters))
+
     def fit(self, X, labels):
         self._validate_args()
 
