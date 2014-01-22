@@ -176,16 +176,16 @@ class LogisticRegression(object):
 
         betas = np.zeros(k)
         lambda_ = self.alpha
+        self.converged_ = False
         for epoch in range(self.max_iters):
             old_lcl = rlcl(data, labels, betas, self.mu)
             for i, (x, y) in enumerate(zip(data, labels)):
                 betas = self._sgd_update(betas, x, y, lambda_)
             new_lcl = rlcl(data, labels, betas, self.mu)
-            print new_lcl
             if np.abs(new_lcl - old_lcl) < 1e-8:
-                print "Converged at epoch", epoch
+                self.converged_ = True
                 break
-            lambda_ = lambda_ * 0.999
+            lambda_ = lambda_ * 0.6
         return betas
 
     def _lbfgs(self, data, labels):
