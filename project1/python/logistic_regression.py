@@ -1,8 +1,11 @@
 from __future__ import division
 
 import collections
+
 import numpy as np
 from scipy.optimize import fmin_l_bfgs_b
+
+from sklearn.utils.random import check_random_state
 
 
 def _sigmoid(z):
@@ -75,18 +78,22 @@ class LogisticRegression(object):
     decay: float
         After every epoch, ``alpha`` is reduced to ``decay * alpha``.
 
-    max_iters:
+    max_iters: int
         Maximum iterations of SGD.
+
+    random_state: None or int or numpy.random.RandomState
+        Seed for randomness
 
     """
 
     def __init__(self, method="sgd", mu=0.1, alpha=0.1, decay=0.6,
-                 max_iters=1000):
+                 max_iters=1000, random_state=None):
         self.method = method
         self.mu = mu
         self.alpha = alpha
         self.decay = decay
         self.max_iters = 1000
+        self.random_state = random_state
 
     def _validate_args(self):
         methods = ("sgd", "lbfgs")
@@ -176,7 +183,8 @@ class LogisticRegression(object):
         # shuffle data
         n, k = data.shape
         idx = np.arange(n)
-        np.random.shuffle(idx)
+        state = check_random_state(self.random_state)
+        state.shuffle(idx)
         data = data[idx]
         labels = labels[idx]
 
