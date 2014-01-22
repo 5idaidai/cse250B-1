@@ -97,8 +97,8 @@ if __name__ == "__main__":
     data_test, labels_test = read_file('../1571/test.txt')
 
     # hyperparameters to try
-    mus = list(10 ** x for x in range(-5, 1))
-    alphas = [1]
+    mus = list(10 ** x for x in range(-2, 1))
+    alphas = list(10 ** x for x in range(-5, 3))
 
     sgd(mus, alphas, data, labels, data_train, labels_train,
         data_valid, labels_valid, data_test, labels_test)
