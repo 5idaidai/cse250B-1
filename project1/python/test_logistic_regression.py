@@ -6,6 +6,14 @@ from sklearn.metrics import accuracy_score
 
 import logistic_regression as lr
 
+
+def test_process_labels():
+    labels = [-1, 1, -1]
+    expected = np.array([0, 1, 0])
+    result = lr.preprocess_labels(labels)
+    assert expected == result
+
+
 def test_rlcl():
     data = [[40000, 0, 1],
             [1, 1, -40000]]
@@ -46,6 +54,7 @@ def test_logistic_regression():
 
     betas = lr.lr_sgd(data, labels)
     predictions = lr.predict(data, betas)
+
     score = accuracy_score(labels, predictions)
     assert (score > 0.9), "lr_sgd: Fail {}".format(score)
     if score > 0.9:
@@ -58,7 +67,6 @@ def test_logistic_regression():
     if score > 0.9:
         print "lr_lbfgs: Pass {}".format(score)
 
-	
 #testarr = range(6)
 #print sum(np.power(testarr,2))
 #print np.linalg.norm(testarr, ord=2)

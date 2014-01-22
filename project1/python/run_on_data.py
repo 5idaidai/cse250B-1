@@ -25,9 +25,15 @@ def read_file(filename):
     samples, labels = zip(*pairs)
     samples = np.array(samples)
     labels = np.array(labels)
+    samples = lr.preprocess_data(samples)
+    labels = lr.preprocess_labels(labels)
     return samples, labels
 
+<<<<<<< HEAD
 def sgd(mus, alphas, data, labels, data_train, labels_train, 
+=======
+def sgd(mus, alphas, data, labels, data_train, labels_train,
+>>>>>>> Changed label processing , fixed sigmoid
         data_valid, labels_valid, data_test, labels_test):
     print "starting grid search for SGD"
     validation_results = {}
@@ -38,8 +44,13 @@ def sgd(mus, alphas, data, labels, data_train, labels_train,
             prediction = lr.predict(data_valid, betas)
             score = accuracy_score(labels_valid, prediction)
             validation_results[(mu, alpha)] = score
+<<<<<<< HEAD
             print "  score: {}".format(score)
             print "  error rate: {}".format(1-score)
+=======
+            print " score: {}".format(score)
+            print " error rate: {}".format(1-score)
+>>>>>>> Changed label processing , fixed sigmoid
     
     print "evaluating on test set"
     
@@ -53,6 +64,7 @@ def sgd(mus, alphas, data, labels, data_train, labels_train,
     
     print "SGD test score: {}, error rate: {}".format(sgd_score, 1-sgd_score)
     
+<<<<<<< HEAD
 
 def lbfgs(mus, data, labels, data_train, labels_train, 
         data_valid, labels_valid, data_test, labels_test):
@@ -79,12 +91,36 @@ def lbfgs(mus, data, labels, data_train, labels_train,
     score = accuracy_score(labels_test, prediction)
     
     print "L-BFGS test score: {}, error rate: {}".format(score, 1-score)    
+=======
+>>>>>>> Changed label processing , fixed sigmoid
 
-# read data and split training data into training and validation sets
-data, labels = read_file('../1571/train.txt')
-data_train, data_valid, labels_train, labels_valid = \
-    train_test_split(data, labels, test_size=0.3)
+def lbfgs(mus, data, labels, data_train, labels_train,
+        data_valid, labels_valid, data_test, labels_test):
+    print "starting grid search for L-BFGS"
+    validation_results = {}
+    for mu in mus:
+        for alpha in alphas:
+            print "trying mu={} alpha={}".format(mu, alpha)
+            betas = lr.lr_lbfgs(data_train, labels_train, mu=mu)
+            prediction = lr.predict(data_valid, betas)
+            score = accuracy_score(labels_valid, prediction)
+            validation_results[(mu, alpha)] = score
+            print " score: {}".format(score)
+            print " error rate: {}".format(1-score)
+    
+    print "evaluating on test set"
+    
+    # get hyperparameters for highest accuracy on validation set
+    mu = max(validation_results, key=validation_results.get)
+    
+    # train on entire train set and predict on test set
+    betas = lr.lr_lbfgs(data, labels, mu=mu)
+    prediction = lr.predict(data_test, betas)
+    score = accuracy_score(labels_test, prediction)
+    
+    print "L-BFGS test score: {}, error rate: {}".format(score, 1-score)
 
+<<<<<<< HEAD
 data_test, labels_test = read_file('../1571/test.txt')
 
 # hyperparameters to try
@@ -93,3 +129,19 @@ alphas = [0.002]
 
 sgd(mus, alphas, data, labels, data_train, labels_train,
     data_valid, labels_valid, data_test, labels_test)
+=======
+if __name__ == "__main__":
+    # read data and split training data into training and validation sets
+    data, labels = read_file('/Users/sandicalhoun/cse250B/project1/1571/train.txt')
+    data_train, data_valid, labels_train, labels_valid = \
+        train_test_split(data, labels, test_size=0.3)
+    
+    data_test, labels_test = read_file('/Users/sandicalhoun/cse250B/project1/1571/test.txt')
+    
+    # hyperparameters to try
+    mus = list(10 ** x for x in range(-5, 1))
+    alphas = list(10 ** x for x in range(-5, 1))
+    
+    sgd(mus, alphas, data, labels, data_train, labels_train,
+        data_valid, labels_valid, data_test, labels_test)
+>>>>>>> Changed label processing , fixed sigmoid

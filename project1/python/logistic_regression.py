@@ -25,7 +25,7 @@ def preprocess_data(data):
     """Normalize and add intercept."""
     data = np.array(data)
     assert data.ndim == 2
-    data = add_intercept(normalize(data))
+    data = add_intercept(data)
     return data
 
 
@@ -51,22 +51,19 @@ def preprocess_labels(labels):
 ####################
 
 def _sigmoid(z):
-    if z < 0:
-        z = -np.log10(abs(z))
-    elif z > 0:
-        z = np.log10(abs(z))
-    return 1 / (1+np.exp(-z))
+    if z > 36:
+        return 1 - 1e-9
+    elif z < -709:
+        return 1e-9
+    else:
+        return 1 / (1+np.exp(-z))
+        
 
 def sigmoid(z):
     if not isinstance(z,collections.Iterable):
         return _sigmoid(z)
     else:
-        ret = np.zeros(z.shape)
-        cnt = 0
-        for n in np.nditer(z):
-            ret[cnt] = _sigmoid(n)
-            cnt = cnt + 1
-        return ret
+        return np.array(list(_sigmoid(n) for n in np.nditer(z)))
 
 
 def prob(y, x, betas):
@@ -75,6 +72,7 @@ def prob(y, x, betas):
     if y == 0:
         p = 1 - p
     if p == 0: # TODO: this is a hack
+        raise Exception('this should never happen')
         p = 1e-9
     return p
 
@@ -105,6 +103,7 @@ Step size of SGD is calculated as ``alpha / (epoch + 1)``.
 """
     # FIXME: needs better learning rate schedule
     # TODO: check for convergence during epoch
+
     data = preprocess_data(data)
     labels = preprocess_labels(labels)
 
@@ -118,10 +117,14 @@ Step size of SGD is calculated as ``alpha / (epoch + 1)``.
     betas = np.zeros(k)
     for epoch in range(max_iters):
         old = betas.copy()
-        lambda_ = alpha / (epoch + 1)
+        old_lcl = rlcl(data, labels, betas, mu)
+        lambda_ = alpha #/ (epoch + 1)
         for x, y in zip(data, labels):
             betas = update(betas, x, y, lambda_, mu)
-        if np.linalg.norm(betas - old, ord=2) < 1e-5:
+        new_lcl = rlcl(data, labels, betas, mu)
+        print old_lcl, new_lcl
+        if np.abs(new_lcl - old_lcl) < 1e-4:
+            print "Converged at epoch", epoch
             break # converged
     return betas
 
@@ -137,8 +140,8 @@ def lcl(data, labels, betas):
 
 def rlcl(data, labels, betas, mu):
     """regularized log conditional likelihood"""
-    return lcl(data, labels, betas) - mu * np.linalg.norm(betas[1:], ord=2)
-    #return lcl(data, labels, betas) - mu * sum(np.power(betas[1:], 2))
+    #return lcl(data, labels, betas) - mu * np.linalg.norm(betas[1:], ord=2)
+    return lcl(data, labels, betas) - mu * sum(np.power(betas[1:], 2))
 
 
 def lcl_prime(data, labels, betas):
@@ -169,8 +172,8 @@ def lr_lbfgs(data, labels, mu=1):
     result = fmin_l_bfgs_b(f, x0, fprime)
     print result[2]['warnflag'], result[2]['task'], result[2]['grad']
     return result[0]
-
-
+    
+    
 ##############
 # prediction #
 ##############
