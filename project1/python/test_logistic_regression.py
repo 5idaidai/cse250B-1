@@ -5,6 +5,7 @@ from scipy.optimize import check_grad
 
 from sklearn.datasets import make_blobs
 from sklearn.metrics import accuracy_score
+from sklearn.cross_validation import train_test_split
 
 import logistic_regression as lr
 
@@ -62,6 +63,14 @@ class TestLogisticRegression(unittest.TestCase):
         assert np.all(expected == result)
         assert old == (-1, 1)
 
+    def test_predicted_labels(self):
+        data = np.array([0, 0, 1, 1]).reshape([-1, 1])
+        labels = np.array([-1, -1, 1, 1])
+        model = lr.LogisticRegression()
+        model.fit(data, labels)
+        predictions = model.predict(data)
+        self.assertTrue(np.all(predictions == labels))
+
     def test_rlcl(self):
         data = [[40000, 0, 1],
                 [1, 1, -40000]]
@@ -77,23 +86,21 @@ class TestLogisticRegression(unittest.TestCase):
 
     def test_sgd(self):
         data, labels = make_blobs(n_features=5, centers=2)
-
-        # also ensure relabeling is working
-        labels = np.array(labels)
-        labels = np.where(labels == 1, 2, -2)
-
+        data_a, data_b, labels_a, labels_b = train_test_split(data, labels)
         model = lr.LogisticRegression(method="sgd")
-        model.fit(data, labels)
-        predictions = model.predict(data)
-        score = accuracy_score(labels, predictions)
+        model.fit(data_a, labels_a)
+        predictions = model.predict(data_b)
+        score = accuracy_score(labels_b, predictions)
         self.assertTrue(score > 0.9)
 
     def test_lbfgs(self):
         data, labels = make_blobs(n_features=5, centers=2)
+        data_a, data_b, labels_a, labels_b = train_test_split(data, labels)
         model = lr.LogisticRegression(method="lbfgs")
         model.fit(data, labels)
-        predictions = model.predict(data)
-        score = accuracy_score(labels, predictions)
+        model.fit(data_a, labels_a)
+        predictions = model.predict(data_b)
+        score = accuracy_score(labels_b, predictions)
         self.assertTrue(score > 0.9)
 
 
