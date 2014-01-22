@@ -30,7 +30,6 @@ def lcl(data, labels, betas):
 
 def rlcl(data, labels, betas, mu):
     """regularized log conditional likelihood"""
-    #return lcl(data, labels, betas) - mu * np.linalg.norm(betas[1:], ord=2)
     return lcl(data, labels, betas) - mu * sum(np.power(betas[1:], 2))
 
 
@@ -44,9 +43,8 @@ def lcl_prime(data, labels, betas):
 def rlcl_prime(data, labels, betas, mu):
     """gradient of rlcl"""
     grad = lcl_prime(data, labels, betas)
-    result = grad - 2 * mu * betas
-    result[0] = grad[0]  # do not regularize intercept
-    return result
+    grad[1:] = grad[1:] - 2 * mu * betas[1:]
+    return grad
 
 
 class LogisticRegression(object):
