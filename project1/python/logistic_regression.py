@@ -69,18 +69,23 @@ class LogisticRegression(object):
     mu: float
         Strength of regularization.
 
-    alpha:
-        Step size of SGD. Calculated as ``alpha / (epoch + 1)``.
+    alpha: float
+        Learning rate of SGD.
+
+    decay: float
+        After every epoch, ``alpha`` is reduced to ``decay * alpha``.
 
     max_iters:
         Maximum iterations of SGD.
 
     """
 
-    def __init__(self, method="sgd", mu=1, alpha=1, max_iters=1000):
+    def __init__(self, method="sgd", mu=0.1, alpha=0.1, decay=0.6,
+                 max_iters=1000):
         self.method = method
         self.mu = mu
         self.alpha = alpha
+        self.decay = decay
         self.max_iters = 1000
 
     def _validate_args(self):
@@ -95,6 +100,10 @@ class LogisticRegression(object):
         if self.alpha <= 0:
             raise Exception("invalid step schedule. alpha={},"
                             " but it should be > 0".format(self.alpha))
+
+        if self.decay <= 0 or self.decay > 1:
+            raise Exception("invalid decay: {}."
+                            " should be in (0, 1]".format(self.decay))
 
     def fit(self, X, labels):
         self._validate_args()
@@ -164,9 +173,6 @@ class LogisticRegression(object):
         return result
 
     def _sgd(self, data, labels):
-        # FIXME: needs better learning rate schedule
-        # TODO: check for convergence during epoch
-
         # shuffle data
         n, k = data.shape
         idx = np.arange(n)
@@ -185,7 +191,7 @@ class LogisticRegression(object):
             if np.abs(new_lcl - old_lcl) < 1e-8:
                 self.converged_ = True
                 break
-            lambda_ = lambda_ * 0.6
+            lambda_ = lambda_ * self.decay
         return betas
 
     def _lbfgs(self, data, labels):
