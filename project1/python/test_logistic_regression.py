@@ -8,18 +8,26 @@ import logistic_regression as lr
 
 def test_sigmoid():
     print "Testing sigmoid"
-    data = np.array(range(-50000,0,100))
-    data2 = np.array(range(0,50000,100))
+    data = np.array(range(-50000,0,10))
+    data2 = np.array(range(0,50000,10))
     
     negs = lr.sigmoid(data)
     pos = lr.sigmoid(data2)
     
-    assert negs.all() <= 0.5, "Wrong negs"
-    assert negs.all() > 0, "Wrong negs, less than 0"
-    assert pos.all() >= 0.5, "Wrong pos"
-    assert pos.all() < 1, "Wrong pos, greater than 1"
+    assert max(negs) <= 0.5, "Wrong negs"
+    assert min(negs) > 0, "Wrong negs, less than 0"
+    assert min(pos) >= 0.5, "Wrong pos"
+    assert max(pos) < 1, "Wrong pos, greater than 1"
 
     print "Sigmoid passed"
+
+
+def test_process_labels():
+    labels = [-1, 1, -1]
+    expected = np.array([0, 1, 0])
+    result = lr.preprocess_labels(labels)
+    assert expected == result
+
 
 def test_rlcl():
     print "Testing RLCL"
@@ -76,10 +84,11 @@ def test_lr():
     test_lr_lbfgs()
 
 def test_lr_sgd():
-    data, labels = make_blobs(n_features=100, centers=2)
+    data, labels = make_blobs(n_features=5, centers=2)
 
-    betas = lr.lr_sgd(data, labels)
+    betas = lr.lr_sgd(data, labels, 1, 0.2)
     predictions = lr.predict(data, betas)
+
     score = accuracy_score(labels, predictions)
     if score > 0.9:
         print "lr_sgd: Pass {}".format(score)
@@ -96,8 +105,6 @@ def test_lr_lbfgs():
         print "lr_lbfgs: Pass score={}".format(score)
     else:
         print "lr_lbfgs: Fail score={}".format(score)
-    print predictions
-    print labels
 
 test_sigmoid()
 test_rlcl()
