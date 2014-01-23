@@ -195,6 +195,9 @@ class LogisticRegression(object):
             print "converged after {} epochs".format(epoch)
         else:
             print "did not converge"
+
+        self.lcl_ = lcl(data, labels, betas)
+        self.rlcl_ = rlcl(data, labels, betas, self.mu)
         return betas
 
     def _lbfgs(self, data, labels):
@@ -203,4 +206,9 @@ class LogisticRegression(object):
         x0 = np.zeros(data.shape[1])
         result = fmin_l_bfgs_b(f, x0, fprime)
         print result[2]['warnflag'], result[2]['task']
-        return result[0]
+        betas = result[0]
+
+        self.lcl_ = lcl(data, labels, betas)
+        self.rlcl_ = rlcl(data, labels, betas, self.mu)
+
+        return betas
