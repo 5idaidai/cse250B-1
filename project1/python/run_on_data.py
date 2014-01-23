@@ -70,7 +70,7 @@ if __name__ == "__main__":
     # read data and split training data into training and validation sets
     data, labels = read_file('../1571/train.txt')
     data_train, data_valid, labels_train, labels_valid = \
-        train_test_split(data, labels, test_size=0.3)
+        train_test_split(data, labels, test_size=0.3, random_state=0)
 
     data_test, labels_test = read_file('../1571/test.txt')
 
