@@ -28,29 +28,30 @@ def read_file(filename):
     return samples, labels
 
 
-def sgd(mus, alphas, data, labels, data_train, labels_train,
+def sgd(mus, rates, decays, data, labels, data_train, labels_train,
         data_valid, labels_valid, data_test, labels_test):
     print "starting grid search for SGD"
     validation_results = {}
     for mu in mus:
-        for alpha in alphas:
-            print "trying mu={} alpha={}".format(mu, alpha)
-            model = LogisticRegression(method="sgd", mu=mu, alpha=alpha)
-            model.fit(data_train, labels_train)
-            prediction = model.predict(data_valid)
-            score = accuracy_score(labels_valid, prediction)
-            validation_results[(mu, alpha)] = score
-            print "  score: {}".format(score)
-            print "  error rate: {}".format(1 - score)
+        for rate in rates:
+            for decay in decays:
+                print "trying mu={} rate={} decay={}".format(mu, rate, decay)
+                model = LogisticRegression(method="sgd", mu=mu,
+                                           rate=rate, decay=decay)
+                model.fit(data_train, labels_train)
+                prediction = model.predict(data_valid)
+                score = accuracy_score(labels_valid, prediction)
+                validation_results[(mu, rate, decay)] = score
+                print "  score: {}".format(score)
+                print "  error rate: {}".format(1 - score)
 
     print "evaluating on test set"
     # get hyperparameters for highest accuracy on validation set
-    mu, alpha = max(validation_results, key=validation_results.get)
-
-    print "Using mu of {} and alpha of {}".format(mu, alpha)
+    mu, rate, decay = max(validation_results, key=validation_results.get)
+    print "Using mu={} rate={} decay={}".format(mu, rate, decay)
 
     # train on entire train set and predict on test set
-    model = LogisticRegression(method="sgd", mu=mu, alpha=alpha)
+    model = LogisticRegression(method="sgd", mu=mu, rate=rate, decay=decay)
     model.fit(data, labels)
     prediction = model.predict(data_test)
     sgd_score = accuracy_score(labels_test, prediction)
@@ -98,9 +99,10 @@ if __name__ == "__main__":
 
     # hyperparameters to try
     mus = list(10 ** x for x in range(-4, 1))
-    alphas = list(10 ** x for x in range(-3, 1))
+    rates = list(10 ** x for x in range(-3, 1))
+    decays = [0.3, 0.6, 0.9]
 
-    sgd(mus, alphas, data, labels, data_train, labels_train,
+    sgd(mus, rates, decays, data, labels, data_train, labels_train,
         data_valid, labels_valid, data_test, labels_test)
 
     lbfgs(mus, data, labels, data_train, labels_train,

@@ -58,11 +58,11 @@ class LogisticRegression(object):
     mu: float
         Strength of regularization.
 
-    alpha: float
+    rate: float
         Learning rate of SGD.
 
     decay: float
-        After every epoch, ``alpha`` is reduced to ``decay * alpha``.
+        After every epoch, ``rate`` is reduced to ``decay * rate``.
 
     max_iters: int
         Maximum iterations of SGD.
@@ -72,11 +72,11 @@ class LogisticRegression(object):
 
     """
 
-    def __init__(self, method="sgd", mu=0.1, alpha=0.1, decay=0.6,
+    def __init__(self, method="sgd", mu=0.1, rate=0.1, decay=0.6,
                  max_iters=1000, random_state=None):
         self.method = method
         self.mu = mu
-        self.alpha = alpha
+        self.rate = rate
         self.decay = decay
         self.max_iters = 1000
         self.random_state = random_state
@@ -90,9 +90,9 @@ class LogisticRegression(object):
             raise Exception("invalid regularization strength. mu={},"
                             " but it should be > 0".format(self.mu))
 
-        if self.alpha <= 0:
-            raise Exception("invalid step schedule. alpha={},"
-                            " but it should be > 0".format(self.alpha))
+        if self.rate <= 0:
+            raise Exception("invalid step schedule. rate={},"
+                            " but it should be > 0".format(self.rate))
 
         if self.decay <= 0 or self.decay > 1:
             raise Exception("invalid decay: {}."
@@ -162,12 +162,12 @@ class LogisticRegression(object):
         labels = np.where(labels == pos, 1, 0)
         return labels, (neg, pos)
 
-    def _sgd_update(self, betas, x, y, lambda_):
+    def _sgd_update(self, betas, x, y, rate):
         """single step in SGD"""
         p = np.exp(log_prob(1, np.dot(x, betas)))
-        result = betas + lambda_ * ((y - p) * x - 2 * self.mu * betas)
+        result = betas + rate * ((y - p) * x - 2 * self.mu * betas)
         # do not regularize intercept
-        result[0] = betas[0] + lambda_ * ((y - p) * x[0])
+        result[0] = betas[0] + rate * ((y - p) * x[0])
         return result
 
     def _sgd(self, data, labels):
@@ -180,17 +180,21 @@ class LogisticRegression(object):
         labels = labels[idx]
 
         betas = np.zeros(k)
-        lambda_ = self.alpha
+        rate = self.rate
         self.converged_ = False
         for epoch in range(self.max_iters):
             old_lcl = rlcl(data, labels, betas, self.mu)
             for i, (x, y) in enumerate(zip(data, labels)):
-                betas = self._sgd_update(betas, x, y, lambda_)
+                betas = self._sgd_update(betas, x, y, rate)
             new_lcl = rlcl(data, labels, betas, self.mu)
             if np.abs(new_lcl - old_lcl) < 1e-8:
                 self.converged_ = True
                 break
-            lambda_ = lambda_ * self.decay
+            rate = rate * self.decay
+        if self.converged_:
+            print "converged after {} epochs".format(epoch)
+        else:
+            print "did not converge"
         return betas
 
     def _lbfgs(self, data, labels):
