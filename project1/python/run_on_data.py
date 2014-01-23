@@ -14,7 +14,8 @@ def sgd(mus, rates, decays, data, labels, data_train, labels_train,
             for decay in decays:
                 print "trying mu={} rate={} decay={}".format(mu, rate, decay)
                 model = LogisticRegression(method="sgd", mu=mu,
-                                           rate=rate, decay=decay)
+                                           rate=rate, decay=decay,
+                                           random_state=0)
                 model.fit(data_train, labels_train)
                 prediction = model.predict(data_valid)
                 score = accuracy_score(labels_valid, prediction)
@@ -28,7 +29,8 @@ def sgd(mus, rates, decays, data, labels, data_train, labels_train,
     print "Using mu={} rate={} decay={}".format(mu, rate, decay)
 
     # train on entire train set and predict on test set
-    model = LogisticRegression(method="sgd", mu=mu, rate=rate, decay=decay)
+    model = LogisticRegression(method="sgd", mu=mu, rate=rate,
+                               decay=decay, random_state=0)
     model.fit(data, labels)
     prediction = model.predict(data_test)
     sgd_score = accuracy_score(labels_test, prediction)
