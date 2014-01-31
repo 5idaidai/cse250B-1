@@ -7,9 +7,6 @@ Created on Tue Jan 28 17:18:32 2014
 
 def writeFF(f, filename, j, a, b, A, B):
     ffunc = "def f{}(yi1, yi, x, i, n):\n".format(j)
-    
-    print "Digits",str(a).isdigit(), str(b).isdigit()
-    print "Alpha",str(a).isalpha(), str(b).isalpha()
 
     #print a & b differently depending on type: number, string, tag
     if isinstance(a, basestring):
@@ -18,7 +15,7 @@ def writeFF(f, filename, j, a, b, A, B):
         ffunc += "\ta = {2}.{1}(x, i, n, {0})\n".format(a,A.__name__,filename)
     
     if isinstance(b, basestring):
-        ffunc += "\tb = {2}.{1}(x, i, n, \"{0}\")\n".format(b,B.__name__,filename)
+        ffunc += "\tb = {2}.{1}(yi1, yi, \"{0}\")\n".format(b,B.__name__,filename)
     else:
         ffunc += "\tb = {2}.{1}(yi1, yi, {0})\n".format(b,B.__name__,filename)
     
