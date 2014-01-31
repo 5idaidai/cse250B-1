@@ -16,9 +16,16 @@ def importData():
     data, labels = read_file('training')
     data_train, data_valid, labels_train, labels_valid = \
         train_test_split(data, labels, test_size=0.3, random_state=0)
+        
+    assert data_train[0].size == labels_train[0].size
+    assert data_train[200].size == labels_train[200].size
 
-    test_data, test_labels = read_file('test')
-    return data_train, data_valid, test_data, labels_train, labels_valid, test_labels
+    data_test, labels_test = read_file('test')
+            
+    assert data_test[0].size == labels_test[0].size
+    assert data_test[200].size == labels_test[200].size    
+    
+    return data_train, data_valid, data_test, labels_train, labels_valid, labels_test
     
 
 """Feature Functions:

@@ -29,6 +29,11 @@ def testffA2(x, i, n, a):
 def testffB2(yi1, yi, b):
     return yi == b
 
+def testffA3(x, i, n, a):
+    return 1
+
+def testffB3(yi1, yi, b):
+    return yi == tags[7]
 
 if __name__ == "__main__":
     ffs = []
@@ -45,6 +50,13 @@ if __name__ == "__main__":
     temp2['bset'] = tags
     temp2['A'] = testffA2
     temp2['B'] = testffB2
+    ffs.append(temp2)
+    
+    temp3 = {}
+    temp3['aset'] = []
+    temp3['bset'] = []
+    temp3['A'] = testffA3
+    temp3['B'] = testffB3
     ffs.append(temp2)
     
     gFF.generateFFs(ffs, os.path.splitext(os.path.basename(__file__))[0])
