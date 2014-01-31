@@ -52,5 +52,7 @@ def generateFFs(templates,filename):
             else:
                 writeFF(f, filename, j, 0, 0, temp['A'], temp['B'])
                 j += 1
+                
+    f.write("\nnumJ={}\n".format(j))
         
     f.close()
