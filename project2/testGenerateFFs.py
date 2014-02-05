@@ -6,22 +6,13 @@ Created on Tue Jan 28 17:34:23 2014
 """
 
 import generateFFs as gFF
-
-tags = []
-tags.append("START")
-tags.append("STOP")
-tags.append("COMMA")
-tags.append("PERIOD")
-tags.append("QUESTION_MARK")
-tags.append("EXCLAMATION_POINT")
-tags.append("COLON")
-tags.append("SPACE")
+import tags
 
 def testffA1(x, i, n, a):
     return x[0] == 'W'
     
 def testffB1(yi1, yi, b):
-    return yi == tags[4]
+    return yi == tags.tags[4]
     
 def testffA2(x, i, n, a):
     return x[i][0].isupper()
@@ -33,7 +24,7 @@ def testffA3(x, i, n, a):
     return 1
 
 def testffB3(yi1, yi, b):
-    return yi == tags[7]
+    return yi == tags.tags[7]
 
 if __name__ == "__main__":
     ffs = []
@@ -47,7 +38,7 @@ if __name__ == "__main__":
     
     temp2 = {}
     temp2['aset'] = []
-    temp2['bset'] = tags
+    temp2['bset'] = tags.tags
     temp2['A'] = testffA2
     temp2['B'] = testffB2
     ffs.append(temp2)

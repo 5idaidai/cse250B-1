@@ -2,6 +2,7 @@ from __future__ import division
 
 import numpy as np
 import ffs
+import tags
 from scipy.optimize import fmin_l_bfgs_b
 from sklearn.utils.random import check_random_state
 
@@ -44,8 +45,8 @@ def rlcl_prime(data, labels, betas, mu):
     grad = lcl_prime(data, labels, betas)
     grad[1:] = grad[1:] - 2 * mu * betas[1:]
     return grad
-
-
+    
+    
 class LogisticRegression(object):
     """Logistic regression model with L2 regularization..
 
@@ -84,6 +85,7 @@ class LogisticRegression(object):
         self.betas = []
         self.Z = []
 
+
     def _validate_args(self):
         methods = ("sgd", "collins", "lbfgs")
         if self.method not in methods:
@@ -104,20 +106,20 @@ class LogisticRegression(object):
         if self.max_iters <= 0:
             raise Exception("invalid max_iters: {}".format(self.max_iters))
 
-    def fit(self, X, labels):
+    def fit(self, data, labels):
         self._validate_args()
 
         if self.method == "sgd" or self.method == "collins":
-            betas = self._sgd(X, labels)
+            betas = self._sgd(data, labels)
         else:
-            betas = self._lbfgs(X, labels)
+            betas = self._lbfgs(data, labels)
 
         self.intercept_ = betas[0]
         self.coefficients_ = betas[1:]
 
-    def predict(self, X):
+    def predict(self, data):
         self._validate_args()
-        XB = self.intercept_ + np.dot(X, self.coefficients_)
+        XB = self.intercept_ + np.dot(data, self.coefficients_)
         XB = XB.reshape(-1, 1)
         f = lambda z: log_prob(1, z)
         probs = np.exp(np.apply_along_axis(f, axis=1, arr=XB))
@@ -126,8 +128,6 @@ class LogisticRegression(object):
 
 
     def calcgis(self, ws, x, y):
-        #for i = 1 -> n (number of words)
-            #for each pair of yi-1 yi
         return []
 
 
