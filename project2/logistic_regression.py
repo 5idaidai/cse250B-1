@@ -72,7 +72,7 @@ class LogisticRegression(object):
 
     """
 
-    def __init__(self, method="sgd", mu=0.1, rate=0.1, decay=0.6,
+    def __init__(self, method="sgd", mu=0.1, rate=1, decay=1,
                  max_iters=1000, random_state=None):
         self.method = method
         self.mu = mu
@@ -80,9 +80,13 @@ class LogisticRegression(object):
         self.decay = decay
         self.max_iters = 1000
         self.random_state = random_state
+        self.gis = []
+        self.alphas = []
+        self.betas = []
+        self.Z = []
 
     def _validate_args(self):
-        methods = ("sgd", "lbfgs")
+        methods = ("sgd", "collins", "lbfgs")
         if self.method not in methods:
             raise Exception("method '{}' invalid. should be"
                             " one of {}".format(self.method, methods))
@@ -104,20 +108,7 @@ class LogisticRegression(object):
     def fit(self, X, labels):
         self._validate_args()
 
-        X = self._preprocess_data(X)
-        labels, old_labels = self._preprocess_labels(labels)
-        self.old_labels_ = old_labels
-
-        # normalize data
-        self.means_ = X.mean(axis=0)
-        self.stds_ = X.std(axis=0, ddof=1)
-        X = self._normalize_data(X)
-
-        # add intercept
-        ones = np.ones(X.shape[0]).reshape(-1, 1)
-        X = np.hstack((ones, X))
-
-        if self.method == "sgd":
+        if self.method == "sgd" or self.method == "collins":
             betas = self._sgd(X, labels)
         else:
             betas = self._lbfgs(X, labels)
@@ -127,8 +118,6 @@ class LogisticRegression(object):
 
     def predict(self, X):
         self._validate_args()
-        X = self._preprocess_data(X)
-        X = self._normalize_data(X)
         XB = self.intercept_ + np.dot(X, self.coefficients_)
         XB = XB.reshape(-1, 1)
         f = lambda z: log_prob(1, z)
@@ -136,38 +125,65 @@ class LogisticRegression(object):
         neg, pos = self.old_labels_
         return np.where(probs.ravel() >= 0.5, pos, neg)
 
-    @staticmethod
-    def _preprocess_data(data):
-        data = np.array(data)
-        assert data.ndim == 2
-        return data
 
-    def _normalize_data(self, data):
-        return (data - self.means_) / self.stds_
+    def calcgis(self, ws, x, y):
+        return []
 
-    @staticmethod
-    def _preprocess_labels(labels):
-        labels = np.array(labels)
-        assert labels.ndim <= 2
-        if labels.ndim == 2:
-            x, y = labels.shape
-            assert x == 1 or y == 1
-            labels = labels.ravel()
-        assert labels.ndim == 1
 
-        all_labels = set(labels)
-        assert len(all_labels) == 2
+    def calcalphas(self, ws, x, y):
+        return []
 
-        neg, pos = sorted(list(all_labels))
-        labels = np.where(labels == pos, 1, 0)
-        return labels, (neg, pos)
 
-    def _sgd_update(self, betas, x, y, rate):
+    def calcbetas(self, ws, x, y):
+        return []
+
+
+    def calcZ(self, ws, x, y):
+        return []
+
+
+    def _calcExpect(self, ws, x, y):
+        return 0
+
+
+    def _calcCollExp(self, ws, x, y):
+        return 0
+
+
+    def calcExpect(self, ws, x, y):
+        if self.method == "sgd":
+            return self._calcExpect(ws, x, y)
+        elif self.method == "collins":
+            return self._calcCollExp(ws, x, y)
+        else:
+            print "Incorrect method"
+            return -1
+
+
+    def _sgd_update(self, ws, x, y, rate):
         """single step in SGD"""
-        p = np.exp(log_prob(1, np.dot(x, betas)))
-        result = betas + rate * ((y - p) * x - 2 * self.mu * betas)
+        
+        #clear internal vars
+        self.gis = []
+        self.alphas = []
+        self.betas = []
+        self.Z = []
+        
+        #calculate gi matrices
+        self.gis = self.calcgis(ws, x, y)
+
+        #calculate forward(alpha) & backward(beta) vectors, and Z
+        self.alphas = self.calcalphas(ws, x, y)
+        self.betas = self.calcbetas(ws, x, y)
+        self.Z = self.calcZ(ws, x, y)
+
+        #compute expectation
+        expectation = self.calcExpect(ws, x, y)        
+        
+        p = np.exp(log_prob(1, np.dot(x, ws)))
+        result = ws + rate * ((y - p) * x - 2 * self.mu * ws)
         # do not regularize intercept
-        result[0] = betas[0] + rate * ((y - p) * x[0])
+        result[0] = ws[0] + rate * ((y - p) * x[0])
         return result
 
     def _sgd(self, data, labels):
