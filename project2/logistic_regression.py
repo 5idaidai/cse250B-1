@@ -84,6 +84,7 @@ class LogisticRegression(object):
         self.alphas = []
         self.betas = []
         self.Z = []
+        self.m = len(tags.tags)
 
 
     def _validate_args(self):
@@ -131,16 +132,47 @@ class LogisticRegression(object):
         return []
 
 
-    def calcalphas(self, ws, x, y):
-        return []
+    def calcalpha(self, k, v):
+        if k==0:
+            return tags.tags[v] == tags.tags[0]
+        else:
+            summ = 0
+            for u in range(0,self.m):
+                summ = summ + (self.alphas(k-1, u) * np.exp(self.gis(k)[u,v]))
+            return summ
 
 
-    def calcbetas(self, ws, x, y):
-        return []
+    def calcalphas(self, ws, x, y, n):
+        for k in range(0, n):
+            for v in range(0, self.m):
+                self.alphas(k,v) = self.calcalpha(k,v)
+        return
+        
+
+    def calcbeta(self, u, k, n):
+        if k==n:
+            return tags.tags[u] == tags.tags[1]
+        else:
+            summ = 0
+            for v in range(0,self.m):
+                summ = summ + (np.exp(self.gis(k+1)[u,v]) * self.betas(v, k+1, n))
+            return summ
 
 
-    def calcZ(self, ws, x, y):
-        return []
+    def calcbetas(self, ws, x, y, n):
+        for k in range(n,0,-1):
+            for u in range(0, self.m):
+                self.betas(u,k) = self.calcbeta(u,k,n)
+        return
+
+
+    def calcZ(self, ws, x, y, n):
+        zAlpha = sum(self.alphas(n,v) for v in range(0,self.m))
+        zBeta = self.betas(0,0)
+        
+        assert zAlpha == zBeta    
+        
+        return zBeta
 
 
     def _calcExpect(self, ws, x, y):
@@ -163,10 +195,11 @@ class LogisticRegression(object):
 
     def _sgd_update(self, ws, x, y, rate):
         """single step in SGD"""
+        n = len(x)
         
         #clear internal vars
         self.gis = []
-        self.alphas = []
+        self.alphas = np.zeros(n,self.m)
         self.betas = []
         self.Z = []
         
@@ -174,9 +207,9 @@ class LogisticRegression(object):
         self.gis = self.calcgis(ws, x, y)
 
         #calculate forward(alpha) & backward(beta) vectors, and Z
-        self.alphas = self.calcalphas(ws, x, y)
-        self.betas = self.calcbetas(ws, x, y)
-        self.Z = self.calcZ(ws, x, y)
+        self.calcalphas(ws, x, y, n)
+        self.calcbetas(ws, x, y, n)
+        self.Z = self.calcZ(ws, x, y, n)
 
         #compute expectation
         expectation = self.calcExpect(ws, x, y)        
