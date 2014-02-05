@@ -1,10 +1,9 @@
 from __future__ import division
 
 import numpy as np
+import ffs
 from scipy.optimize import fmin_l_bfgs_b
-
 from sklearn.utils.random import check_random_state
-
 
 def log_sum_exp(x):
     m = x.max()
@@ -186,23 +185,24 @@ class LogisticRegression(object):
         result[0] = ws[0] + rate * ((y - p) * x[0])
         return result
 
+
     def _sgd(self, data, labels):
         # shuffle data
-        n, k = data.shape
+        n = data.size
         idx = np.arange(n)
         state = check_random_state(self.random_state)
         state.shuffle(idx)
         data = data[idx]
         labels = labels[idx]
 
-        betas = np.zeros(k)
+        ws = np.zeros(ffs.numJ)
         rate = self.rate
         self.converged_ = False
         for epoch in range(self.max_iters):
-            old_lcl = rlcl(data, labels, betas, self.mu)
+            old_lcl = rlcl(data, labels, ws, self.mu)
             for i, (x, y) in enumerate(zip(data, labels)):
-                betas = self._sgd_update(betas, x, y, rate)
-            new_lcl = rlcl(data, labels, betas, self.mu)
+                betas = self._sgd_update(ws, x, y, rate)
+            new_lcl = rlcl(data, labels, ws, self.mu)
             if np.abs(new_lcl - old_lcl) < 1e-8:
                 self.converged_ = True
                 break
@@ -215,6 +215,7 @@ class LogisticRegression(object):
         self.lcl_ = lcl(data, labels, betas)
         self.rlcl_ = rlcl(data, labels, betas, self.mu)
         return betas
+
 
     def _lbfgs(self, data, labels):
         f = lambda b: -rlcl(data, labels, b, self.mu)
