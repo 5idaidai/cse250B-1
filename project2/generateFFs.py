@@ -23,6 +23,17 @@ def writeFF(f, filename, j, a, b, A, B):
     f.write(ffunc)
 
 
+def writeFFAccessor(f, j):
+    func = "\n\nfeatureFunc = {\n"
+    
+    for i in range(0,j):
+        func += "\t{0} : f{0},\n".format(i)
+    
+    func += "}\n"
+    
+    f.write(func)
+
+
 def generateFFs(templates,filename):
     """
     Input: list of FF templates
@@ -52,6 +63,8 @@ def generateFFs(templates,filename):
             else:
                 writeFF(f, filename, j, 0, 0, temp['A'], temp['B'])
                 j += 1
+                
+    writeFFAccessor(f, j)
                 
     f.write("\nnumJ={}\n".format(j))
         

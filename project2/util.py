@@ -1,5 +1,3 @@
-import numpy as np
-
 tags = []
 tags.append("START")
 tags.append("STOP")
