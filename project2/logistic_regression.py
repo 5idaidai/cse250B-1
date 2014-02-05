@@ -126,6 +126,8 @@ class LogisticRegression(object):
 
 
     def calcgis(self, ws, x, y):
+        #for i = 1 -> n (number of words)
+            #for each pair of yi-1 yi
         return []
 
 
@@ -188,7 +190,7 @@ class LogisticRegression(object):
 
     def _sgd(self, data, labels):
         # shuffle data
-        n = data.size
+        n = len(data)
         idx = np.arange(n)
         state = check_random_state(self.random_state)
         state.shuffle(idx)
