@@ -78,13 +78,13 @@ class LogisticRegression(object):
         self.mu = mu
         self.rate = rate
         self.decay = decay
-        self.max_iters = 1000
+        self.max_iters = max_iters
         self.random_state = random_state
-        self.gis = []
-        self.alphas = []
-        self.betas = []
-        self.Z = []
         self.m = len(tags.tags)
+        self.gis = []
+        self.alphas = np.zeros((self.m,self.m))
+        self.betas = np.zeros((self.m,self.m))
+        self.Z = 1
 
 
     def _validate_args(self):
@@ -115,8 +115,7 @@ class LogisticRegression(object):
         else:
             betas = self._lbfgs(data, labels)
 
-        self.intercept_ = betas[0]
-        self.coefficients_ = betas[1:]
+        self.coefficients_ = betas
 
     def predict(self, data):
         self._validate_args()
@@ -136,58 +135,79 @@ class LogisticRegression(object):
         if k==0:
             return tags.tags[v] == tags.tags[0]
         else:
-            summ = 0
-            for u in range(0,self.m):
-                summ = summ + (self.alphas(k-1, u) * np.exp(self.gis(k)[u,v]))
-            return summ
+            #summ = 0
+            #for u in range(0,self.m):
+            #    summ = summ + (self.alphas[k-1][u] * np.exp(self.gis[k][u][v]))
+            return sum((self.alphas[k-1][u] * np.exp(self.gis[k][u][v])) for u in range(0,self.m))
 
 
     def calcalphas(self, ws, x, y, n):
         for k in range(0, n):
             for v in range(0, self.m):
-                self.alphas(k,v) = self.calcalpha(k,v)
+                self.alphas[k][v] = self.calcalpha(k,v)
         return
         
 
     def calcbeta(self, u, k, n):
-        if k==n:
+        if k==n:#I(u==STOP)
             return tags.tags[u] == tags.tags[1]
         else:
-            summ = 0
-            for v in range(0,self.m):
-                summ = summ + (np.exp(self.gis(k+1)[u,v]) * self.betas(v, k+1, n))
-            return summ
+            #summ = 0
+            #for v in range(0,self.m):
+            #    summ = summ + (np.exp(self.gis[k+1][u][v]) * self.betas[v][k+1])
+            return sum((np.exp(self.gis[k+1][u][v]) * self.betas[v][k+1]) for v in range(0,self.m))
 
 
     def calcbetas(self, ws, x, y, n):
         for k in range(n,0,-1):
             for u in range(0, self.m):
-                self.betas(u,k) = self.calcbeta(u,k,n)
+                self.betas[u][k] = self.calcbeta(u,k,n)
         return
 
 
     def calcZ(self, ws, x, y, n):
-        zAlpha = sum(self.alphas(n,v) for v in range(0,self.m))
-        zBeta = self.betas(0,0)
+        zAlpha = sum(self.alphas[n][v] for v in range(0,self.m))
+        zBeta = self.betas[0][0]
+        #print self.betas
+        #print zAlpha, zBeta
+        #assert zAlpha == zBeta    
         
-        assert zAlpha == zBeta    
+        return zAlpha
         
-        return zBeta
+        
+    def calcF(self, j, x, y, n):
+        #summ = 0
+        #for i in range(1,n):
+        #    summ = summ + ffs.featureFunc[j](y[i-1], y[i], x, i, n)
+        return sum(ffs.featureFunc[j](y[i-1], y[i], x, i, n) for i in range(1,n))
 
 
-    def _calcExpect(self, ws, x, y):
-        return 0
+    def _calcSGDExpect(self, ws, x, y, n):
+        expect = np.zeros((len(ws)))
+        for j in range(0,len(ws)):
+            summ = 0
+            for i in range(0,n):
+                for yi1 in range(0, self.m):
+                    for yi in range(0, self.m):
+                        num = self.alphas[i-1][yi1] * np.exp(self.gis[i][yi1][yi]) * self.betas[yi][i]
+                        p = num / self.Z
+                        summ = summ + (ffs.featureFunc[j](tags.tags[yi1], tags.tags[yi], x, i, n) * p)
+            expect[j] = summ
+        return expect
 
 
-    def _calcCollExp(self, ws, x, y):
-        return 0
+    def _calcCollExp(self, ws, x, y, n):
+        expect = np.zeros((len(ws)))
+        for j in range(0, len(ws)):
+            expect[j] = self.calcF(j, x, y, n)
+        return expect
 
 
-    def calcExpect(self, ws, x, y):
+    def calcExpect(self, ws, x, y, n):
         if self.method == "sgd":
-            return self._calcExpect(ws, x, y)
+            return self._calcSGDExpect(ws, x, y, n)
         elif self.method == "collins":
-            return self._calcCollExp(ws, x, y)
+            return self._calcCollExp(ws, x, y, n)
         else:
             print "Incorrect method"
             return -1
@@ -199,25 +219,26 @@ class LogisticRegression(object):
         
         #clear internal vars
         self.gis = []
-        self.alphas = np.zeros(n,self.m)
-        self.betas = []
-        self.Z = []
+        self.alphas = np.zeros((n,self.m))
+        self.betas = np.zeros((self.m,n))
+        self.Z = 1
         
         #calculate gi matrices
-        self.gis = self.calcgis(ws, x, y)
+        self.gis = self.calcgis(ws, x, y, n)
 
         #calculate forward(alpha) & backward(beta) vectors, and Z
         self.calcalphas(ws, x, y, n)
-        self.calcbetas(ws, x, y, n)
-        self.Z = self.calcZ(ws, x, y, n)
+        self.calcbetas(ws, x, y, n-1)
+        self.Z = self.calcZ(ws, x, y, n-1)
 
         #compute expectation
-        expectation = self.calcExpect(ws, x, y)        
+        fval = self._calcCollExp(ws, x, y, n)
+        expectation = self.calcExpect(ws, x, y, n)        
         
-        p = np.exp(log_prob(1, np.dot(x, ws)))
-        result = ws + rate * ((y - p) * x - 2 * self.mu * ws)
+        #p = np.exp(log_prob(1, np.dot(x, ws)))
+        result = ws + rate * (fval - expectation)#- 2 * self.mu * ws)
         # do not regularize intercept
-        result[0] = ws[0] + rate * ((y - p) * x[0])
+        #result[0] = ws[0] + rate * ((y - p) * x[0])
         return result
 
 
@@ -234,22 +255,22 @@ class LogisticRegression(object):
         rate = self.rate
         self.converged_ = False
         for epoch in range(self.max_iters):
-            old_lcl = rlcl(data, labels, ws, self.mu)
+            #old_lcl = rlcl(data, labels, ws, self.mu)
             for i, (x, y) in enumerate(zip(data, labels)):
-                betas = self._sgd_update(ws, x, y, rate)
-            new_lcl = rlcl(data, labels, ws, self.mu)
-            if np.abs(new_lcl - old_lcl) < 1e-8:
-                self.converged_ = True
-                break
+                ws = self._sgd_update(ws, x, y, rate)
+            #new_lcl = rlcl(data, labels, ws, self.mu)
+            #if np.abs(new_lcl - old_lcl) < 1e-8:
+                #self.converged_ = True
+                #break
             rate = rate * self.decay
         if self.converged_:
             print "converged after {} epochs".format(epoch)
         else:
             print "did not converge"
 
-        self.lcl_ = lcl(data, labels, betas)
-        self.rlcl_ = rlcl(data, labels, betas, self.mu)
-        return betas
+        #self.lcl_ = lcl(data, labels, betas)
+        #self.rlcl_ = rlcl(data, labels, betas, self.mu)
+        return ws
 
 
     def _lbfgs(self, data, labels):
