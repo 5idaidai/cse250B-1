@@ -2,7 +2,7 @@ from __future__ import division
 
 import numpy as np
 import ffs
-from scipy.optimize import fmin_l_bfgs_b
+import tags
 from sklearn.utils.random import check_random_state
 
 def log_sum_exp(x):
@@ -128,7 +128,18 @@ class LogisticRegression(object):
     def calcgis(self, ws, x, y):
         #for i = 1 -> n (number of words)
             #for each pair of yi-1 yi
-        return []
+        n = len(x)
+        j = []
+        J = ffs.numJ
+        for i in range[n]:
+            gi = np.zeros(len(tags.tags))
+            for yi1 in range[len(tags.tags)]:
+                for yi in range[len(tags.tags)]:
+                    gi[yi1:yi:1]= sum(j)
+                    for ji in range[J]:
+                        j = ws * ffs.featureFunc[ji](tags.tags[yi1], tags.tags[yi], x, i, n)
+                        return j
+            return gi         
 
 
     def calcalphas(self, ws, x, y):
@@ -171,7 +182,7 @@ class LogisticRegression(object):
         self.Z = []
         
         #calculate gi matrices
-        self.gis = self.calcgis(ws, x, y)
+        self.gis = self.calcgis(ws, x)
 
         #calculate forward(alpha) & backward(beta) vectors, and Z
         self.alphas = self.calcalphas(ws, x, y)
@@ -218,16 +229,3 @@ class LogisticRegression(object):
         self.rlcl_ = rlcl(data, labels, betas, self.mu)
         return betas
 
-
-    def _lbfgs(self, data, labels):
-        f = lambda b: -rlcl(data, labels, b, self.mu)
-        fprime = lambda b: -rlcl_prime(data, labels, b, self.mu)
-        x0 = np.zeros(data.shape[1])
-        result = fmin_l_bfgs_b(f, x0, fprime)
-        print result[2]['warnflag'], result[2]['task']
-        betas = result[0]
-
-        self.lcl_ = lcl(data, labels, betas)
-        self.rlcl_ = rlcl(data, labels, betas, self.mu)
-
-        return betas
