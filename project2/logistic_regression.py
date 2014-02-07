@@ -128,7 +128,20 @@ class LogisticRegression(object):
 
 
     def calcgis(self, ws, x, y):
-        return []
+        #for i = 1 -> n (number of words)
+            #for each pair of yi-1 yi
+        n = len(x)
+        j = []
+        J = ffs.numJ
+        for i in range[n]:
+            gi = np.zeros(len(tags.tags))
+            for yi1 in range[len(tags.tags)]:
+                for yi in range[len(tags.tags)]:
+                    gi[yi1:yi:1]= sum(j)
+                    for ji in range[J]:
+                        j = ws * ffs.featureFunc[ji](tags.tags[yi1], tags.tags[yi], x, i, n)
+                        return j
+            return gi 
 
 
     def calcalpha(self, k, v):
