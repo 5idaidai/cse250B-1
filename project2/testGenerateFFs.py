@@ -4,7 +4,7 @@ Created on Tue Jan 28 17:34:23 2014
 
 @author: axydes
 """
-
+import os
 import generateFFs as gFF
 
 tags = []
