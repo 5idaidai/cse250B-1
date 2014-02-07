@@ -237,7 +237,6 @@ class LogisticRegression(object):
         self.Z = 1
         
         #calculate gi matrices
-        self.gis = self.calcgis(ws, x, y, n)
 
         #calculate forward(alpha) & backward(beta) vectors, and Z
         self.calcalphas(ws, x, y, n)
