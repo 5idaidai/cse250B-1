@@ -142,25 +142,76 @@ class LogisticRegression(object):
             return gi         
 
 
-    def calcalphas(self, ws, x, y):
-        return []
+  def calcalpha(self, k, v):
+        if k==0:
+            return tags.tags[v] == tags.tags[0]
+        else:
+            #summ = 0
+            #for u in range(0,self.m):
+            # summ = summ + (self.alphas[k-1][u] * np.exp(self.gis[k][u][v]))
+            return sum((self.alphas[k-1][u] * np.exp(self.gis[k][u][v])) for u in range(0,self.m))
 
 
-    def calcbetas(self, ws, x, y):
-        return []
+    def calcalphas(self, ws, x, y, n):
+        for k in range(0, n):
+            for v in range(0, self.m):
+                self.alphas[k][v] = self.calcalpha(k,v)
+        return
+        
+
+    def calcbeta(self, u, k, n):
+        if k==n:#I(u==STOP)
+            return tags.tags[u] == tags.tags[1]
+        else:
+            #summ = 0
+            #for v in range(0,self.m):
+            # summ = summ + (np.exp(self.gis[k+1][u][v]) * self.betas[v][k+1])
+            return sum((np.exp(self.gis[k+1][u][v]) * self.betas[v][k+1]) for v in range(0,self.m))
 
 
-    def calcZ(self, ws, x, y):
-        return []
+    def calcbetas(self, ws, x, y, n):
+        for k in range(n,0,-1):
+            for u in range(0, self.m):
+                self.betas[u][k] = self.calcbeta(u,k,n)
+        return
 
 
-    def _calcExpect(self, ws, x, y):
-        return 0
+    def calcZ(self, ws, x, y, n):
+        zAlpha = sum(self.alphas[n][v] for v in range(0,self.m))
+        zBeta = self.betas[0][0]
+        #print self.betas
+        #print zAlpha, zBeta
+        #assert zAlpha == zBeta
+        
+        return zAlpha
+        
+        
+    def calcF(self, j, x, y, n):
+        #summ = 0
+        #for i in range(1,n):
+        # summ = summ + ffs.featureFunc[j](y[i-1], y[i], x, i, n)
+        return sum(ffs.featureFunc[j](y[i-1], y[i], x, i, n) for i in range(1,n))
 
 
-    def _calcCollExp(self, ws, x, y):
-        return 0
+    def _calcSGDExpect(self, ws, x, y, n):
+        expect = np.zeros((len(ws)))
+        for j in range(0,len(ws)):
+            summ = 0
+            for i in range(0,n):
+                for yi1 in range(0, self.m):
+                    for yi in range(0, self.m):
+                        num = self.alphas[i-1][yi1] * np.exp(self.gis[i][yi1][yi]) * self.betas[yi][i]
+                        p = num / self.Z
+                        summ = summ + (ffs.featureFunc[j](tags.tags[yi1], tags.tags[yi], x, i, n) * p)
+            expect[j] = summ
+        return expect
 
+
+    def _calcCollExp(self, ws, x, y, n):
+        expect = np.zeros((len(ws)))
+        for j in range(0, len(ws)):
+            expect[j] = self.calcF(j, x, y, n)
+        return expect
 
     def calcExpect(self, ws, x, y):
         if self.method == "sgd":
