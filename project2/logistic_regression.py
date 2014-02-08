@@ -134,7 +134,7 @@ class LogisticRegression(object):
 
     def calcU(self, k, v):
         if k==0: #base case: return start tag
-            return max((self.gis[k][yk1][v]) for yk1 in range(self.m))
+            return self.gis[k][0][v]
         else:
             return max((self.U[k-1][yk1] + self.gis[k][yk1][v]) for yk1 in range(self.m))
 
@@ -173,13 +173,13 @@ class LogisticRegression(object):
             #compute gi
             self.gis.append(np.zeros((self.m,self.m)))
             #for each pair of yi-1 yi
-            for yi in range(0, self.m):
-                for yk in range(0, self.m):
+            for yi1 in range(0, self.m):
+                for yi in range(0, self.m):
                     summ = 0
                     #sum over all J feature functions
                     for j in self.S:#range(0, ffs.numJ):
-                        summ += ws[j] * ffs.featureFunc[j](tags.tags[yi], tags.tags[yk], x, i, n)
-                    self.gis[i][yi][yk] = summ
+                        summ += ws[j] * ffs.featureFunc[j](tags.tags[yi1], tags.tags[yi], x, i, n)
+                    self.gis[i][yi1][yi] = summ
         return self.gis
         
 
