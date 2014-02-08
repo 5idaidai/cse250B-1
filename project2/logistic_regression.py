@@ -116,17 +116,27 @@ class LogisticRegression(object):
 
         self.coefficients_ = betas
 
+
+    def calcYHat(self):
+        return []
+        
+
+    def calcU(self):
+        return []
+
+
     def predict(self, data):
         self._validate_args()
-        XB = self.intercept_ + np.dot(data, self.coefficients_)
-        XB = XB.reshape(-1, 1)
-        f = lambda z: log_prob(1, z)
-        probs = np.exp(np.apply_along_axis(f, axis=1, arr=XB))
-        neg, pos = self.old_labels_
-        return np.where(probs.ravel() >= 0.5, pos, neg)
+
+        predLabels = []        
+        for i in range(len(data)):
+            self.calcgis(self.coefficients_, data[i], len(data[i]))
+            U = self.calcU()
+            predLabels.append(self.calcYHat())
+        return predLabels
 
 
-    def calcgis(self, ws, x, y):
+    def calcgis(self, ws, x, n):
         #for i = 1 -> n (number of words)
             #for each pair of yi-1 yi
         n = len(x)
@@ -141,6 +151,7 @@ class LogisticRegression(object):
                         j = ws * ffs.featureFunc[ji](tags.tags[yi1], tags.tags[yi], x, i, n)
                         return j
             return gi
+        
 
     def calcalpha(self, k, v):
         if k==0:
@@ -149,6 +160,7 @@ class LogisticRegression(object):
             #summ = 0
             #for u in range(0,self.m):
             #    summ = summ + (self.alphas[k-1][u] * np.exp(self.gis[k][u][v]))
+            #return summ
             return sum((self.alphas[k-1][u] * np.exp(self.gis[k][u][v])) for u in range(0,self.m))
 
 
@@ -166,6 +178,7 @@ class LogisticRegression(object):
             #summ = 0
             #for v in range(0,self.m):
             #    summ = summ + (np.exp(self.gis[k+1][u][v]) * self.betas[v][k+1])
+            #return summ
             return sum((np.exp(self.gis[k+1][u][v]) * self.betas[v][k+1]) for v in range(0,self.m))
 
 
@@ -190,7 +203,7 @@ class LogisticRegression(object):
         #summ = 0
         #for i in range(1,n):
         #    summ = summ + ffs.featureFunc[j](y[i-1], y[i], x, i, n)
-        return sum(ffs.featureFunc[j](y[i-1], y[i], x, i, n) for i in range(1,n))
+        return sum(ffs.featureFunc[j](y[i-1], y[i], x, i, n) for i in range(0,n))
 
 
     def _calcSGDExpect(self, ws, x, y, n):
@@ -235,7 +248,7 @@ class LogisticRegression(object):
         self.Z = 1
         
         #calculate gi matrices
-        self.gis = self.calcgis(ws, x)
+        self.calcgis(ws, x, n)
 
         #calculate forward(alpha) & backward(beta) vectors, and Z
         self.calcalphas(ws, x, y, n)
