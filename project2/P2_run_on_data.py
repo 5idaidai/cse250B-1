@@ -64,7 +64,7 @@ if __name__ == "__main__":
     
     model = LogisticRegression(method="collins",max_iters=10)
     model.fit(data_train, labels_train)
-    #prediction = model.predict(data_valid)
+    prediction = model.predict(data_valid)
     #score = accuracy_score(labels_valid, prediction)
     #validation_results[(mu, rate, decay)] = score
     #print "  score: {}".format(score)

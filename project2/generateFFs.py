@@ -5,7 +5,13 @@ Created on Tue Jan 28 17:18:32 2014
 @author: axydes
 """
 
+aFuncs = []
+bFuncs = []
+
 def writeFF(f, filename, j, a, b, A, B):
+    aFuncs.append((A,a))
+    bFuncs.append((B,b))    
+    
     ffunc = "def f{}(yi1, yi, x, i, n):\n".format(j)
 
     #print a & b differently depending on type: number, string, tag
@@ -32,6 +38,36 @@ def writeFFAccessor(f, j):
     func += "}\n"
     
     f.write(func)
+    
+
+def writeAAccessor(f, filename):
+    func = "\n\naFunc = {\n"
+    
+    for i in range(0,len(aFuncs)):
+        func += "\t{0} : Func(func={1}.{2},val=".format(i,filename,aFuncs[i][0].__name__)
+        if isinstance(aFuncs[i][1], basestring):
+            func += "\"{}\"),\n".format(aFuncs[i][1])
+        else:
+            func += "{}),\n".format(aFuncs[i][1])
+            
+    func += "}\n"
+    
+    f.write(func)
+    
+    
+def writeBAccessor(f, filename):
+    func = "\n\nbFunc = {\n"
+    
+    for i in range(0,len(bFuncs)):
+        func += "\t{0} : Func(func={1}.{2},val=".format(i,filename,bFuncs[i][0].__name__)
+        if isinstance(bFuncs[i][1], basestring):
+            func += "\"{}\"),\n".format(bFuncs[i][1])
+        else:
+            func += "{}),\n".format(bFuncs[i][1])
+    
+    func += "}\n"
+    
+    f.write(func)
 
 
 def generateFFs(templates,filename):
@@ -43,6 +79,8 @@ def generateFFs(templates,filename):
     f=open('ffs.py', 'w')
     
     f.write("import {}\n\n".format(filename))
+    f.write("from collections import namedtuple\n")
+    f.write("Func = namedtuple(\"Func\", [\"func\", \"val\"])\n\n")
 
     j = 0
     for temp in templates:
@@ -64,6 +102,8 @@ def generateFFs(templates,filename):
                 writeFF(f, filename, j, 0, 0, temp['A'], temp['B'])
                 j += 1
                 
+    writeAAccessor(f, filename)
+    writeBAccessor(f, filename)
     writeFFAccessor(f, j)
                 
     f.write("\nnumJ={}\n".format(j))

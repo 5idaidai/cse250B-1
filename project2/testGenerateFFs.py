@@ -10,13 +10,13 @@ import generateFFs as gFF
 import tags
 
 def testffA1(x, i, n, a):
-    return x[0] == 'W'
+    return x[1][0] == 'W'
     
 def testffB1(yi1, yi, b):
     return yi == tags.tags[4]
     
 def testffA2(x, i, n, a):
-    return x[i][0].isupper()
+    return len(x) > i and len(x[i])>0 and x[i][0].isupper()
     
 def testffB2(yi1, yi, b):
     return yi == b

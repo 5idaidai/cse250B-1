@@ -117,12 +117,34 @@ class LogisticRegression(object):
         self.coefficients_ = betas
 
 
-    def calcYHat(self):
-        return []
+    def calcYHat(self, x):
+        end = len(x)-2
+        yhat = ['']*len(x)
+        yhat[0] = tags.tags[0]
+        yhat[end+1] = tags.tags[1]
+        
+        #last tag:
+        yhat[end] = tags.tags[np.argmax(self.U[end])]
+        
+        for u in range(end,0,-1):
+            yhat[u] = tags.tags[np.argmax(self.U[u])]
+        
+        return yhat
         
 
-    def calcU(self):
-        return []
+    def calcU(self, k, v):
+        if k==0: #base case: return start tag
+            return max((self.gis[k][yk1][v]) for yk1 in range(self.m))
+        else:
+            return max((self.U[k-1][yk1] + self.gis[k][yk1][v]) for yk1 in range(self.m))
+
+
+    def calcUMat(self, n):
+        self.U = np.zeros((n, self.m))
+        for k in range(n):
+            for v in range(self.m):
+                self.U[k][v] = self.calcU(k, v)
+        return self.U
 
 
     def predict(self, data):
@@ -130,27 +152,35 @@ class LogisticRegression(object):
 
         predLabels = []        
         for i in range(len(data)):
-            self.calcgis(self.coefficients_, data[i], len(data[i]))
-            U = self.calcU()
-            predLabels.append(self.calcYHat())
+            x = data[i]
+            n = len(x)
+            self.calcgis(self.coefficients_, x, n)
+            self.calcUMat(n)
+            predLabels.append(self.calcYHat(x))
         return predLabels
+        
+        
+    def calcS(self, ws, x, n):
+        for j in range(ffs.numJ):
+            if ffs.aFunc[j].func(x,1,n,ffs.aFunc[j].val) !=0:
+                self.S.append(j)
+        return self.S
 
 
     def calcgis(self, ws, x, n):
         #for i = 1 -> n (number of words)
+        for i in range(0, n):
+            #compute gi
+            self.gis.append(np.zeros((self.m,self.m)))
             #for each pair of yi-1 yi
-        n = len(x)
-        j = []
-        J = ffs.numJ
-        for i in range[n]:
-            gi = np.zeros(len(tags.tags))
-            for yi1 in range[len(tags.tags)]:
-                for yi in range[len(tags.tags)]:
-                    gi[yi1:yi:1]= sum(j)
-                    for ji in range[J]:
-                        j = ws * ffs.featureFunc[ji](tags.tags[yi1], tags.tags[yi], x, i, n)
-                        return j
-            return gi
+            for yi in range(0, self.m):
+                for yk in range(0, self.m):
+                    summ = 0
+                    #sum over all J feature functions
+                    for j in self.S:#range(0, ffs.numJ):
+                        summ += ws[j] * ffs.featureFunc[j](tags.tags[yi], tags.tags[yk], x, i, n)
+                    self.gis[i][yi][yk] = summ
+        return self.gis
         
 
     def calcalpha(self, k, v):
@@ -208,7 +238,7 @@ class LogisticRegression(object):
 
     def _calcSGDExpect(self, ws, x, y, n):
         expect = np.zeros((len(ws)))
-        for j in range(0,len(ws)):
+        for j in self.S:#range(0,len(ws)):
             summ = 0
             for i in range(0,n):
                 for yi1 in range(0, self.m):
@@ -242,10 +272,15 @@ class LogisticRegression(object):
         n = len(x)
         
         #clear internal vars
+        self.S = []
         self.gis = []
         self.alphas = np.zeros((n,self.m))
         self.betas = np.zeros((self.m,n))
         self.Z = 1
+        
+        #calculate S set (set of feature functions that aren't 0)
+        self.calcS(ws, x, n)
+        #print len(self.S),self.S
         
         #calculate gi matrices
         self.calcgis(ws, x, n)
