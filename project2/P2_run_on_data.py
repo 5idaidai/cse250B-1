@@ -1,4 +1,3 @@
-from sklearn.cross_validation import train_test_split
 from sklearn.metrics import accuracy_score
 from util import read_file
 from logistic_regression import LogisticRegression
@@ -13,9 +12,7 @@ from logistic_regression import LogisticRegression
 
 def importData():
     # read data and split training data into training and validation sets
-    data, labels = read_file('short')
-    data_train, data_valid, labels_train, labels_valid = \
-        train_test_split(data, labels, test_size=0.3, random_state=0)
+    data_train, labels_train = read_file('short')
         
     #assert len(data_train[0]) == len(labels_train[0])
     #assert len(data_train[200]) == len(labels_train[200])
@@ -25,7 +22,7 @@ def importData():
     #assert len(data_test[0]) == len(data_test[0])
     #assert len(data_test[200]) == len(data_test[200])    
     
-    return data_train, data_valid, data_test, labels_train, labels_valid, labels_test
+    return data_train, data_test, labels_train, labels_test
     
 
 """Feature Functions:
@@ -60,12 +57,12 @@ def importData():
 """
 
 if __name__ == "__main__":
-    data_train, data_valid, data_test, labels_train, labels_valid, labels_test = importData()
+    data_train, data_test, labels_train, labels_test = importData()
     
-    model = LogisticRegression(method="collins",max_iters=10)
+    model = LogisticRegression(method="collins",max_iters=1000)
     model.fit(data_train, labels_train)
-    prediction = model.predict(data_valid)
-    #score = accuracy_score(labels_valid, prediction)
+    prediction = model.predict(data_test)
+    #score = accuracy_score(labels_test, prediction)
     #validation_results[(mu, rate, decay)] = score
     #print "  score: {}".format(score)
     #print "  error rate: {}".format(1 - score)

@@ -4,6 +4,8 @@ import numpy as np
 import ffs
 import tags
 from sklearn.utils.random import check_random_state
+from sklearn.cross_validation import train_test_split
+from sklearn.metrics import accuracy_score
 
 def log_sum_exp(x):
     m = x.max()
@@ -111,9 +113,7 @@ class LogisticRegression(object):
 
         if self.method == "sgd" or self.method == "collins":
             betas = self._sgd(data, labels)
-        else:
-            betas = self._lbfgs(data, labels)
-
+            
         self.coefficients_ = betas
 
 
@@ -154,7 +154,7 @@ class LogisticRegression(object):
         for i in range(len(data)):
             x = data[i]
             n = len(x)
-            self.calcgis(self.coefficients_, x, n)
+            self.calcgis(self.ws, x, n)
             self.calcUMat(n)
             predLabels.append(self.calcYHat(x))
         return predLabels
@@ -302,26 +302,33 @@ class LogisticRegression(object):
 
 
     def _sgd(self, data, labels):
+        #split off validation set
+        data_train, data_valid, labels_train, labels_valid = \
+            train_test_split(data, labels, test_size=0.3, random_state=0)        
+        
         # shuffle data
-        n = len(data)
+        n = len(data_train)
         idx = np.arange(n)
         state = check_random_state(self.random_state)
         state.shuffle(idx)
-        data = data[idx]
-        labels = labels[idx]
+        data_train = data_train[idx]
+        labels_train = labels_train[idx]
 
         ws = np.zeros(ffs.numJ)
         rate = self.rate
         self.converged_ = False
+        old_score = 0
         for epoch in range(self.max_iters):
-            #old_lcl = rlcl(data, labels, ws, self.mu)
-            for i, (x, y) in enumerate(zip(data, labels)):
+            for i, (x, y) in enumerate(zip(data_train, labels_train)):
                 ws = self._sgd_update(ws, x, y, rate)
-            #new_lcl = rlcl(data, labels, ws, self.mu)
-            #if np.abs(new_lcl - old_lcl) < 1e-8:
-                #self.converged_ = True
-                #break
+            self.ws = ws
+            prediction = self.predict(data_valid)
+            score = accuracy_score(labels_valid, prediction)
+            if score > 0 and np.abs(score - old_score) < 1e-8:
+                self.converged_ = True
+                break
             rate = rate * self.decay
+            old_score = score
         if self.converged_:
             print "converged after {} epochs".format(epoch)
         else:
