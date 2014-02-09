@@ -36,14 +36,14 @@ if __name__ == "__main__":
     temp1['bset'] = []
     temp1['A'] = testffA1
     temp1['B'] = testffB1
-    ffs.append(temp1)
+    #ffs.append(temp1)
     
     temp2 = {}
     temp2['aset'] = []
     temp2['bset'] = tags.tags
     temp2['A'] = testffA2
     temp2['B'] = testffB2
-    ffs.append(temp2)
+    #ffs.append(temp2)
     
     temp3 = {}
     temp3['aset'] = []
