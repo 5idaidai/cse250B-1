@@ -76,8 +76,11 @@ class LogisticRegression(object):
     @staticmethod      
     def log_sum_exp(x):
         m = x.max()
-        x = x - m
-        return m + np.log(np.exp(x).sum())
+        newx=[]
+        for xval in x:
+            if xval != float("-inf"):
+                newx.append(xval - m)
+        return m + np.log(np.exp(newx).sum())
     
     @staticmethod
     def preproclabels(labels):
@@ -186,12 +189,10 @@ class LogisticRegression(object):
         if k==0:
             return tags.tags[v] == tags.tags[tags.start]
         else:
-            #summ = 0
-            #for u in range(0,self.m):
-            #    summ = summ + (self.alphas[k-1][u] * np.exp(self.gis[k][u][v]))
-            #return summ
-            return sum((self.alphas[k-1][u] * np.exp(self.gis[k][u][v])) for u in xrange(self.m))
-
+            alph = self.alphas[k-1]
+            gi = self.gis[k][:,v]
+            temp = gi + alph
+            return self.log_sum_exp(temp)
 
     def calcalphas(self, ws, x, y, n):
         for k in xrange(n):
@@ -204,11 +205,11 @@ class LogisticRegression(object):
         if k==n:#I(u==STOP)
             return tags.tags[u] == tags.tags[tags.stop]
         else:
-            #summ = 0
-            #for v in range(0,self.m):
-            #    summ = summ + (np.exp(self.gis[k+1][u][v]) * self.betas[v][k+1])
-            #return summ
-            return sum((np.exp(self.gis[k+1][u][v]) * self.betas[v][k+1]) for v in xrange(self.m))
+            bet = self.betas[:,k-1]
+            gi = self.gis[k+1][u]
+            temp = gi + bet
+            return self.log_sum_exp(temp)
+            return sum((np.exp(self.gis[k+1][u]) * self.betas[:,k+1]))
 
 
     def calcbetas(self, ws, x, y, n):
@@ -242,8 +243,8 @@ class LogisticRegression(object):
             for i in xrange(n):
                 for yi1 in xrange(self.m):
                     for yi in xrange(self.m):
-                        num = self.alphas[i-1][yi1] * np.exp(self.gis[i][yi1][yi]) * self.betas[yi][i]
-                        p = num / self.Z
+                        num = self.alphas[i-1][yi1] + self.gis[i][yi1][yi] + self.betas[yi][i]
+                        p = self.log_sum_exp(num) / self.Z
                         summ = summ + (ffs.featureFunc[j](tags.tags[yi1], tags.tags[yi], x, i, n) * p)
             expect[j] = summ
         return expect

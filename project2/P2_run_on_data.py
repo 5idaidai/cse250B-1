@@ -59,7 +59,7 @@ def importData():
 
 if __name__ == "__main__":
     data_train, data_test, labels_train, labels_test = importData()
-    labels_test=LogisticRegression.preproclabels(labels_test)
+    #labels_test=LogisticRegression.preproclabels(labels_test)
     
     print datetime.now().time()
     model = LogisticRegression(method="collins",max_iters=100)
