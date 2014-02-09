@@ -209,7 +209,6 @@ class LogisticRegression(object):
             gi = self.gis[k+1][u]
             temp = gi + bet
             return self.log_sum_exp(temp)
-            return sum((np.exp(self.gis[k+1][u]) * self.betas[:,k+1]))
 
 
     def calcbetas(self, ws, x, y, n):
