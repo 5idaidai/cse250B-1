@@ -13,7 +13,7 @@ from datetime import datetime
 
 def importData():
     # read data and split training data into training and validation sets
-    data_train, labels_train = read_file('short')
+    data_train, labels_train = read_file('sample')
         
     #assert len(data_train[0]) == len(labels_train[0])
     #assert len(data_train[200]) == len(labels_train[200])
@@ -59,12 +59,14 @@ def importData():
 
 if __name__ == "__main__":
     data_train, data_test, labels_train, labels_test = importData()
+    labels_test=LogisticRegression.preproclabels(labels_test)
     
     print datetime.now().time()
     model = LogisticRegression(method="collins",max_iters=100)
     model.fit(data_train, labels_train)
     print datetime.now().time()
     prediction = model.predict(data_train)
+    labels_train=LogisticRegression.preproclabels(labels_train)
     score = accuracy_score(labels_train, prediction)
 #    prediction = model.predict(data_test)
 #    score = accuracy_score(labels_test, prediction)

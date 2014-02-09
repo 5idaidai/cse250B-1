@@ -26,7 +26,7 @@ def testffA3(x, i, n, a):
 
 #test case: last tag is a period
 def testffB3(yi1, yi, b):
-    return yi == tags.tags[tags.stop] and yi1 == tags.tags[3]
+    return yi == tags.tags[tags.stop] and yi1 == tags.tags[2]
 
 if __name__ == "__main__":
     ffs = []

@@ -72,6 +72,28 @@ class LogisticRegression(object):
 
         if self.max_iters <= 0:
             raise Exception("invalid max_iters: {}".format(self.max_iters))
+      
+    @staticmethod      
+    def log_sum_exp(x):
+        m = x.max()
+        x = x - m
+        return m + np.log(np.exp(x).sum())
+    
+    @staticmethod
+    def preproclabels(labels):
+        newlabels = []
+        
+        i=0
+        for y in labels:
+            newy = []
+            for tag in y:
+                for ot in xrange(len(tags.tags)):
+                    if tags.tags[ot] == tag:
+                        newy.append(ot)
+                        break
+            newlabels.append(newy)
+        
+        return newlabels
 
     def fit(self, data, labels):
         self._validate_args()
@@ -99,7 +121,7 @@ class LogisticRegression(object):
             yhat[k] = temp
             pred[k] = tags.tags[yhat[k]]
         
-        return pred
+        return yhat
         
 
     def calcU(self, k, v):
@@ -120,8 +142,8 @@ class LogisticRegression(object):
     def predict(self, data):
         self._validate_args()
 
-        predLabels = []
         ld=len(data)
+        predLabels = []
         for i in xrange(ld):
             x = data[i]
             n = len(x)
@@ -294,6 +316,7 @@ class LogisticRegression(object):
         state.shuffle(idx)
         data_train = data_train[idx]
         labels_train = labels_train[idx]
+        labels_valid=self.preproclabels(labels_valid)
 
         self.ws = np.zeros(ffs.numJ)
         rate = self.rate
