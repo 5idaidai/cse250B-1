@@ -130,7 +130,8 @@ class LogisticRegression(object):
         pred[end] = tags.tags[yhat[end]]
         
         for k in xrange(end-1,-1,-1):
-            yhat[k] = np.argmax((self.U[k][u] + self.gis[k+1][u][yhat[k+1]]) for u in xrange(self.m))
+            temp = np.argmax((self.U[k][u] + self.gis[k+1][u][yhat[k+1]]) for u in xrange(self.m))
+            yhat[k] = temp
             pred[k] = tags.tags[yhat[k]]
         
         return pred

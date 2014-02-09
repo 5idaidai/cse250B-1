@@ -7,13 +7,13 @@ Created on Tue Feb 04 17:52:07 2014
 
 tags = []
 tags.append("START")
-tags.append("STOP")
 tags.append("COMMA")
 tags.append("PERIOD")
 tags.append("QUESTION_MARK")
 tags.append("EXCLAMATION_POINT")
 tags.append("COLON")
 tags.append("SPACE")
+tags.append("STOP")
 
 start=0
-stop=1
+stop=len(tags)-1
