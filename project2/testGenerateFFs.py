@@ -16,7 +16,7 @@ def testffB1(yi1, yi, b):
     return yi == tags.tags[4]
     
 def testffA2(x, i, n, a):
-    return len(x) > i and len(x[i])>0 and x[i][0].isupper()
+    return i>0 and i<n-1 and x[i][0].isupper()
     
 def testffB2(yi1, yi, b):
     return yi == b
@@ -26,7 +26,7 @@ def testffA3(x, i, n, a):
 
 #test case: last tag is a period
 def testffB3(yi1, yi, b):
-    return yi == tags.tags[1] and yi1 == tags.tags[3]
+    return yi == tags.tags[tags.stop] and yi1 == tags.tags[3]
 
 if __name__ == "__main__":
     ffs = []
@@ -36,14 +36,14 @@ if __name__ == "__main__":
     temp1['bset'] = []
     temp1['A'] = testffA1
     temp1['B'] = testffB1
-    #ffs.append(temp1)
+    ffs.append(temp1)
     
     temp2 = {}
     temp2['aset'] = []
     temp2['bset'] = tags.tags
     temp2['A'] = testffA2
     temp2['B'] = testffB2
-    #ffs.append(temp2)
+    ffs.append(temp2)
     
     temp3 = {}
     temp3['aset'] = []

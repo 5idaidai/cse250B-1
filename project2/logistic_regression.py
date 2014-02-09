@@ -6,6 +6,7 @@ import tags
 from sklearn.utils.random import check_random_state
 from sklearn.cross_validation import train_test_split
 from sklearn.metrics import accuracy_score
+from datetime import datetime
 
 def log_sum_exp(x):
     m = x.max()
@@ -118,31 +119,34 @@ class LogisticRegression(object):
 
 
     def calcYHat(self, x):
-        end = len(x)-2
+        end = len(x)-1
         yhat = ['']*len(x)
-        yhat[0] = tags.tags[0]
-        yhat[end+1] = tags.tags[1]
+        pred = ['']*len(x)
+#        yhat[0] = tags.tags[tags.start]
+#        yhat[end+1] = tags.tags[tags.stop]
         
         #last tag:
-        yhat[end] = tags.tags[np.argmax(self.U[end])]
+        yhat[end] = np.argmax(self.U[end])
+        pred[end] = tags.tags[yhat[end]]
         
-        for u in range(end,0,-1):
-            yhat[u] = tags.tags[np.argmax(self.U[u])]
+        for k in xrange(end-1,-1,-1):
+            yhat[k] = np.argmax((self.U[k][u] + self.gis[k+1][u][yhat[k+1]]) for u in xrange(self.m))
+            pred[k] = tags.tags[yhat[k]]
         
-        return yhat
+        return pred
         
 
     def calcU(self, k, v):
         if k==0: #base case: return start tag
-            return self.gis[k][0][v]
+            return self.gis[k][tags.start][v]
         else:
-            return max((self.U[k-1][yk1] + self.gis[k][yk1][v]) for yk1 in range(self.m))
+            return max((self.U[k-1][u] + self.gis[k][u][v]) for u in xrange(self.m))
 
 
     def calcUMat(self, n):
         self.U = np.zeros((n, self.m))
-        for k in range(n):
-            for v in range(self.m):
+        for k in xrange(n):
+            for v in xrange(self.m):
                 self.U[k][v] = self.calcU(k, v)
         return self.U
 
@@ -150,8 +154,9 @@ class LogisticRegression(object):
     def predict(self, data):
         self._validate_args()
 
-        predLabels = []        
-        for i in range(len(data)):
+        predLabels = []
+        ld=len(data)
+        for i in xrange(ld):
             x = data[i]
             n = len(x)
             self.calcgis(self.ws, x, n)
@@ -161,66 +166,74 @@ class LogisticRegression(object):
         
         
     def calcS(self, ws, x, n):
-        for j in range(ffs.numJ):
+        tempS = []
+        for j in xrange(ffs.numJ):
             if ffs.aFunc[j].func(x,1,n,ffs.aFunc[j].val) !=0:
-                self.S.append(j)
+                tempS.append(j)
+        self.S = np.array(tempS)
         return self.S
 
+    def sumFFs(self, ws, i, yi1, yi, x, n):
+        summ = 0
+        #um over all J feature functions
+        for j in self.S:#range(0, ffs.numJ):
+            summ += ws[j] * ffs.featureFunc[j](tags.tags[yi1], tags.tags[yi], x, i, n)
+        return summ
+        #return sum((ws[j] * ffs.featureFunc[j](tags.tags[yi1], tags.tags[yi], x, i, n)) for j in self.S)
 
     def calcgis(self, ws, x, n):
+        #print "CalcGis start",datetime.now().time()
         #for i = 1 -> n (number of words)
-        for i in range(0, n):
+        self.gis = np.zeros((n,self.m,self.m))
+        for i in xrange(n):
             #compute gi
-            self.gis.append(np.zeros((self.m,self.m)))
+            #self.gis.append(np.zeros((self.m,self.m)))
             #for each pair of yi-1 yi
-            for yi1 in range(0, self.m):
-                for yi in range(0, self.m):
-                    summ = 0
-                    #sum over all J feature functions
-                    for j in self.S:#range(0, ffs.numJ):
-                        summ += ws[j] * ffs.featureFunc[j](tags.tags[yi1], tags.tags[yi], x, i, n)
-                    self.gis[i][yi1][yi] = summ
+            for yi1 in xrange(self.m):
+                for yi in xrange(self.m):                    
+                    self.gis[i][yi1][yi] = self.sumFFs(ws, i, yi1, yi, x, n)
+        #print "CalcGis stop",datetime.now().time()                    
         return self.gis
         
 
     def calcalpha(self, k, v):
         if k==0:
-            return tags.tags[v] == tags.tags[0]
+            return tags.tags[v] == tags.tags[tags.start]
         else:
             #summ = 0
             #for u in range(0,self.m):
             #    summ = summ + (self.alphas[k-1][u] * np.exp(self.gis[k][u][v]))
             #return summ
-            return sum((self.alphas[k-1][u] * np.exp(self.gis[k][u][v])) for u in range(0,self.m))
+            return sum((self.alphas[k-1][u] * np.exp(self.gis[k][u][v])) for u in xrange(self.m))
 
 
     def calcalphas(self, ws, x, y, n):
-        for k in range(0, n):
-            for v in range(0, self.m):
+        for k in xrange(n):
+            for v in xrange(self.m):
                 self.alphas[k][v] = self.calcalpha(k,v)
         return
         
 
     def calcbeta(self, u, k, n):
         if k==n:#I(u==STOP)
-            return tags.tags[u] == tags.tags[1]
+            return tags.tags[u] == tags.tags[tags.stop]
         else:
             #summ = 0
             #for v in range(0,self.m):
             #    summ = summ + (np.exp(self.gis[k+1][u][v]) * self.betas[v][k+1])
             #return summ
-            return sum((np.exp(self.gis[k+1][u][v]) * self.betas[v][k+1]) for v in range(0,self.m))
+            return sum((np.exp(self.gis[k+1][u][v]) * self.betas[v][k+1]) for v in xrange(self.m))
 
 
     def calcbetas(self, ws, x, y, n):
-        for k in range(n,0,-1):
-            for u in range(0, self.m):
+        for k in xrange(n,0,-1):
+            for u in xrange(self.m):
                 self.betas[u][k] = self.calcbeta(u,k,n)
         return
 
 
     def calcZ(self, ws, x, y, n):
-        zAlpha = sum(self.alphas[n][v] for v in range(0,self.m))
+        zAlpha = sum(self.alphas[n][v] for v in xrange(self.m))
         zBeta = self.betas[0][0]
         #print self.betas
         #print zAlpha, zBeta
@@ -233,16 +246,16 @@ class LogisticRegression(object):
         #summ = 0
         #for i in range(1,n):
         #    summ = summ + ffs.featureFunc[j](y[i-1], y[i], x, i, n)
-        return sum(ffs.featureFunc[j](y[i-1], y[i], x, i, n) for i in range(0,n))
+        return sum(ffs.featureFunc[j](y[i-1], y[i], x, i, n) for i in xrange(n))
 
 
     def _calcSGDExpect(self, ws, x, y, n):
         expect = np.zeros((len(ws)))
         for j in self.S:#range(0,len(ws)):
             summ = 0
-            for i in range(0,n):
-                for yi1 in range(0, self.m):
-                    for yi in range(0, self.m):
+            for i in xrange(n):
+                for yi1 in xrange(self.m):
+                    for yi in xrange(self.m):
                         num = self.alphas[i-1][yi1] * np.exp(self.gis[i][yi1][yi]) * self.betas[yi][i]
                         p = num / self.Z
                         summ = summ + (ffs.featureFunc[j](tags.tags[yi1], tags.tags[yi], x, i, n) * p)
@@ -251,8 +264,9 @@ class LogisticRegression(object):
 
 
     def _calcCollExp(self, ws, x, y, n):
-        expect = np.zeros((len(ws)))
-        for j in range(0, len(ws)):
+        lws=len(ws)
+        expect = np.zeros((lws))
+        for j in xrange(lws):
             expect[j] = self.calcF(j, x, y, n)
         return expect
 
@@ -261,7 +275,10 @@ class LogisticRegression(object):
         if self.method == "sgd":
             return self._calcSGDExpect(ws, x, y, n)
         elif self.method == "collins":
-            return self._calcCollExp(ws, x, y, n)
+            #calculate yhat
+            self.calcUMat(n)
+            yhat=self.calcYHat(x)
+            return self._calcCollExp(ws, x, yhat, n)
         else:
             print "Incorrect method"
             return -1
@@ -273,7 +290,7 @@ class LogisticRegression(object):
         
         #clear internal vars
         self.S = []
-        self.gis = []
+        self.gis = np.zeros((n,self.m,self.m))
         self.alphas = np.zeros((n,self.m))
         self.betas = np.zeros((self.m,n))
         self.Z = 1
@@ -314,17 +331,17 @@ class LogisticRegression(object):
         data_train = data_train[idx]
         labels_train = labels_train[idx]
 
-        ws = np.zeros(ffs.numJ)
+        self.ws = np.zeros(ffs.numJ)
         rate = self.rate
         self.converged_ = False
         old_score = 0
-        for epoch in range(self.max_iters):
+        for epoch in xrange(self.max_iters):
             for i, (x, y) in enumerate(zip(data_train, labels_train)):
-                ws = self._sgd_update(ws, x, y, rate)
-            self.ws = ws
+                self.ws = self._sgd_update(self.ws, x, y, rate)
             prediction = self.predict(data_valid)
             score = accuracy_score(labels_valid, prediction)
-            if score > 0 and np.abs(score - old_score) < 1e-8:
+            print score,self.ws
+            if score > 0 and score < old_score:#np.abs(score - old_score) < 1e-8:
                 self.converged_ = True
                 break
             rate = rate * self.decay
@@ -336,5 +353,5 @@ class LogisticRegression(object):
 
         #self.lcl_ = lcl(data, labels, betas)
         #self.rlcl_ = rlcl(data, labels, betas, self.mu)
-        return ws
+        return self.ws
 

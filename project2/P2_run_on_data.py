@@ -1,6 +1,7 @@
 from sklearn.metrics import accuracy_score
 from util import read_file
 from logistic_regression import LogisticRegression
+from datetime import datetime
 
 """Data processing:
 
@@ -59,10 +60,14 @@ def importData():
 if __name__ == "__main__":
     data_train, data_test, labels_train, labels_test = importData()
     
-    model = LogisticRegression(method="collins",max_iters=1000)
+    print datetime.now().time()
+    model = LogisticRegression(method="collins",max_iters=100)
     model.fit(data_train, labels_train)
-    prediction = model.predict(data_test)
-    #score = accuracy_score(labels_test, prediction)
-    #validation_results[(mu, rate, decay)] = score
-    #print "  score: {}".format(score)
-    #print "  error rate: {}".format(1 - score)
+    print datetime.now().time()
+    prediction = model.predict(data_train)
+    score = accuracy_score(labels_train, prediction)
+#    prediction = model.predict(data_test)
+#    score = accuracy_score(labels_test, prediction)
+    print "  score: {}".format(score)
+    print "  error rate: {}".format(1 - score)
+    print datetime.now().time()
