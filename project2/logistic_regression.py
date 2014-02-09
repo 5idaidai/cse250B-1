@@ -12,42 +12,6 @@ def log_sum_exp(x):
     m = x.max()
     x = x - m
     return m + np.log(np.exp(x).sum())
-
-
-def log_prob(y, xb):
-    """returns log prob(Y=y)
-
-    xb = np.dot(X, betas)
-
-    """
-    if y == 1:
-        xb = -xb
-    return -log_sum_exp(np.array([0, xb]))
-
-
-def lcl(data, labels, betas):
-    """log conditional likelihood"""
-    return sum(log_prob(y, np.dot(x, betas)) for x, y in zip(data, labels))
-
-
-def rlcl(data, labels, betas, mu):
-    """regularized log conditional likelihood"""
-    return lcl(data, labels, betas) - mu * sum(np.power(betas[1:], 2))
-
-
-def lcl_prime(data, labels, betas):
-    """gradient of lcl"""
-    coeffs = np.array(list(y - np.exp(log_prob(1, np.dot(x, betas)))
-                           for x, y in zip(data, labels)))
-    return coeffs.dot(data)
-
-
-def rlcl_prime(data, labels, betas, mu):
-    """gradient of rlcl"""
-    grad = lcl_prime(data, labels, betas)
-    grad[1:] = grad[1:] - 2 * mu * betas[1:]
-    return grad
-    
     
 class LogisticRegression(object):
     """Logistic regression model with L2 regularization..
@@ -122,14 +86,15 @@ class LogisticRegression(object):
         end = len(x)-1
         yhat = ['']*len(x)
         pred = ['']*len(x)
-#        yhat[0] = tags.tags[tags.start]
+        yhat[0] = tags.start
+        pred[0] = tags.tags[tags.start]
 #        yhat[end+1] = tags.tags[tags.stop]
         
         #last tag:
         yhat[end] = np.argmax(self.U[end])
         pred[end] = tags.tags[yhat[end]]
         
-        for k in xrange(end-1,-1,-1):
+        for k in xrange(end-1,0,-1):
             temp = np.argmax((self.U[k][u] + self.gis[k+1][u][yhat[k+1]]) for u in xrange(self.m))
             yhat[k] = temp
             pred[k] = tags.tags[yhat[k]]
@@ -138,7 +103,7 @@ class LogisticRegression(object):
         
 
     def calcU(self, k, v):
-        if k==0: #base case: return start tag
+        if k==1: #base case: return start tag
             return self.gis[k][tags.start][v]
         else:
             return max((self.U[k-1][u] + self.gis[k][u][v]) for u in xrange(self.m))
@@ -146,7 +111,7 @@ class LogisticRegression(object):
 
     def calcUMat(self, n):
         self.U = np.zeros((n, self.m))
-        for k in xrange(n):
+        for k in xrange(1,n):
             for v in xrange(self.m):
                 self.U[k][v] = self.calcU(k, v)
         return self.U
@@ -187,8 +152,6 @@ class LogisticRegression(object):
         #for i = 1 -> n (number of words)
         self.gis = np.zeros((n,self.m,self.m))
         for i in xrange(n):
-            #compute gi
-            #self.gis.append(np.zeros((self.m,self.m)))
             #for each pair of yi-1 yi
             for yi1 in xrange(self.m):
                 for yi in xrange(self.m):                    
@@ -235,7 +198,7 @@ class LogisticRegression(object):
 
     def calcZ(self, ws, x, y, n):
         zAlpha = sum(self.alphas[n][v] for v in xrange(self.m))
-        zBeta = self.betas[0][0]
+        zBeta = self.betas[tags.start][0]
         #print self.betas
         #print zAlpha, zBeta
         #assert zAlpha == zBeta    
