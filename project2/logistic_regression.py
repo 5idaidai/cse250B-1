@@ -232,7 +232,6 @@ class LogisticRegression(object):
         #print zAlpha, zBeta
         #print zAlpha - zBeta
         #assert zAlpha == zBeta    
-        
         return self.Z
         
         
