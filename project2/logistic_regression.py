@@ -195,6 +195,7 @@ class LogisticRegression(object):
             return self.log_sum_exp(temp)
 
     def calcalphas(self, ws, x, y, n):
+        self.alphas = np.zeros((n,self.m))
         for k in xrange(n):
             for v in xrange(self.m):
                 self.alphas[k][v] = self.calcalpha(k,v)
@@ -205,28 +206,34 @@ class LogisticRegression(object):
         if k==n:#I(u==STOP)
             return tags.tags[u] == tags.tags[tags.stop]
         else:
-            bet = self.betas[:,k-1]
-            gi = self.gis[k+1][u]
+            bet = self.betas[:,k]
+            gi = self.gis[k][u]
             temp = gi + bet
             return self.log_sum_exp(temp)
-            return sum((np.exp(self.gis[k+1][u]) * self.betas[:,k+1]))
 
 
     def calcbetas(self, ws, x, y, n):
+        self.betas = np.zeros((self.m,n))
+        print self.betas.shape
         for k in xrange(n,0,-1):
             for u in xrange(self.m):
-                self.betas[u][k] = self.calcbeta(u,k,n)
+                self.betas[u][k-1] = self.calcbeta(u,k,n)
         return
 
 
     def calcZ(self, ws, x, y, n):
-        zAlpha = sum(self.alphas[n][v] for v in xrange(self.m))
+        zAlpha = self.alphas[n-1][tags.start]
         zBeta = self.betas[tags.start][0]
+        for k in xrange(n+1):
+            self.Z = sum((zAlpha*zBeta) for u in xrange(self.m))
+            print self.Z
+        #print zAlpha
         #print self.betas
         #print zAlpha, zBeta
+        #print zAlpha - zBeta
         #assert zAlpha == zBeta    
         
-        return zAlpha
+        return self.Z
         
         
     def calcF(self, j, x, y, n):
@@ -277,9 +284,6 @@ class LogisticRegression(object):
         
         #clear internal vars
         self.S = []
-        self.gis = np.zeros((n,self.m,self.m))
-        self.alphas = np.zeros((n,self.m))
-        self.betas = np.zeros((self.m,n))
         self.Z = 1
         
         #calculate S set (set of feature functions that aren't 0)
@@ -291,8 +295,8 @@ class LogisticRegression(object):
 
         #calculate forward(alpha) & backward(beta) vectors, and Z
         self.calcalphas(ws, x, y, n)
-        self.calcbetas(ws, x, y, n-1)
-        self.Z = self.calcZ(ws, x, y, n-1)
+        self.calcbetas(ws, x, y, n)
+        self.Z = self.calcZ(ws, x, y, n)
 
         #compute expectation
         fval = self._calcCollExp(ws, x, y, n)
