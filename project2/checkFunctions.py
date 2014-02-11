@@ -7,6 +7,8 @@ Created on Sat Feb  8 13:03:32 2014
 
 import numpy as np
 from util import read_file
+import ffs
+import tags
 from logistic_regression import LogisticRegression
 
 
@@ -14,21 +16,47 @@ from logistic_regression import LogisticRegression
 
 data_sample, labels_sample = read_file('sample')
 
-n = len(data_sample)
-ws = np.random.rand(n)
-x = data_sample
+lr = LogisticRegression(method="collins", max_iters=1)
 
-checkgis = LogisticRegression(method="collins", max_iters=1)
+labels_proc = lr.preproclabels(labels_sample)
 
-#checkgis.calcgis(ws, x, n)
-print data_sample
+i = int(np.random.rand() * len(data_sample))
+n = len(data_sample[i])
+ws = [0.67, 1-0.67]#np.random.rand(ffs.numJ)
+x = data_sample[i]
+y = labels_proc[i]
+
+#lr.calcgis(ws, x, n)
+print data_sample[i]
+print labels_sample[i],y
 print ws
-print checkgis.calcgis(ws, x, n)
-print checkgis.gis.shape
 
-#np.savetxt("calcgisTest.csv", checkgis, delimiter=",", fmt='%1.4e')
-
+lr.calcAs(x, n)
+print "As",lr.As
 
 
+lr.calcBs()
+print "Bs",lr.Bs
+
+lr.calcS(ws, x, n)
+print "S",lr.S
 
 
+lr.calcgis(ws, x, n)
+print lr.gis.shape
+#print lr.gis
+print lr.gis[0][2][len(tags.tags)-1]
+print lr.gis[n-1][2][len(tags.tags)-1]
+
+#np.savetxt("calcgisTest.csv", lr, delimiter=",", fmt='%1.4e')
+
+lr.calcalphas(ws, x, y, n)
+print "Alphas",lr.alphas
+
+lr.calcbetas(ws, x, y, n)
+print "Betas",lr.betas
+
+lr.calcUMat(n)
+print "U",lr.U
+
+print lr.calcYHat(x)

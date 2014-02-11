@@ -47,6 +47,8 @@ class LogisticRegression(object):
         self.max_iters = max_iters
         self.random_state = random_state
         self.m = len(tags.tags)
+        self.As = np.zeros((ffs.numJ,10))
+        self.Bs = np.zeros((ffs.numJ,self.m,self.m))
         self.gis = []
         self.alphas = np.zeros((self.m,self.m))
         self.betas = np.zeros((self.m,self.m))
@@ -150,28 +152,53 @@ class LogisticRegression(object):
         for i in xrange(ld):
             x = data[i]
             n = len(x)
+            self.calcAs(x, n)
+            self.calcBs()
+            self.calcS(self.ws, x, n)
             self.calcgis(self.ws, x, n)
             self.calcUMat(n)
             predLabels.append(self.calcYHat(x))
         return predLabels
         
+    
+    def calcAs(self, x, n):
+        self.As = np.zeros((ffs.numJ,n))
+        for j in xrange(ffs.numJ):
+            for i in xrange(n):
+                self.As[j,i] = ffs.aFunc[j].func(x,i,n, ffs.aFunc[j].val)
+
         
+    
+    def calcBs(self):
+        self.Bs = np.zeros((ffs.numJ,self.m,self.m))
+        for j in xrange(ffs.numJ):
+            for yi1 in xrange(self.m):
+                for yi in xrange(self.m):
+                    self.Bs[j,yi1,yi] = ffs.bFunc[j].func(tags.tags[yi1], tags.tags[yi], ffs.bFunc[j].val)
+        
+    
     def calcS(self, ws, x, n):
         tempS = []
         for j in xrange(ffs.numJ):
-            if ffs.aFunc[j].func(x,1,n,ffs.aFunc[j].val) !=0:
+            if max(self.As[j]) !=0:
                 tempS.append(j)
         self.S = np.array(tempS)
         return self.S
 
+    
     def sumFFs(self, ws, i, yi1, yi, x, n):
-        summ = 0
-        #um over all J feature functions
-        for j in self.S:#range(0, ffs.numJ):
-            summ += ws[j] * ffs.featureFunc[j](tags.tags[yi1], tags.tags[yi], x, i, n)
-        return summ
+        #summ = 0
+        #sum over all J feature functions
+        #for j in self.S:#range(0, ffs.numJ):
+            #summ += ws[j] * ffs.featureFunc[j](tags.tags[yi1], tags.tags[yi], x, i, n)
+        #return summ
+        #return sum(ws[self.S] * ffs.featureFunc[self.S](tags.tags[yi1], tags.tags[yi], x, i, n))
         #return sum((ws[j] * ffs.featureFunc[j](tags.tags[yi1], tags.tags[yi], x, i, n)) for j in self.S)
+        #print i,yi1,yi,n
+        #print ws.shape, self.As.shape, self.Bs.shape
+        return sum(ws * self.As[:,i] * self.Bs[:,yi1,yi])
 
+    
     def calcgis(self, ws, x, n):
         #print "CalcGis start",datetime.now().time()
         #for i = 1 -> n (number of words)
@@ -212,21 +239,22 @@ class LogisticRegression(object):
             return self.log_sum_exp(temp)
 
 
+    
     def calcbetas(self, ws, x, y, n):
         self.betas = np.zeros((self.m,n))
-        print self.betas.shape
+        #print self.betas.shape
         for k in xrange(n,0,-1):
             for u in xrange(self.m):
                 self.betas[u][k-1] = self.calcbeta(u,k,n)
         return
 
-
+    
     def calcZ(self, ws, x, y, n):
         zAlpha = self.alphas[n-1][tags.start]
         zBeta = self.betas[tags.start][0]
         for k in xrange(n+1):
             self.Z = sum((zAlpha*zBeta) for u in xrange(self.m))
-            print self.Z
+            #print self.Z
         #print zAlpha
         #print self.betas
         #print zAlpha, zBeta
@@ -286,6 +314,8 @@ class LogisticRegression(object):
         self.Z = 1
         
         #calculate S set (set of feature functions that aren't 0)
+        self.calcAs(x, n)
+        self.calcBs()
         self.calcS(ws, x, n)
         #print len(self.S),self.S
         

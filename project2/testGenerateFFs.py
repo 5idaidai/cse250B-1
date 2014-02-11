@@ -27,6 +27,10 @@ def testffA3(x, i, n, a):
 #test case: last tag is a period
 def testffB3(yi1, yi, b):
     return yi == tags.tags[tags.stop] and yi1 == tags.tags[2]
+    
+def testffB4(yi1, yi, b):
+    return yi == tags.tags[6]
+
 
 if __name__ == "__main__":
     ffs = []
@@ -51,5 +55,12 @@ if __name__ == "__main__":
     temp3['A'] = testffA3
     temp3['B'] = testffB3
     ffs.append(temp3)
+    
+    temp4 = {}
+    temp4['aset'] = []
+    temp4['bset'] = []
+    temp4['A'] = testffA3
+    temp4['B'] = testffB4
+    ffs.append(temp4)
     
     gFF.generateFFs(ffs, os.path.splitext(os.path.basename(__file__))[0])
