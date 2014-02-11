@@ -122,7 +122,7 @@ class LogisticRegression(object):
         pred[end] = tags.tags[yhat[end]]
         
         for k in xrange(end-1,0,-1):
-            temp = np.argmax((self.U[k][u] + self.gis[k+1][u][yhat[k+1]]) for u in xrange(self.m))
+            temp = np.argmax(self.U[k] + self.gis[k+1][:,yhat[k+1]])
             yhat[k] = temp
             pred[k] = tags.tags[yhat[k]]
         
@@ -133,7 +133,7 @@ class LogisticRegression(object):
         if k==1: #base case: return start tag
             return self.gis[k][tags.start][v]
         else:
-            return max((self.U[k-1][u] + self.gis[k][u][v]) for u in xrange(self.m))
+            return max((self.U[k-1] + self.gis[k][:,v]))
 
 
     def calcUMat(self, n):
@@ -197,17 +197,24 @@ class LogisticRegression(object):
         #print i,yi1,yi,n
         #print ws.shape, self.As.shape, self.Bs.shape
         return sum(ws * self.As[:,i] * self.Bs[:,yi1,yi])
-
     
     def calcgis(self, ws, x, n):
         #print "CalcGis start",datetime.now().time()
         #for i = 1 -> n (number of words)
-        self.gis = np.zeros((n,self.m,self.m))
-        for i in xrange(n):
+        #self.gis = np.zeros((n,self.m,self.m))
+        #for i in xrange(n):
             #for each pair of yi-1 yi
-            for yi1 in xrange(self.m):
-                for yi in xrange(self.m):                    
-                    self.gis[i][yi1][yi] = self.sumFFs(ws, i, yi1, yi, x, n)
+        #    for yi1 in xrange(self.m):
+        #        for yi in xrange(self.m):                    
+        #            #self.gis[i][yi1][yi] = self.sumFFs(ws, i, yi1, yi, x, n)
+        #            self.gis[i][yi1][yi] = sum(ws * self.As[:,i] * self.Bs[:,yi1,yi])
+        gis = np.fromiter((sum(ws * self.As[:,i] * self.Bs[:,yi1,yi])
+                            for i in xrange(n) 
+                            for yi1 in xrange(self.m) 
+                            for yi in xrange(self.m)),
+                            dtype=np.float,
+                            count=n * self.m * self.m)
+        self.gis = gis.reshape((n,self.m,self.m))
         #print "CalcGis stop",datetime.now().time()                    
         return self.gis
         
@@ -252,8 +259,8 @@ class LogisticRegression(object):
     def calcZ(self, ws, x, y, n):
         zAlpha = self.alphas[n-1][tags.start]
         zBeta = self.betas[tags.start][0]
-        for k in xrange(n+1):
-            self.Z = sum((zAlpha*zBeta) for u in xrange(self.m))
+        #for k in xrange(n+1):
+        self.Z = sum((zAlpha*zBeta) for u in xrange(self.m))
             #print self.Z
         #print zAlpha
         #print self.betas
