@@ -125,7 +125,7 @@ class LogisticRegression(object):
             yhat[k] = temp
             pred[k] = tags.tags[yhat[k]]
         
-        return yhat
+        return yhat,pred
         
 
     def calcU(self, k, v):
@@ -158,24 +158,31 @@ class LogisticRegression(object):
             #self.calcS(self.ws, x, n)
             self.calcgis(self.ws, x, n)
             self.calcUMat(n)
-            predLabels.append(self.calcYHat(x))
+            yhat,pred = self.calcYHat(x)
+            predLabels.append(pred)
         return predLabels
         
     
     def calcAs(self, x, n):
-        self.As = np.zeros((ffs.numJ,n))
-        for j in xrange(ffs.numJ):
-            for i in xrange(n):
-                self.As[j,i] = ffs.aFunc[j].func(x,i,n, ffs.aFunc[j].val)
+        self.As = np.fromiter((ffs.aFunc[j].func(x,i,n, ffs.aFunc[j].val)
+                            for j in xrange(ffs.numJ)
+                            for i in xrange(n)),
+                            dtype=np.float,
+                            count=ffs.numJ*n)
+        self.As = self.As.reshape((ffs.numJ,n))
+        return self.As
 
         
     
     def calcBs(self):
-        self.Bs = np.zeros((ffs.numJ,self.m,self.m))
-        for j in xrange(ffs.numJ):
-            for yi1 in xrange(self.m):
-                for yi in xrange(self.m):
-                    self.Bs[j,yi1,yi] = ffs.bFunc[j].func(tags.tags[yi1], tags.tags[yi], ffs.bFunc[j].val)
+        self.Bs = np.fromiter((ffs.bFunc[j].func(tags.tags[yi1], tags.tags[yi], ffs.bFunc[j].val)
+                    for j in xrange(ffs.numJ)
+                    for yi1 in xrange(self.m)
+                    for yi in xrange(self.m)),
+                    dtype=np.float,
+                    count=ffs.numJ*self.m*self.m)
+        self.Bs = self.Bs.reshape((ffs.numJ,self.m,self.m))
+        return self.Bs                   
         
     
     def calcS(self, ws, x, n):
@@ -305,8 +312,8 @@ class LogisticRegression(object):
 
     def _calcCollExp(self, ws, x, n):
         self.calcUMat(n)
-        yhat=self.calcYHat(x)
-        return self._calcFExp(ws, x, yhat, n)
+        yhat,pred = self.calcYHat(x)
+        return self._calcFExp(ws, x, pred, n)
 
 
     def calcExpect(self, ws, x, y, n):
