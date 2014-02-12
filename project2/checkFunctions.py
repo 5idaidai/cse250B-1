@@ -64,3 +64,5 @@ print yhat
 
 expect = lr._calcCollExp(ws, x, n)
 print expect
+
+lr.calcYstar(labels_sample[i], n)

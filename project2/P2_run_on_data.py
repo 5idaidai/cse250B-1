@@ -13,7 +13,7 @@ from datetime import datetime
 
 def importData():
     # read data and split training data into training and validation sets
-    data_train, labels_train = read_file('short')
+    data_train, labels_train = read_file('medium')
         
     #assert len(data_train[0]) == len(labels_train[0])
     #assert len(data_train[200]) == len(labels_train[200])
@@ -25,51 +25,23 @@ def importData():
     
     return data_train, data_test, labels_train, labels_test
     
-
-"""Feature Functions:
-
-1. Write script to generate FFs for all sentences based on A and B functions
-2. Determine what the A and B functions should be, and how many we should use
-3. Generate AxB FFs for all training data using script
-4. FF output is {1,0} where 0 is the majority of outputs
-5. Create set S that is only non-zero outputs for all FFs
-"""
-
-"""Training:
-
-1. Maximize LCL
-2. Regularization??
-3. Update wj using wj + lambda[Fj(x,y)-Expectation[Fj(x,y')]] 
-4. Collins Perceptron
-5. L-BFGS
-"""
-
-"""Prediction:
-
-1. Predict y-hat based on S for each sentence(x-bar)
-"""
-
-"""Check functions:
-
-1. Use forward and backward vectors to check that Z(x-bar,w) is the same for both
-2. Checkgrad
-3. Check data processing??
-4. Check FFs??
-"""
-
-if __name__ == "__main__":
-    data_train, data_test, labels_train, labels_test = importData()
-    #labels_test=LogisticRegression.preproclabels(labels_test)
-    
-    print datetime.now().time()
-    model = LogisticRegression(method="collins",max_iters=10)
+def runML(meth, itrs, data_train, data_test, labels_train, labels_test):
+    print meth,datetime.now().time()
+    model = LogisticRegression(method=meth,max_iters=itrs)
     model.fit(data_train, labels_train)
     print datetime.now().time()
     prediction = model.predict(data_train)
-    labels_train=LogisticRegression.preproclabels(labels_train)
-    score = accuracy_score(labels_train, prediction)
+    labels_train2=LogisticRegression.preproclabels(labels_train)
+    score = accuracy_score(labels_train2, prediction)
 #    prediction = model.predict(data_test)
 #    score = accuracy_score(labels_test, prediction)
     print "  score: {}".format(score)
     print "  error rate: {}".format(1 - score)
     print datetime.now().time()
+
+if __name__ == "__main__":
+    data_train, data_test, labels_train, labels_test = importData()
+    #labels_test=LogisticRegression.preproclabels(labels_test)
+    
+    #runML("collins",10,data_train, data_test, labels_train, labels_test)
+    runML("cd",10,data_train, data_test, labels_train, labels_test)

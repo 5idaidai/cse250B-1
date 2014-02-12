@@ -405,8 +405,6 @@ class LogisticRegression(object):
             print "converged after {} epochs".format(epoch)
         else:
             print "did not converge"
-
-        #self.lcl_ = lcl(data, labels, betas)
-        #self.rlcl_ = rlcl(data, labels, betas, self.mu)
+            
         return self.ws
 
