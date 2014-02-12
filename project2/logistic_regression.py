@@ -88,7 +88,6 @@ class LogisticRegression(object):
     def preproclabels(labels):
         newlabels = []
         
-        i=0
         for y in labels:
             newy = []
             for tag in y:
@@ -113,15 +112,15 @@ class LogisticRegression(object):
         end = len(x)-1
         yhat = ['']*len(x)
         pred = ['']*len(x)
-        yhat[0] = tags.start
-        pred[0] = tags.tags[tags.start]
+        #yhat[0] = tags.start
+        #pred[0] = tags.tags[tags.start]
 #        yhat[end+1] = tags.tags[tags.stop]
         
         #last tag:
         yhat[end] = np.argmax(self.U[end])
         pred[end] = tags.tags[yhat[end]]
         
-        for k in xrange(end-1,0,-1):
+        for k in xrange(end-1,-1,-1):
             temp = np.argmax(self.U[k] + self.gis[k+1][:,yhat[k+1]])
             yhat[k] = temp
             pred[k] = tags.tags[yhat[k]]
@@ -130,7 +129,9 @@ class LogisticRegression(object):
         
 
     def calcU(self, k, v):
-        if k==1: #base case: return start tag
+        if k==0:
+            return 0
+        elif k==1: #base case: return start tag
             return self.gis[k][tags.start][v]
         else:
             return max((self.U[k-1] + self.gis[k][:,v]))
@@ -154,7 +155,7 @@ class LogisticRegression(object):
             n = len(x)
             self.calcAs(x, n)
             self.calcBs()
-            self.calcS(self.ws, x, n)
+            #self.calcS(self.ws, x, n)
             self.calcgis(self.ws, x, n)
             self.calcUMat(n)
             predLabels.append(self.calcYHat(x))
@@ -178,34 +179,22 @@ class LogisticRegression(object):
         
     
     def calcS(self, ws, x, n):
+        self.S = []
         tempS = []
         for j in xrange(ffs.numJ):
             if max(self.As[j]) !=0:
                 tempS.append(j)
         self.S = np.array(tempS)
         return self.S
-
-    
-    def sumFFs(self, ws, i, yi1, yi, x, n):
-        #summ = 0
-        #sum over all J feature functions
-        #for j in self.S:#range(0, ffs.numJ):
-            #summ += ws[j] * ffs.featureFunc[j](tags.tags[yi1], tags.tags[yi], x, i, n)
-        #return summ
-        #return sum(ws[self.S] * ffs.featureFunc[self.S](tags.tags[yi1], tags.tags[yi], x, i, n))
-        #return sum((ws[j] * ffs.featureFunc[j](tags.tags[yi1], tags.tags[yi], x, i, n)) for j in self.S)
-        #print i,yi1,yi,n
-        #print ws.shape, self.As.shape, self.Bs.shape
-        return sum(ws * self.As[:,i] * self.Bs[:,yi1,yi])
     
     def calcgis(self, ws, x, n):
-        gis = np.fromiter((sum(ws * self.As[:,i] * self.Bs[:,yi1,yi])
+        self.gis = np.fromiter((sum(ws * self.As[:,i] * self.Bs[:,yi1,yi])
                             for i in xrange(n) 
                             for yi1 in xrange(self.m) 
                             for yi in xrange(self.m)),
                             dtype=np.float,
                             count=n * self.m * self.m)
-        self.gis = gis.reshape((n,self.m,self.m))                  
+        self.gis = self.gis.reshape((n,self.m,self.m))                  
         return self.gis
         
 
@@ -283,6 +272,7 @@ class LogisticRegression(object):
         #for i in range(1,n):
         #    summ = summ + ffs.featureFunc[j](y[i-1], y[i], x, i, n)
         return sum(ffs.featureFunc[j](y[i-1], y[i], x, i, n) for i in xrange(n))
+        #return sum(self.As[j,i] * self.Bs[j,i-1,i] for i in xrange(n))
 
 
     def _calcSGDExpect(self, ws, x, y, n):
@@ -304,23 +294,26 @@ class LogisticRegression(object):
             expect[j] = summ
         return expect
 
-
-    def _calcCollExp(self, ws, x, y, n):
+    def _calcFExp(self, ws, x, y, n):
         lws=len(ws)
-        expect = np.zeros((lws))
-        for j in xrange(lws):
-            expect[j] = self.calcF(j, x, y, n)
+        expect = np.fromiter((self.calcF(j, x, y, n)
+                            for j in xrange(lws)),
+                            dtype=np.float,
+                            count=lws
+                        )
         return expect
+
+    def _calcCollExp(self, ws, x, n):
+        self.calcUMat(n)
+        yhat=self.calcYHat(x)
+        return self._calcFExp(ws, x, yhat, n)
 
 
     def calcExpect(self, ws, x, y, n):
         if self.method == "sgd":
             return self._calcSGDExpect(ws, x, y, n)
         elif self.method == "collins":
-            #calculate yhat
-            self.calcUMat(n)
-            yhat=self.calcYHat(x)
-            return self._calcCollExp(ws, x, yhat, n)
+            return self._calcCollExp(ws, x, n)
         else:
             print "Incorrect method"
             return -1
@@ -330,21 +323,16 @@ class LogisticRegression(object):
         """single step in SGD"""
         n = len(x)
         
-        #clear internal vars
-        self.S = []
-        self.Z = 1
-        
-        #calculate S set (set of feature functions that aren't 0)
         self.calcAs(x, n)
         self.calcBs()
-        self.calcS(ws, x, n)
+        #self.calcS(ws, x, n)
         #print len(self.S),self.S
         
         #calculate gi matrices
         self.calcgis(ws, x, n)
 
         #compute expectation
-        fval = self._calcCollExp(ws, x, y, n)
+        fval = self._calcFExp(ws, x, y, n)
         expectation = self.calcExpect(ws, x, y, n)        
         
         #p = np.exp(log_prob(1, np.dot(x, ws)))
