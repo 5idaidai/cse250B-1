@@ -10,16 +10,16 @@ import generateFFs as gFF
 import tags
 
 def testffA1(x, i, n, a):
-    return x[1][0] == 'W'
+    return x[1] == a
     
 def testffB1(yi1, yi, b):
     return yi == tags.tags[4]
     
 def testffA2(x, i, n, a):
-    return i>0 and i<n-1 and x[i][0].isupper()
+    return x[i] == a
     
 def testffB2(yi1, yi, b):
-    return yi == b
+    return yi1 == tags.tags[1]
 
 def testffA3(x, i, n, a):
     return 1
@@ -35,20 +35,21 @@ def testffB4(yi1, yi, b):
     return yi == tags.tags[6]
 
 
+
 if __name__ == "__main__":
     ffs = []
     ffstest = []
         
     temp1 = {}
-    temp1['aset'] = []
+    temp1['aset'] = tags.quest
     temp1['bset'] = []
     temp1['A'] = testffA1
     temp1['B'] = testffB1
     ffs.append(temp1)
     
     temp2 = {}
-    temp2['aset'] = []
-    temp2['bset'] = tags.tags
+    temp2['aset'] = tags.conj
+    temp2['bset'] = []
     temp2['A'] = testffA2
     temp2['B'] = testffB2
     ffs.append(temp2)
