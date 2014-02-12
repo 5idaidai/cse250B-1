@@ -56,7 +56,7 @@ class LogisticRegression(object):
 
 
     def _validate_args(self):
-        methods = ("sgd", "collins", "lbfgs")
+        methods = ("sgd", "collins", "cd")
         if self.method not in methods:
             raise Exception("method '{}' invalid. should be"
                             " one of {}".format(self.method, methods))
@@ -285,6 +285,15 @@ class LogisticRegression(object):
         return sum(ffs.featureFunc[j](y[i-1], y[i], x, i, n) for i in xrange(n))
 
 
+    def calcGibbs(self, yi, i, yi1):
+        Gibbs = (np.exp(self.gis[i][yi1,:] + self.gis[i][:,yi]))
+        summ = sum(Gibbs)
+        P = Gibbs / summ
+        M = np.argmax(P)
+        self.Gibbs = tags.tags[P[M]]
+        return self.Gibbs
+
+
     def _calcSGDExpect(self, ws, x, y, n):
         
         #calculate forward(alpha) & backward(beta) vectors, and Z
@@ -313,6 +322,16 @@ class LogisticRegression(object):
         return expect
 
 
+    def calcYstar(self, y, n):
+        expect = np.zeros((n))
+        for i in xrange(n):
+            yi1 = tags.tags.index(y[i-1])
+            yi = tags.tags.index(y[i+1])
+            expect[i] = self.calcGibbs(yi, i, yi1)
+        return expect
+
+
+
     def calcExpect(self, ws, x, y, n):
         if self.method == "sgd":
             return self._calcSGDExpect(ws, x, y, n)
@@ -321,6 +340,9 @@ class LogisticRegression(object):
             self.calcUMat(n)
             yhat=self.calcYHat(x)
             return self._calcCollExp(ws, x, yhat, n)
+        elif self.method == "cd":
+            ystar=self.calcYstar(y, n)
+            return self._calcCollExp(ws, x, ystar, n)
         else:
             print "Incorrect method"
             return -1
