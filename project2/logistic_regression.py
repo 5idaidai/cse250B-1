@@ -149,7 +149,6 @@ class LogisticRegression(object):
             n = len(x)
             self.calcAs(x, n)
             self.calcBs()
-            self.calcS(self.ws, x, n)
             self.calcgis(self.ws, x, n)
             self.calcUMat(n)
             predLabels.append(self.calcYHat(x))
@@ -370,6 +369,8 @@ class LogisticRegression(object):
         #result[0] = ws[0] + rate * ((y - p) * x[0])
         return result
 
+    #def tagAccuracy(label, predicted):
+        
 
     def _sgd(self, data, labels):
         #split off validation set

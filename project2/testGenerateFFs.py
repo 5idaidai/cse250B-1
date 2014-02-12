@@ -9,12 +9,14 @@ import os
 import generateFFs as gFF
 import tags
 
+#question word at start of sentence yields question mark at end
 def testffA1(x, i, n, a):
     return x[1] == a
     
 def testffB1(yi1, yi, b):
     return yi == tags.tags[4]
     
+#conjunction word at i, yields comma tag at i-1
 def testffA2(x, i, n, a):
     return x[i] == a
     
@@ -35,7 +37,12 @@ def testffA4(x, i, n, a):
 def testffB4(yi1, yi, b):
     return yi == tags.tags[6]
 
+#Uppercase letter at beginning of word is associated with any tag
+def testffA5(x, i, n, a):
+    return i>0 and i<n-1 and x[i][0].isupper()
 
+def testffB5(yi1, yi, b):
+    return yi == b
 
 if __name__ == "__main__":
     ffs = []
@@ -69,7 +76,14 @@ if __name__ == "__main__":
     temp4['A'] = testffA4
     temp4['B'] = testffB4
     ffs.append(temp4)
-    ffstest.append(temp4)
+    ffstest.append(temp4) 
+    
+    temp5 = {}
+    temp5['aset'] = []
+    temp5['bset'] = tags.tags
+    temp5['A'] = testffA5
+    temp5['B'] = testffB5
+    ffs.append(temp5)
     
     gFF.generateFFs(ffs, os.path.splitext(os.path.basename(__file__))[0])
     #gFF.generateFFs(ffstest, os.path.splitext(os.path.basename(__file__))[0])
