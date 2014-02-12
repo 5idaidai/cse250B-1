@@ -199,23 +199,13 @@ class LogisticRegression(object):
         return sum(ws * self.As[:,i] * self.Bs[:,yi1,yi])
     
     def calcgis(self, ws, x, n):
-        #print "CalcGis start",datetime.now().time()
-        #for i = 1 -> n (number of words)
-        #self.gis = np.zeros((n,self.m,self.m))
-        #for i in xrange(n):
-            #for each pair of yi-1 yi
-        #    for yi1 in xrange(self.m):
-        #        for yi in xrange(self.m):                    
-        #            #self.gis[i][yi1][yi] = self.sumFFs(ws, i, yi1, yi, x, n)
-        #            self.gis[i][yi1][yi] = sum(ws * self.As[:,i] * self.Bs[:,yi1,yi])
         gis = np.fromiter((sum(ws * self.As[:,i] * self.Bs[:,yi1,yi])
                             for i in xrange(n) 
                             for yi1 in xrange(self.m) 
                             for yi in xrange(self.m)),
                             dtype=np.float,
                             count=n * self.m * self.m)
-        self.gis = gis.reshape((n,self.m,self.m))
-        #print "CalcGis stop",datetime.now().time()                    
+        self.gis = gis.reshape((n,self.m,self.m))                  
         return self.gis
         
 
@@ -229,11 +219,14 @@ class LogisticRegression(object):
             return self.log_sum_exp(temp)
 
     def calcalphas(self, ws, x, y, n):
-        self.alphas = np.zeros((n,self.m))
-        for k in xrange(n):
-            for v in xrange(self.m):
-                self.alphas[k][v] = self.calcalpha(k,v)
-        return
+        self.alphas = np.fromiter((self.calcalpha(k,v)
+                                    for k in xrange(n)
+                                    for v in xrange(self.m)),
+                                    dtype=np.float,
+                                    count=n*self.m
+                                )
+        self.alphas = self.alphas.reshape((n,self.m))
+        return self.alphas
         
 
     def calcbeta(self, u, k, n):
@@ -249,10 +242,25 @@ class LogisticRegression(object):
     
     def calcbetas(self, ws, x, y, n):
         self.betas = np.zeros((self.m,n))
-        #print self.betas.shape
         for k in xrange(n,0,-1):
             for u in xrange(self.m):
                 self.betas[u][k-1] = self.calcbeta(u,k,n)
+                
+#        print self.betas
+#        print self.betas.shape
+#        
+#        self.betas = np.fromiter((self.calcbeta(u,k,n)                            
+#                                                        
+#                            for u in xrange(self.m)
+#                            for k in xrange(n,0,-1)
+#                            ),
+#                            dtype=np.float,
+#                            count=self.m*n
+#                        )
+#        self.betas = self.betas.reshape((self.m,n))
+#        
+#        print self.betas
+#        print self.betas.shape
         return
 
     
@@ -278,6 +286,12 @@ class LogisticRegression(object):
 
 
     def _calcSGDExpect(self, ws, x, y, n):
+        
+        #calculate forward(alpha) & backward(beta) vectors, and Z
+        self.calcalphas(ws, x, y, n)
+        self.calcbetas(ws, x, y, n)
+        self.Z = self.calcZ(ws, x, y, n)
+        
         expect = np.zeros((len(ws)))
         for j in self.S:#range(0,len(ws)):
             summ = 0
@@ -328,11 +342,6 @@ class LogisticRegression(object):
         
         #calculate gi matrices
         self.calcgis(ws, x, n)
-
-        #calculate forward(alpha) & backward(beta) vectors, and Z
-        self.calcalphas(ws, x, y, n)
-        self.calcbetas(ws, x, y, n)
-        self.Z = self.calcZ(ws, x, y, n)
 
         #compute expectation
         fval = self._calcCollExp(ws, x, y, n)
