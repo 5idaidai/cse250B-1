@@ -2,6 +2,7 @@ from sklearn.metrics import accuracy_score
 from util import read_file
 from logistic_regression import LogisticRegression
 from datetime import datetime
+import numpy as np
 
 """Data processing:
 
@@ -31,8 +32,9 @@ def runML(meth, itrs, data_train, data_test, labels_train, labels_test):
     model.fit(data_train, labels_train)
     print datetime.now().time()
     prediction = model.predict(data_test)
+    tagscores = LogisticRegression.tagAccuracy(labels_test, prediction)
     score = accuracy_score(labels_test, prediction)
-    print "  score: {}".format(score)
+    print "  score: {}, tags: mean: {}, max: {}, min: {}".format(score,np.mean(tagscores),max(tagscores),min(tagscores))
     print "  error rate: {}".format(1 - score)
     print datetime.now().time()
 
@@ -40,5 +42,5 @@ if __name__ == "__main__":
     data_train, data_test, labels_train, labels_test = importData()
     labels_test=LogisticRegression.preproclabels(labels_test)
     
-    runML("collins",10,data_train, data_test, labels_train, labels_test)
+    runML("collins",1,data_train, data_test, labels_train, labels_test)
     #runML("cd",10,data_train, data_test, labels_train, labels_test)

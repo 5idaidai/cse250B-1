@@ -110,7 +110,8 @@ class LogisticRegression(object):
         pred = ['']*len(x)
         yhat[0] = tags.start
         pred[0] = tags.tags[tags.start]
-#        yhat[end+1] = tags.tags[tags.stop]
+        #yhat[end+1] = tags.stop  
+        #pred[end+1] = tags.tags[tags.stop]
         
         #last tag:
         yhat[end] = np.argmax(self.U[end])
@@ -369,7 +370,14 @@ class LogisticRegression(object):
         #result[0] = ws[0] + rate * ((y - p) * x[0])
         return result
 
-    #def tagAccuracy(label, predicted):
+    @staticmethod
+    def tagAccuracy(labels, preds):
+        scores = np.fromiter((accuracy_score(label, pred)
+                            for label,pred in zip(labels,preds)),
+                            dtype=np.float,
+                            count=len(preds)
+                            )
+        return scores
         
 
     def _sgd(self, data, labels):
@@ -394,8 +402,9 @@ class LogisticRegression(object):
             for i, (x, y) in enumerate(zip(data_train, labels_train)):
                 self.ws = self._sgd_update(self.ws, x, y, rate)
             prediction = self.predict(data_valid)
+            tagscores = self.tagAccuracy(labels_valid, prediction)
             score = accuracy_score(labels_valid, prediction)
-            print score,self.ws
+            print np.mean(tagscores),max(tagscores),min(tagscores),score#,self.ws
             if score > 0 and score < old_score:#np.abs(score - old_score) < 1e-8:
                 self.converged_ = True
                 break
