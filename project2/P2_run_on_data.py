@@ -43,5 +43,5 @@ if __name__ == "__main__":
     data_train, data_test, labels_train, labels_test = importData()
     #labels_test=LogisticRegression.preproclabels(labels_test)
     
-    #runML("collins",10,data_train, data_test, labels_train, labels_test)
-    runML("cd",10,data_train, data_test, labels_train, labels_test)
+    runML("collins",10,data_train, data_test, labels_train, labels_test)
+    #runML("cd",10,data_train, data_test, labels_train, labels_test)
