@@ -21,13 +21,14 @@ def testffA2(x, i, n, a):
 def testffB2(yi1, yi, b):
     return yi1 == tags.tags[1]
 
+#test case: last tag is a period
 def testffA3(x, i, n, a):
     return 1
 
-#test case: last tag is a period
 def testffB3(yi1, yi, b):
     return yi == tags.tags[tags.stop] and yi1 == tags.tags[2]
-    
+   
+#default: tag is space
 def testffA4(x, i, n, a):
     return i>0 and i<n
 
