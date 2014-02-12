@@ -26,13 +26,17 @@ def read_file(filename):
     """Read a data file and return data matrix and labels"""
     
     #read data file
-    f = open("punctuationDataset/{}Sentences.txt".format(filename))
+    sentences = "punctuationDataset/{}Sentences.txt".format(filename)
+    print sentences
+    f = open(sentences)
     lines = f.read().split('\n')
     data = (list(process_line(i, False) for i in lines if len(i.strip()) > 0))
     f.close()
     
     #read labels file
-    f = open("punctuationDataset/{}Labels.txt".format(filename))
+    labelsfile = "punctuationDataset/{}Labels.txt".format(filename)
+    print labelsfile
+    f = open(labelsfile)
     lines = f.read().split('\n')
     labels = (list(process_line(i, True) for i in lines if len(i.strip()) > 0))
     f.close()
