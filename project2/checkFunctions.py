@@ -22,7 +22,7 @@ labels_proc = lr.preproclabels(labels_sample)
 
 i = int(np.random.rand() * len(data_sample))
 n = len(data_sample[i])
-ws = [0.67, 1-0.67]#np.random.rand(ffs.numJ)
+ws = [1-0.67, 0.67]#np.random.rand(ffs.numJ)
 x = data_sample[i]
 y = labels_proc[i]
 
@@ -50,13 +50,17 @@ print lr.gis[n-1][2][len(tags.tags)-1]
 
 #np.savetxt("calcgisTest.csv", lr, delimiter=",", fmt='%1.4e')
 
-lr.calcalphas(ws, x, y, n)
-print "Alphas",lr.alphas
+#lr.calcalphas(ws, x, y, n)
+#print "Alphas",lr.alphas
 
-lr.calcbetas(ws, x, y, n)
-print "Betas",lr.betas
+#lr.calcbetas(ws, x, y, n)
+#print "Betas",lr.betas
 
 lr.calcUMat(n)
 print "U",lr.U
 
-print lr.calcYHat(x)
+yhat = lr.calcYHat(x)
+print yhat
+
+expect = lr._calcCollExp(ws, x, n)
+print expect

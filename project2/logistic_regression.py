@@ -91,10 +91,7 @@ class LogisticRegression(object):
         for y in labels:
             newy = []
             for tag in y:
-                for ot in xrange(len(tags.tags)):
-                    if tags.tags[ot] == tag:
-                        newy.append(ot)
-                        break
+                newy.append(tags.tags.index(tag))
             newlabels.append(newy)
         
         return newlabels
@@ -155,7 +152,6 @@ class LogisticRegression(object):
             n = len(x)
             self.calcAs(x, n)
             self.calcBs()
-            #self.calcS(self.ws, x, n)
             self.calcgis(self.ws, x, n)
             self.calcUMat(n)
             yhat,pred = self.calcYHat(x)
