@@ -32,7 +32,7 @@ def testffB3(yi1, yi, b):
    
 #default: tag is space
 def testffA4(x, i, n, a):
-    return i>0 and i<n
+    return i>0 and i<n-1
 
 def testffB4(yi1, yi, b):
     return yi == tags.tags[6]
@@ -43,6 +43,13 @@ def testffA5(x, i, n, a):
 
 def testffB5(yi1, yi, b):
     return yi == b
+    
+#conjunction word at i, yields comma tag at i
+def testffA6(x, i, n, a):
+    return x[i] == a
+    
+def testffB6(yi1, yi, b):
+    return yi == tags.tags[1]
 
 if __name__ == "__main__":
     ffs = []
@@ -75,7 +82,7 @@ if __name__ == "__main__":
     temp4['bset'] = []
     temp4['A'] = testffA4
     temp4['B'] = testffB4
-    ffs.append(temp4)
+    #ffs.append(temp4)
     ffstest.append(temp4) 
     
     temp5 = {}
@@ -84,6 +91,13 @@ if __name__ == "__main__":
     temp5['A'] = testffA5
     temp5['B'] = testffB5
     ffs.append(temp5)
+    
+    temp6 = {}
+    temp6['aset'] = tags.conj
+    temp6['bset'] = []
+    temp6['A'] = testffA6
+    temp6['B'] = testffB6
+    ffs.append(temp6)
     
     gFF.generateFFs(ffs, os.path.splitext(os.path.basename(__file__))[0])
     #gFF.generateFFs(ffstest, os.path.splitext(os.path.basename(__file__))[0])
