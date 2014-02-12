@@ -29,7 +29,7 @@ def testffB3(yi1, yi, b):
     return yi == tags.tags[tags.stop] and yi1 == tags.tags[2]
     
 def testffA4(x, i, n, a):
-    return i<n
+    return i>0 and i<n
 
 def testffB4(yi1, yi, b):
     return yi == tags.tags[6]

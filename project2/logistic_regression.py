@@ -273,8 +273,9 @@ class LogisticRegression(object):
 
 
     def calcGibbs(self, yi, i, yi1):
-        Gibbs = (np.exp(self.gis[i][yi1,:] + self.gis[i][:,yi]))
-        summ = sum(Gibbs)
+        temp = self.gis[i][yi1,:] + self.gis[i][:,yi]
+        Gibbs = temp
+        summ = self.log_sum_exp(temp)
         P = Gibbs / summ
         M = np.argmax(P)
         self.Gibbs = tags.tags[M]
