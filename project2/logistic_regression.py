@@ -429,6 +429,7 @@ class LogisticRegression(object):
                     if score > 0.85 or (score > 0 and score <= old_score):#np.abs(score - old_score) < 1e-8:
                         self.converged_ = True
                         break
+                    old_score = score
             prediction = self.predict(data_valid)
             tagscores = self.tagAccuracy(labels_valid, prediction)
             score = np.mean(tagscores)
