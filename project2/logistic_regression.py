@@ -324,9 +324,7 @@ class LogisticRegression(object):
     def calcYstar(self, y, n):
         expect = [0]
         for i in xrange(1,n-1):
-            yi1 = tags.tags.index(y[i-1])
-            yi = tags.tags.index(y[i+1])
-            expect.append(self.calcGibbs(yi, i, yi1))
+            expect.append(self.calcGibbs(y[i], i, y[i-1]))
         expect.append(7)
 #        ystar = []
 #        ystar = (self.calcGibbs(tags.tags.index[y[i+1]], i, tags.tags.index[y[i-1]])
