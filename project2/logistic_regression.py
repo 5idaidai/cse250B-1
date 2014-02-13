@@ -112,15 +112,19 @@ class LogisticRegression(object):
         pred[0] = tags.tags[tags.start]
         #yhat[end+1] = tags.stop  
         #pred[end+1] = tags.tags[tags.stop]
+        yhat[end] = tags.stop  
+        pred[end] = tags.tags[tags.stop]
         
         #last tag:
-        yhat[end] = np.argmax(self.U[end])
-        pred[end] = tags.tags[yhat[end]]
+        yhat[end-1] = np.argmax(self.U[end-1])
+        pred[end-1] = tags.tags[yhat[end-1]]
         
-        for k in xrange(end-1,0,-1):
+        for k in xrange(end-2,0,-1):
             temp = np.argmax(self.U[k] + self.gis[k+1][:,yhat[k+1]])
             yhat[k] = temp
             pred[k] = tags.tags[yhat[k]]
+            
+
         
         return yhat
         
@@ -268,8 +272,8 @@ class LogisticRegression(object):
         
         
     def calcF(self, j, x, y, n):
-        return sum(ffs.featureFunc[j](y[i-1], y[i], x, i, n) for i in xrange(n))
-        #return sum(self.As[j,i] * self.Bs[j,i-1,i] for i in xrange(n))
+        #return sum(ffs.featureFunc[j](y[i-1], y[i], x, i, n) for i in xrange(n))
+        return sum(self.As[j,i] * self.Bs[j,y[i-1],y[i]] for i in xrange(1,n))
 
 
     def calcGibbs(self, yi, i, yi1):
@@ -278,7 +282,7 @@ class LogisticRegression(object):
         summ = self.log_sum_exp(temp)
         P = Gibbs / summ
         M = np.argmax(P)
-        self.Gibbs = tags.tags[M]
+        self.Gibbs = M#tags.tags[M]
         return self.Gibbs
 
 
@@ -317,12 +321,12 @@ class LogisticRegression(object):
 
 
     def calcYstar(self, y, n):
-        expect = ['START']
+        expect = [0]
         for i in xrange(1,n-1):
             yi1 = tags.tags.index(y[i-1])
             yi = tags.tags.index(y[i+1])
             expect.append(self.calcGibbs(yi, i, yi1))
-        expect.append('STOP')
+        expect.append(7)
 #        ystar = []
 #        ystar = (self.calcGibbs(tags.tags.index[y[i+1]], i, tags.tags.index[y[i-1]])
 #                            for i in xrange(1,n-1))
@@ -361,7 +365,10 @@ class LogisticRegression(object):
         self.calcgis(ws, x, n)
 
         #compute expectation
-        fval = self._calcFExp(ws, x, y, n)
+        yidxs = np.fromiter((tags.tags.index(y[i]) for i in range(n)),
+                            dtype=np.float,
+                            count=n)
+        fval = self._calcFExp(ws, x, yidxs, n)
         expectation = self.calcExpect(ws, x, y, n)        
         
         #p = np.exp(log_prob(1, np.dot(x, ws)))
@@ -403,8 +410,8 @@ class LogisticRegression(object):
                 self.ws = self._sgd_update(self.ws, x, y, rate)
             prediction = self.predict(data_valid)
             tagscores = self.tagAccuracy(labels_valid, prediction)
-            score = accuracy_score(labels_valid, prediction)
-            print np.mean(tagscores),max(tagscores),min(tagscores),score#,self.ws
+            score = np.mean(tagscores)
+            print score,max(tagscores),min(tagscores)#,self.ws
             if score > 0 and score < old_score:#np.abs(score - old_score) < 1e-8:
                 self.converged_ = True
                 break

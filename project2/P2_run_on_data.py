@@ -33,8 +33,8 @@ def runML(meth, itrs, data_train, data_test, labels_train, labels_test):
     print datetime.now().time()
     prediction = model.predict(data_test)
     tagscores = LogisticRegression.tagAccuracy(labels_test, prediction)
-    score = accuracy_score(labels_test, prediction)
-    print "  score: {}, tags: mean: {}, max: {}, min: {}".format(score,np.mean(tagscores),max(tagscores),min(tagscores))
+    score = np.mean(tagscores)
+    print "  score tags: mean: {}, max: {}, min: {}".format(score,max(tagscores),min(tagscores))
     print "  error rate: {}".format(1 - score)
     print datetime.now().time()
 
