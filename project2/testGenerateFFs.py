@@ -50,6 +50,13 @@ def testffA6(x, i, n, a):
     
 def testffB6(yi1, yi, b):
     return yi == tags.tags[1]
+    
+#two commas in a row: should be negative weight as it's uncommon
+def testffA7(x, i, n, a):
+    return 1
+    
+def testffB7(yi1, yi, b):
+    return yi1 == tags.tags[1] and yi == tags.tags[1]
 
 if __name__ == "__main__":
     ffs = []
@@ -82,7 +89,7 @@ if __name__ == "__main__":
     temp4['bset'] = []
     temp4['A'] = testffA4
     temp4['B'] = testffB4
-    #ffs.append(temp4)
+    ffs.append(temp4)
     ffstest.append(temp4) 
     
     temp5 = {}
@@ -98,6 +105,13 @@ if __name__ == "__main__":
     temp6['A'] = testffA6
     temp6['B'] = testffB6
     ffs.append(temp6)
+    
+    temp7 = {}
+    temp7['aset'] = []
+    temp7['bset'] = []
+    temp7['A'] = testffA7
+    temp7['B'] = testffB7
+    ffs.append(temp7)
     
     gFF.generateFFs(ffs, os.path.splitext(os.path.basename(__file__))[0])
     #gFF.generateFFs(ffstest, os.path.splitext(os.path.basename(__file__))[0])
