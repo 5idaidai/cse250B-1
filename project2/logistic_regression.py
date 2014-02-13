@@ -115,19 +115,19 @@ class LogisticRegression(object):
         pred[0] = tags.tags[tags.start]
         #yhat[end+1] = tags.stop  
         #pred[end+1] = tags.tags[tags.stop]
-        yhat[end] = tags.stop  
-        pred[end] = tags.tags[tags.stop]
+        
         
         #last tag:
-        yhat[end-1] = np.argmax(self.U[end-1])
-        pred[end-1] = tags.tags[yhat[end-1]]
+        yhat[end] = np.argmax(self.U[end-1])
+        pred[end] = tags.tags[yhat[end]]
         
-        for k in xrange(end-2,0,-1):
+        for k in xrange(end-1,0,-1):
             temp = np.argmax(self.U[k] + self.gis[k+1][:,yhat[k+1]])
             yhat[k] = temp
             pred[k] = tags.tags[yhat[k]]
             
-
+        yhat[end] = tags.stop  
+        pred[end] = tags.tags[tags.stop]
         
         return yhat
         
@@ -424,7 +424,7 @@ class LogisticRegression(object):
             score = np.mean(tagscores)
             epochscores[epoch] = score
             print score,max(tagscores),min(tagscores)#,self.ws
-            if score > 0 and score <= old_score:#np.abs(score - old_score) < 1e-8:
+            if score > 0.9 or (score > 0 and score <= old_score):#np.abs(score - old_score) < 1e-8:
                 self.converged_ = True
                 break
             rate = rate * self.decay
