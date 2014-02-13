@@ -14,12 +14,12 @@ import numpy as np
 
 def importData():
     # read data and split training data into training and validation sets
-    data_train, labels_train = read_file('medium')
+    data_train, labels_train = read_file('training')
         
     #assert len(data_train[0]) == len(labels_train[0])
     #assert len(data_train[200]) == len(labels_train[200])
 
-    data_test, labels_test = read_file('short')
+    data_test, labels_test = read_file('test')
             
     #assert len(data_test[0]) == len(data_test[0])
     #assert len(data_test[200]) == len(data_test[200])
@@ -42,5 +42,5 @@ if __name__ == "__main__":
     data_train, data_test, labels_train, labels_test = importData()
     labels_test=LogisticRegression.preproclabels(labels_test)
     
-    runML("collins",1,data_train, data_test, labels_train, labels_test)
-    #runML("cd",10,data_train, data_test, labels_train, labels_test)
+    runML("collins",10,data_train, data_test, labels_train, labels_test)
+    runML("cd",10,data_train, data_test, labels_train, labels_test)

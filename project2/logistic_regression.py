@@ -434,7 +434,7 @@ class LogisticRegression(object):
         else:
             print "did not converge"
             
-        np.savetxt("tagscoreperepoch.csv", epochscores, delimiter=",", fmt='%1.4e')
+        np.savetxt(self.method+"_tagscoreperepoch.csv", epochscores, delimiter=",", fmt='%1.4e')
             
         return self.ws
 
