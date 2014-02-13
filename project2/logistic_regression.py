@@ -415,16 +415,26 @@ class LogisticRegression(object):
         rate = self.rate
         self.converged_ = False
         old_score = 0
-        epochscores = np.zeros((self.max_iters))
+        epochscores = []
+        minorscores = []
         for epoch in xrange(self.max_iters):
             for i, (x, y) in enumerate(zip(data_train, labels_train)):
                 self.ws = self._sgd_update(self.ws, i, x, y, rate)
+                if i%1000 == 0:
+                    prediction = self.predict(data_valid)
+                    tagscores = self.tagAccuracy(labels_valid, prediction)
+                    score = np.mean(tagscores)
+                    minorscores.append(score)
+                    print score,max(tagscores),min(tagscores)#,self.ws
+                    if score > 0.9 or (score > 0 and score <= old_score):#np.abs(score - old_score) < 1e-8:
+                        self.converged_ = True
+                        break
             prediction = self.predict(data_valid)
             tagscores = self.tagAccuracy(labels_valid, prediction)
             score = np.mean(tagscores)
-            epochscores[epoch] = score
+            epochscores.append(score)
             print score,max(tagscores),min(tagscores)#,self.ws
-            if score > 0.9 or (score > 0 and score <= old_score):#np.abs(score - old_score) < 1e-8:
+            if self.converged_ == True or score > 0.9 or (score > 0 and score <= old_score):#np.abs(score - old_score) < 1e-8:
                 self.converged_ = True
                 break
             rate = rate * self.decay
@@ -434,7 +444,9 @@ class LogisticRegression(object):
         else:
             print "did not converge"
             
-        np.savetxt(self.method+"_tagscoreperepoch.csv", epochscores, delimiter=",", fmt='%1.4e')
+        np.savetxt(self.method+"_tagscore_per_epoch.csv", epochscores, delimiter=",", fmt='%1.4e')
+        np.savetxt(self.method+"_tagscore_minor.csv", minorscores, delimiter=",", fmt='%1.4e')
+        
             
         return self.ws
 
