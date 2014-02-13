@@ -89,9 +89,10 @@ class LogisticRegression(object):
         newlabels = []
         
         for y in labels:
-            newy = []
-            for tag in y:
-                newy.append(tags.tags.index(tag))
+            newy = np.fromiter((tags.tags.index(tag) for tag in y),
+                               dtype=np.float,
+                               count=len(y))
+
             newlabels.append(newy)
         
         return newlabels
@@ -365,10 +366,7 @@ class LogisticRegression(object):
         self.calcgis(ws, x, n)
 
         #compute expectation
-        yidxs = np.fromiter((tags.tags.index(y[i]) for i in range(n)),
-                            dtype=np.float,
-                            count=n)
-        fval = self._calcFExp(ws, x, yidxs, n)
+        fval = self._calcFExp(ws, x, y, n)
         expectation = self.calcExpect(ws, x, y, n)        
         
         #p = np.exp(log_prob(1, np.dot(x, ws)))
@@ -399,7 +397,9 @@ class LogisticRegression(object):
         state.shuffle(idx)
         data_train = data_train[idx]
         labels_train = labels_train[idx]
+        
         labels_valid=self.preproclabels(labels_valid)
+        labels_train=self.preproclabels(labels_train)
 
         self.ws = np.zeros(ffs.numJ)
         rate = self.rate
