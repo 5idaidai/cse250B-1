@@ -22,7 +22,7 @@ labels_proc = lr.preproclabels(labels_sample)
 
 i = int(np.random.rand() * len(data_sample))
 n = len(data_sample[i])
-ws = [0.67, 1-0.67]#np.random.rand(ffs.numJ)
+ws = np.random.rand(ffs.numJ)
 x = data_sample[i]
 y = labels_proc[i]
 
@@ -63,6 +63,7 @@ yhat = lr.calcYHat(x)
 print yhat
 
 expect = lr._calcCollExp(ws, x, n)
-print expect
+#print expect
 
-print lr.calcYstar(labels_sample[i], n)
+print lr.calcYstar(y, n)
+print y

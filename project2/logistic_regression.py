@@ -55,6 +55,8 @@ class LogisticRegression(object):
         self.Z = 1
         self.ADict = {}
         self.BDict = {}
+        self.yhats = []
+        self.ystars = []
 
 
     def _validate_args(self):
@@ -92,12 +94,26 @@ class LogisticRegression(object):
         
         for y in labels:
             newy = np.fromiter((tags.tags.index(tag) for tag in y),
-                               dtype=np.float,
+                               dtype=np.int,
                                count=len(y))
 
             newlabels.append(newy)
         
         return newlabels
+        
+    
+    @staticmethod
+    def unpreproclabels(labels):
+        newlabels = []
+        
+        for y in labels:
+            newy = []
+            for idx in y:
+                newy.append(tags.tags[idx])
+
+            newlabels.append(newy)
+        
+        return newlabels        
 
     def fit(self, data, labels):
         self._validate_args()
@@ -320,6 +336,7 @@ class LogisticRegression(object):
     def _calcCollExp(self, ws, x, n):
         self.calcUMat(n)
         yhat = self.calcYHat(x)
+        self.yhats.append(yhat)
         return self._calcFExp(ws, x, yhat, n)
 
 
@@ -338,6 +355,7 @@ class LogisticRegression(object):
 
     def _calcCDExpect(self, ws, x, y, n):
         ystar=self.calcYstar(y, n)
+        self.ystars.append(ystar)
         return self._calcFExp(ws, x, ystar, n)
 
 
@@ -444,10 +462,16 @@ class LogisticRegression(object):
             print "converged after {} epochs".format(epoch)
         else:
             print "did not converge"
-            
-        np.savetxt(self.method+"_tagscore_per_epoch.csv", epochscores, delimiter=",", fmt='%1.4e')
-        np.savetxt(self.method+"_tagscore_minor.csv", minorscores, delimiter=",", fmt='%1.4e')
         
+        
+#        np.savetxt(self.method+"_tagscore_per_epoch.csv", epochscores, delimiter=",", fmt='%1.4e')
+#        np.savetxt(self.method+"_tagscore_minor.csv", minorscores, delimiter=",", fmt='%1.4e')
+#        
+#        if self.method == "collins":
+#            np.savetxt(self.method+"_yhat.csv", self.unpreproclabels(self.yhats), delimiter=",", fmt='%s')
+#        elif self.method == "cd":
+#            np.savetxt(self.method+"_ystar.csv", self.unpreproclabels(self.ystars), delimiter=",", fmt='%s')
+#        np.savetxt(self.method+"_labels.csv", self.unpreproclabels(labels_train), delimiter=",", fmt='%s')
             
         return self.ws
 
