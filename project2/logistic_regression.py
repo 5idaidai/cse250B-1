@@ -53,6 +53,8 @@ class LogisticRegression(object):
         self.alphas = np.zeros((self.m,self.m))
         self.betas = np.zeros((self.m,self.m))
         self.Z = 1
+        self.ADict = {}
+        self.BDict = {}
 
 
     def _validate_args(self):
@@ -351,12 +353,19 @@ class LogisticRegression(object):
             return -1
 
 
-    def _sgd_update(self, ws, x, y, rate):
+    def _sgd_update(self, ws, i, x, y, rate):
         """single step in SGD"""
         n = len(x)
         
-        self.calcAs(x, n)
-        self.calcBs()
+        if self.ADict[i] == None:
+           self.ADict[i] = self.calcAs(x, n)
+        else:
+            self.As = self.ADict[i]
+            
+        if self.BDict[i] == None:
+           self.BDict[i] = self.calcBs()
+        else:
+            self.Bs = self.BDict[i]   
         #self.calcS(ws, x, n)
         #print len(self.S),self.S
         
@@ -398,19 +407,24 @@ class LogisticRegression(object):
         
         labels_valid=self.preproclabels(labels_valid)
         labels_train=self.preproclabels(labels_train)
+        
+        self.ADict = dict.fromkeys(range(n))
+        self.BDict = dict.fromkeys(range(n))
 
         self.ws = np.zeros(ffs.numJ)
         rate = self.rate
         self.converged_ = False
         old_score = 0
+        epochscores = np.zeros((self.max_iters))
         for epoch in xrange(self.max_iters):
             for i, (x, y) in enumerate(zip(data_train, labels_train)):
-                self.ws = self._sgd_update(self.ws, x, y, rate)
+                self.ws = self._sgd_update(self.ws, i, x, y, rate)
             prediction = self.predict(data_valid)
             tagscores = self.tagAccuracy(labels_valid, prediction)
             score = np.mean(tagscores)
+            epochscores[epoch] = score
             print score,max(tagscores),min(tagscores)#,self.ws
-            if score > 0 and score < old_score:#np.abs(score - old_score) < 1e-8:
+            if score > 0 and score <= old_score:#np.abs(score - old_score) < 1e-8:
                 self.converged_ = True
                 break
             rate = rate * self.decay
@@ -419,6 +433,8 @@ class LogisticRegression(object):
             print "converged after {} epochs".format(epoch)
         else:
             print "did not converge"
+            
+        np.savetxt("tagscoreperepoch.csv", epochscores, delimiter=",", fmt='%1.4e')
             
         return self.ws
 

@@ -14,7 +14,7 @@ def testffA1(x, i, n, a):
     return x[1] == a
     
 def testffB1(yi1, yi, b):
-    return yi == tags.tags[4]
+    return yi == tags.tags[3]
     
 #conjunction word at i, yields comma tag at i-1
 def testffA2(x, i, n, a):
@@ -32,7 +32,7 @@ def testffB3(yi1, yi, b):
    
 #default: tag is space
 def testffA4(x, i, n, a):
-    return i>0 and i<n-1
+    return i>0 and i<n-2
 
 def testffB4(yi1, yi, b):
     return yi == tags.tags[6]
@@ -57,6 +57,20 @@ def testffA7(x, i, n, a):
     
 def testffB7(yi1, yi, b):
     return yi1 == tags.tags[1] and yi == tags.tags[1]
+    
+#longer sentences tend to have commas
+def testffA8(x, i, n, a):
+    return n>a
+    
+def testffB8(yi1, yi, b):
+    return yi == tags.tags[1]
+    
+#colon at specific position
+def testffA9(x, i, n, a):
+    return i==a
+    
+def testffB9(yi1, yi, b):
+    return yi == tags.tags[5]
 
 if __name__ == "__main__":
     ffs = []
@@ -112,6 +126,20 @@ if __name__ == "__main__":
     temp7['A'] = testffA7
     temp7['B'] = testffB7
     ffs.append(temp7)
+    
+    temp8 = {}
+    temp8['aset'] = range(5,25,3)
+    temp8['bset'] = []
+    temp8['A'] = testffA8
+    temp8['B'] = testffB8
+    ffs.append(temp8)
+    
+    temp9 = {}
+    temp9['aset'] = range(1,25)
+    temp9['bset'] = []
+    temp9['A'] = testffA9
+    temp9['B'] = testffB9
+    ffs.append(temp9)
     
     gFF.generateFFs(ffs, os.path.splitext(os.path.basename(__file__))[0])
     #gFF.generateFFs(ffstest, os.path.splitext(os.path.basename(__file__))[0])
