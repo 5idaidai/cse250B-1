@@ -3,10 +3,10 @@ from __future__ import division
 import numpy as np
 import ffs
 import tags
+import sys
 from sklearn.utils.random import check_random_state
 from sklearn.cross_validation import train_test_split
 from sklearn.metrics import accuracy_score
-from datetime import datetime
 
 def log_sum_exp(x):
     m = x.max()
@@ -443,17 +443,21 @@ class LogisticRegression(object):
                     tagscores = self.tagAccuracy(labels_valid, prediction)
                     score = np.mean(tagscores)
                     minorscores.append(score)
-                    print score,max(tagscores),min(tagscores)#,self.ws
+                    print "sample:{}".format(i),score,max(tagscores),min(tagscores)#,self.ws
+                    sys.stdout.flush()
                     if score > 0.85 or (score > 0 and score <= old_score):#np.abs(score - old_score) < 1e-8:
                         self.converged_ = True
                         break
                     old_score = score
+            if self.converged_ == True:
+                break
             prediction = self.predict(data_valid)
             tagscores = self.tagAccuracy(labels_valid, prediction)
             score = np.mean(tagscores)
             epochscores.append(score)
-            print score,max(tagscores),min(tagscores)#,self.ws
-            if self.converged_ == True or score > 0.85 or (score > 0 and score <= old_score):#np.abs(score - old_score) < 1e-8:
+            print "epoch:{}".format(epoch),score,max(tagscores),min(tagscores)#,self.ws
+            sys.stdout.flush()
+            if score > 0.85 or (score > 0 and score <= old_score):#np.abs(score - old_score) < 1e-8:
                 self.converged_ = True
                 break
             rate = rate * self.decay
