@@ -420,13 +420,13 @@ class LogisticRegression(object):
         for epoch in xrange(self.max_iters):
             for i, (x, y) in enumerate(zip(data_train, labels_train)):
                 self.ws = self._sgd_update(self.ws, i, x, y, rate)
-                if i%1000 == 0:
+                if i>0 and i%1000 == 0:
                     prediction = self.predict(data_valid)
                     tagscores = self.tagAccuracy(labels_valid, prediction)
                     score = np.mean(tagscores)
                     minorscores.append(score)
                     print score,max(tagscores),min(tagscores)#,self.ws
-                    if score > 0.9 or (score > 0 and score <= old_score):#np.abs(score - old_score) < 1e-8:
+                    if score > 0.85 or (score > 0 and score <= old_score):#np.abs(score - old_score) < 1e-8:
                         self.converged_ = True
                         break
             prediction = self.predict(data_valid)
@@ -434,7 +434,7 @@ class LogisticRegression(object):
             score = np.mean(tagscores)
             epochscores.append(score)
             print score,max(tagscores),min(tagscores)#,self.ws
-            if self.converged_ == True or score > 0.9 or (score > 0 and score <= old_score):#np.abs(score - old_score) < 1e-8:
+            if self.converged_ == True or score > 0.85 or (score > 0 and score <= old_score):#np.abs(score - old_score) < 1e-8:
                 self.converged_ = True
                 break
             rate = rate * self.decay
