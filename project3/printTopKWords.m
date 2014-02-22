@@ -1,4 +1,4 @@
-function [idx,val] = printTopicWords(phis,vocab,k)
+function [idx,val] = printTopKWords(phis,vocab,k)
 %UNTITLED3 Print top k words in each topic
 %   Detailed explanation goes here
 

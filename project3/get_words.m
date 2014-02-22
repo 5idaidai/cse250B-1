@@ -15,5 +15,6 @@ function [words,wordsPerDoc] = get_words(counts, vocab, numWords, numDocs)
             widx = widx + 1;
         end
     end
+    disp('Finished word occurrance calc');
 end
 

@@ -7,8 +7,13 @@ voc=classicwordlist;
 
 numTopics = 4;
 numEpochs = 30;
+percCutOff = 0.15;
     
-[thetas,phis] = lda(numTopics, bag, voc, numEpochs);
+tic;
+[thetas,phis] = lda(numTopics, bag, voc, numEpochs, percCutOff);
+TimeSpent = toc;
+
+fprintf('LDA took %f seconds (aka %f minutes).\n\n',TimeSpent,TimeSpent/60);
 
 plotDocTopics(thetas);
-printTopicWords(phis,voc,numTopics);
+printTopKWords(phis,voc,10);
