@@ -1,19 +1,35 @@
-function [ output_args ] = innergibbs(alpha, beta, q, n)
+function [ newTopic ] = innergibbs(i, m, alphas, betas, q, n, numTopics)
 %GIBBS Equation 5 in the notes
 %   drawing a random number uniformly between 0 and
 % 1, and using it to index into the unit interval which is divided into subintervals
 % of length p
 
-    left = q + beta;
-    right = n + alpha;
+    left = q(:,i) + betas(i);
+    right = n(m,:)' + alphas;
     
-    denomLeft = sum(left);
-    denomRight = sum(right);
+    for j=1:numTopics
+        denomLeft(j) = sum(q(j,:)'+betas);        
+    end
+    denomRight = sum(n(m,:)'+alphas);
     
-    P = (left/denomLeft)*(right/denomRight);
+    leftTerm = (left'./denomLeft);
+    rightTerm = (right./denomRight);
+    
+    P = leftTerm'.*rightTerm;
+    total=sum(P);
+    P = P / total;
     
     r = rand;
-    % r is index into 0-1 interval, subdivided into P(i) intervals
+    % r is index into 0-1 interval, subdivided into P(k) intervals
+    
+    tot = 0;
+    for k=1:numTopics
+        tot = tot + P(k);
+        if r <= tot
+            newTopic = k;
+            return
+        end
+    end
 
 end
 

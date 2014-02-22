@@ -1,4 +1,4 @@
-function [ output_args ] = gibbs(numWords,zs,alphas,betas,counts,n,q)
+function [ thetas,phis ] = gibbs(thetas,phis,words,z,alphas,betas,counts,n,q,numWords,numTopics,wordsPerDoc)
 %GIBBS Summary of this function goes here
 %   standard approach to implementing Gibbs sampling iterates over every
 % position of every document, taking the positions in some arbitrary order. For
@@ -8,9 +8,19 @@ function [ output_args ] = gibbs(numWords,zs,alphas,betas,counts,n,q)
 % K is the number of topics.
 
     %iterate over every position of every doc (arbitrary order)
-	%for i=1tonumWords
-		%for k=1toK -> this might not be necessary depending on if we use matrix magic for inner gibbs
-			%innergibbs(alpha, beta, q, n, k)
-
+    for i=1:numWords
+        
+        docnum=1;
+        totalWords = 0;
+        for m=1:size(wordsPerDoc)
+            totalWords = totalWords + wordsPerDoc(m);
+            if totalWords >= i
+                docnum = m;
+                break;
+            end
+        end
+        
+        z(i) = innergibbs(i, docnum, alphas, betas, q, n, numTopics);
+    end
 end
 

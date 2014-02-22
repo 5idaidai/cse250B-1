@@ -1,4 +1,4 @@
-function [ output_args ] = lda(numTopics, counts, vocab)
+function [ thetas,phis ] = lda(numTopics, counts, vocab, numEpochs)
 %LDA performs LDA based training on documents
     counts=counts';
 	m=size(counts,2);
@@ -10,7 +10,7 @@ function [ output_args ] = lda(numTopics, counts, vocab)
     words = get_words(counts, vocab, numWords, m);
 
 	%init alpha & beta -> everything uniformly likely
-	alphas = ones(k) * (50/k);
+	alphas = ones(k,1) * (50/k);
 	betas = ones(V) * 0.01;
 
 	%init all z randomly
@@ -23,6 +23,10 @@ function [ output_args ] = lda(numTopics, counts, vocab)
 	%init q (mxk)
 	q = calcQ(words,z,V,k);
     
-	gibbs(numWords,zs,alphas,betas,counts,n,q);
+    thetas = zeros([m,k]);
+    phis = zeros([k,V]);
+    for epoch=1:numEpochs
+        [thetas,phis] = gibbs(thetas,phis,words,z,alphas,betas,counts,n,q,numWords,k,wordsPerDoc);
+    end
 	
 end
