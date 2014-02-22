@@ -5,12 +5,12 @@ load('classic400.mat');
 bag=classic400;
 voc=classicwordlist;
 
-numTopics = 4;
+numTopics = 10;
 numEpochs = 30;
 percCutOff = 0.15;
     
 tic;
-[thetas,phis] = lda(numTopics, bag, voc, numEpochs, percCutOff);
+[thetas,phis] = lda(bag, voc, numTopics, numEpochs, percCutOff);
 TimeSpent = toc;
 
 fprintf('LDA took %f seconds (aka %f minutes).\n\n',TimeSpent,TimeSpent/60);

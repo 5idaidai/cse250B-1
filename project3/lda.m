@@ -1,4 +1,4 @@
-function [ thetas,phis ] = lda(numTopics, counts, vocab, numEpochs, percCutOff)
+function [ thetas,phis ] = lda(counts, vocab, numTopics, numEpochs, percCutOff)
 %LDA performs LDA based training on documents
     counts=counts';
 	m=size(counts,2);
@@ -23,7 +23,9 @@ function [ thetas,phis ] = lda(numTopics, counts, vocab, numEpochs, percCutOff)
 	%init q (mxk)
 	q = calcQ(words,z,V,k);
     
-    fprintf('Starting Gibbs sampling, %d epochs\n',numEpochs);
+    format shortg
+    c=clock;
+    fprintf('Starting Gibbs sampling, %d epochs, start time: %d:%d:%.02f\n',numEpochs,c(4),c(5),c(6));
     for epoch=1:numEpochs
         [z,numChanged] = gibbs(z,words,alphas,betas,n,q,numWords,k,wordsPerDoc);
         
@@ -33,7 +35,9 @@ function [ thetas,phis ] = lda(numTopics, counts, vocab, numEpochs, percCutOff)
             fprintf('Percentage changed less than %f',percCutOff);
         end
     end
-    disp('Finished Gibbs sampling');
+    c=clock;
+    disp('Finished Gibbs sampling, end time: %d:%d:%.02f\n',c(4),c(5),c(6)');
+
     
     %recover thetas and phis from learned z distribution
     [thetas,phis] = phiAndTheta(q,n,m,k,V);
