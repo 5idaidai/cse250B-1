@@ -1,4 +1,4 @@
-function [ thetas,phis ] = gibbs(thetas,phis,words,z,alphas,betas,counts,n,q,numWords,numTopics,wordsPerDoc)
+function [ z ] = gibbs(z,alphas,betas,n,q,numWords,numTopics,wordsPerDoc)
 %GIBBS Summary of this function goes here
 %   standard approach to implementing Gibbs sampling iterates over every
 % position of every document, taking the positions in some arbitrary order. For
@@ -20,7 +20,15 @@ function [ thetas,phis ] = gibbs(thetas,phis,words,z,alphas,betas,counts,n,q,num
             end
         end
         
-        z(i) = innergibbs(i, docnum, alphas, betas, q, n, numTopics);
+        oldtopic = z(i);
+        newtopic = innergibbs(i, docnum, alphas, betas, q, n, numTopics);
+        z(i) = newtopic;
+        
+        q(oldtopic,i) = q(oldtopic,i) - 1;
+        q(newtopic,i) = q(newtopic,i) - 1;
+        
+        n(docnum,oldtopic) = n(docnum,oldtopic) - 1;
+        n(docnum,newtopic) = n(docnum,newtopic) + 1;
     end
 end
 

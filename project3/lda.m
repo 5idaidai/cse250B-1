@@ -26,7 +26,9 @@ function [ thetas,phis ] = lda(numTopics, counts, vocab, numEpochs)
     thetas = zeros([m,k]);
     phis = zeros([k,V]);
     for epoch=1:numEpochs
-        [thetas,phis] = gibbs(thetas,phis,words,z,alphas,betas,counts,n,q,numWords,k,wordsPerDoc);
+        [z] = gibbs(z,alphas,betas,n,q,numWords,k,wordsPerDoc);
     end
+    
+    %recover thetas and phis from learned z distribution
 	
 end

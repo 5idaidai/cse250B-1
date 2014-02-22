@@ -4,4 +4,4 @@ load('classic400.mat');
 numTopics = 4;
 numEpochs = 30;
 
-lda(numTopics, classic400, classicwordlist, numEpochs);
+[thetas,phis] = lda(numTopics, classic400, classicwordlist, numEpochs);
