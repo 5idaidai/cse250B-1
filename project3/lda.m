@@ -36,7 +36,7 @@ function [ thetas,phis,ratios ] = lda(counts, vocab, words, numTopics, numEpochs
         end
         
         if epoch > 1 && ratios(epoch) < percCutOff && ratios(epoch-1) < percCutOff
-            fprintf('Percentage changed (%f) less than %f',ratio,percCutOff);
+            fprintf('Percentage changed (%f) less than %f',ratios(epoch),percCutOff);
         end
     end
     c=clock;
