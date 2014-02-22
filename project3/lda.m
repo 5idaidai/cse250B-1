@@ -26,7 +26,9 @@ function [ thetas,phis ] = lda(counts, vocab, numTopics, numEpochs, percCutOff)
     format shortg
     c=clock;
     fprintf('Starting Gibbs sampling, %d epochs, start time: %d:%d:%.02f\n',numEpochs,c(4),c(5),c(6));
+
     for epoch=1:numEpochs
+        fprintf('Epoch #%d\n',epoch);
         [z,numChanged] = gibbs(z,words,alphas,betas,n,q,numWords,k,wordsPerDoc);
         
         ratio = numChanged / numWords;
