@@ -1,13 +1,10 @@
+function [] = gridsearch(file,bag,voc)
 
-load('classic400.mat');
-%load('20Newsgroups.mat');
+fprintf('Running grid search on: %s\n',file);
 
-bag=classic400;
-voc=classicwordlist;
-
-numEpochs = 1;
-numTopics = [2,3,4];%,5,10,15,20];
-percs = [0.02,0.1];%,0.15,0.2];
+numEpochs = 30;
+numTopics = [2,3,4,5,10,15,20];
+percs = [0.02,0.1,0.15,0.2];
 
 
 nT = size(numTopics,1);
@@ -33,11 +30,11 @@ for percCutOff=percs
         storedPhis(pidx,kidx) = {phis};
 
         fprintf('LDA took %f seconds (aka %f minutes).\n\n',times(pidx,kidx),times(pidx,kidx)/60);
-
-        %plotDocTopics(thetas);
-        %printTopKWords(phis,voc,10);
         
         kidx = kidx + 1;
     end
     pidx = pidx + 1;
+end
+
+save(strcat(file,'_grid_results.mat'),times,storedThetas,storedPhis,voc,numTopics,percs);
 end

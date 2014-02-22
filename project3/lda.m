@@ -27,11 +27,13 @@ function [ thetas,phis ] = lda(counts, vocab, words, numTopics, numEpochs, percC
 
     oldratio = 1;
     for epoch=1:numEpochs
-        fprintf('Epoch #%d, ',epoch);
+        
         [z,numChanged] = gibbs(z,words,alphas,betas,n,q,numWords,k,wordsPerDoc);
         
         ratio = numChanged / numWords;
-        fprintf('ratio: %f\n',ratio);
+        if epoch == 1 || mod(epoch,(numEpochs/5)) == 0
+            fprintf('Epoch #%d, ratio: %f\n',epoch,ratio);
+        end
         
         if ratio < percCutOff && oldratio < percCutOff
             fprintf('Percentage changed (%f) less than %f',ratio,percCutOff);
