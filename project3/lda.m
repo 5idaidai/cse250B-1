@@ -18,7 +18,7 @@ function [ thetas,phis ] = lda(numTopics, counts, vocab, numEpochs)
 	
 	%init n (mxk)
     % count of how many words within doc m are assigned to topic j
-	n = randi(k,[m,k]);
+	n = nCalc(wordsPerDoc,z,m,k);
 	
 	%init q (mxk)
 	q = calcQ(words,z,V,k);
