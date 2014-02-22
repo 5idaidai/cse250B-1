@@ -1,4 +1,4 @@
-function [ z ] = gibbs(z,alphas,betas,n,q,numWords,numTopics,wordsPerDoc)
+function [ z ] = gibbs(z,words,alphas,betas,n,q,numWords,numTopics,wordsPerDoc)
 %GIBBS Summary of this function goes here
 %   standard approach to implementing Gibbs sampling iterates over every
 % position of every document, taking the positions in some arbitrary order. For
@@ -21,11 +21,12 @@ function [ z ] = gibbs(z,alphas,betas,n,q,numWords,numTopics,wordsPerDoc)
         end
         
         oldtopic = z(i);
-        newtopic = innergibbs(i, oldtopic, docnum, alphas, betas, q, n, numTopics);
+        word = words(i);
+        newtopic = innergibbs(i, word, oldtopic, docnum, alphas, betas, q, n, numTopics);
         z(i) = newtopic;
         
-        q(oldtopic,i) = q(oldtopic,i) - 1;
-        q(newtopic,i) = q(newtopic,i) - 1;
+        q(oldtopic,word) = q(oldtopic,word) - 1;
+        q(newtopic,word) = q(newtopic,word) - 1;
         
         n(docnum,oldtopic) = n(docnum,oldtopic) - 1;
         n(docnum,newtopic) = n(docnum,newtopic) + 1;
