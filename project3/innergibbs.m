@@ -1,8 +1,12 @@
-function [ newTopic ] = innergibbs(i, m, alphas, betas, q, n, numTopics)
+function [ newTopic ] = innergibbs(i, topic, m, alphas, betas, q, oldn, numTopics)
 %GIBBS Equation 5 in the notes
 %   drawing a random number uniformly between 0 and
 % 1, and using it to index into the unit interval which is divided into subintervals
 % of length p
+
+    n=oldn;
+    
+    n(m,topic) = n(m,topic) - 1;
 
     left = q(:,i) + betas(i);
     right = n(m,:)' + alphas;

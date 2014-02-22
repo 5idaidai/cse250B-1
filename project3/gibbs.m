@@ -21,7 +21,7 @@ function [ z ] = gibbs(z,alphas,betas,n,q,numWords,numTopics,wordsPerDoc)
         end
         
         oldtopic = z(i);
-        newtopic = innergibbs(i, docnum, alphas, betas, q, n, numTopics);
+        newtopic = innergibbs(i, oldtopic, docnum, alphas, betas, q, n, numTopics);
         z(i) = newtopic;
         
         q(oldtopic,i) = q(oldtopic,i) - 1;

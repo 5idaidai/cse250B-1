@@ -6,7 +6,14 @@ function [] = plotDocTopics(thetas)
 
 % each column is x,y,z
 
-scatter3(thetas(:,1),thetas(:,2),thetas(:,3));
+d=size(thetas,2)
+if d >= 4
+    scatter3(thetas(:,1),thetas(:,2),thetas(:,3));
+else if d == 3
+    scatter(thetas(:,1),thetas(:,2));
+else if d == 2
+    scatter(thetas(:,1),thetas(:,2));
+end
 
 end
 
