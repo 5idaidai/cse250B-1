@@ -1,8 +1,22 @@
-file='classic400';
-load(file);
+prompt = 'Enter 1 to use the Classic400 dataset \nEnter 2 to use the 20Newsgroups dataset \n';
+dataset = input(prompt);
 
-bag=classic400;
-voc=classicwordlist;
+if dataset==1
+    file='classic400.mat';
+    load(file);
+    bag=classic400;
+    voc=classicwordlist;
+else if dataset==2
+        file='20NewsgroupsShort.mat';
+        load(file);
+        bag=feaShort;
+        voc=vocabShort;
+    else if dataset>2
+            print 'Not a valid dataset';
+            break
+        end
+    end
+end
 
 fprintf('Running epoch num search on: %s\n',file);
 
