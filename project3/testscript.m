@@ -1,15 +1,15 @@
 
 %load('classic400.mat');
-load('20Newsgroups.mat');
+load('20NewsgroupsShort.mat');
 
 %bag=classic400;
 %voc=classicwordlist;
 
-bag=fea;
-voc=vocab;
+bag=feaShort;
+voc=vocabShort;
 
 numTopics = 10;
-numEpochs = 1;
+numEpochs = 100;
 percCutOff = 0.15;
 
 
