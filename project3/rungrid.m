@@ -1,6 +1,7 @@
 
 filename='classic400';
 load(filename);
+findepochs(filename,classic400,classicwordlist);
 gridsearch(filename,classic400,classicwordlist);
 gridresults(filename);
 
