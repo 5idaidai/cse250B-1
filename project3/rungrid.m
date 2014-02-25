@@ -1,9 +1,10 @@
 
 filename='classic400';
 load(filename);
-findepochs(filename,classic400,classicwordlist);
 gridsearch(filename,classic400,classicwordlist);
-gridresults(filename);
+%gridresults(filename);
+
+%findepochs
 
 %filename='20Newsgroups';
 %load(filename);

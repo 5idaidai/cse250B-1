@@ -2,7 +2,7 @@ function [] = gridsearch(file,bag,voc)
 
 fprintf('Running grid search on: %s\n',file);
 
-numEpochs = 30;
+numEpochs = 500;
 numTopics = [2,3,4,5,10,15,20];
 percs = [0.1];%[0.02,0.1,0.15,0.2];
 
@@ -24,7 +24,7 @@ for percCutOff=percs
         fprintf('Running LDA with %d topics, %.04f percent cutoff\n',k,percCutOff);
         
         tic;
-        [thetas,phis,ratios] = lda(bag, voc, words, k, numEpochs, percCutOff);
+        [thetas,phis,ratios,alphas,betas] = lda(bag, voc, words, k, numEpochs, percCutOff);
         times(pidx,kidx) = toc;
         
         storedThetas(pidx,kidx) = {thetas};
@@ -38,6 +38,6 @@ for percCutOff=percs
     pidx = pidx + 1;
 end
 
-resultsFile = strcat(file,'_grid_results.mat');
-save(resultsFile,'times','storedThetas','storedPhis','storedRatios','voc','numTopics','percs');
+resultsFile = strcat(file,'_xepochs_grid_results.mat');
+save(resultsFile,'times','storedThetas','storedPhis','storedRatios','voc','numEpochs','numTopics','percs');
 end
