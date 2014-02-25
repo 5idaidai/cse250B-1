@@ -26,7 +26,6 @@ function [ thetas,phis,ratios,alphas,betas ] = lda(counts, vocab, words, numTopi
     fprintf('Starting Gibbs sampling, %d epochs, start time: %d:%d:%.02f\n',numEpochs,c(4),c(5),c(6));
 
     ratios = ones(numEpochs,1);
-    %GibbsData = ones(numEpochs,2);
     for epoch=1:numEpochs
         
         [z,numChanged] = gibbs(z,words,alphas,betas,n,q,numWords,k,wordsPerDoc);
@@ -43,9 +42,6 @@ function [ thetas,phis,ratios,alphas,betas ] = lda(counts, vocab, words, numTopi
     c=clock;
     fprintf('Finished Gibbs sampling, end time: %d:%d:%.02f\n',c(4),c(5),c(6));
     
-    %GibbsData(:,1)=numEpochs(:);
-    %GibbsData(:,2)=ratios(:);
-
     %recover thetas and phis from learned z distribution
     [thetas,phis] = phiAndTheta(q,n,m,k,V);
 	
