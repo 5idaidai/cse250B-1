@@ -32,7 +32,7 @@ function [ z, numChanged ] = gibbs(z,words,alphas,betas,n,q,numWords,numTopics,w
             q(oldtopic,word) = q(oldtopic,word) - 1;
             q(newtopic,word) = q(newtopic,word) + 1;
 
-            %n(docnum,oldtopic) = n(docnum,oldtopic) - 1;
+            n(docnum,oldtopic) = n(docnum,oldtopic) - 1;
             n(docnum,newtopic) = n(docnum,newtopic) + 1;
         end
     end
