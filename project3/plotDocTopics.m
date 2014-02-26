@@ -6,17 +6,20 @@ function [] = plotDocTopics(thetas)
 
 % each column is x,y,z
 
+M=size(thetas,1);
 d=size(thetas,2);
 C = repmat([1 2 4],size(thetas,2));
 S=20;
 
+sorted = zeros(size(thetas));
+[sorted,sidx]=sort(thetas,2,'descend');
 
 if d >= 4
-    scatter3(thetas(:,1),thetas(:,2),thetas(:,3));
+    scatter3(sorted(:,1),sorted(:,2),sorted(:,3));
 else if d == 3
-    scatter(thetas(:,1),thetas(:,2));
+    scatter3(sorted(:,1),sorted(:,2));
 else if d == 2
-    scatter(thetas(:,1),thetas(:,2));
+    scatter3(sorted(:,1),sorted(:,2));
     end
     end
 end
