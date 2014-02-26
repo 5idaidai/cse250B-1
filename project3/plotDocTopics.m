@@ -7,6 +7,10 @@ function [] = plotDocTopics(thetas)
 % each column is x,y,z
 
 d=size(thetas,2);
+C = repmat([1 2 4],size(thetas,2));
+S=20;
+
+
 if d >= 4
     scatter3(thetas(:,1),thetas(:,2),thetas(:,3));
 else if d == 3
@@ -18,4 +22,3 @@ else if d == 2
 end
 
 end
-
