@@ -1,4 +1,4 @@
-function [changedThetas] = checkThetas(z,wordsPerDoc,thetasOld,m,k)
+function [changedThetas,thetas] = checkThetas(z,wordsPerDoc,thetasOld,m,k)
 
     changedThetas=zeros(m,k);
     n = nCalc(wordsPerDoc,z,m,k);
