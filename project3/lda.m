@@ -42,7 +42,7 @@ function [ thetas,phis,ratios,alphas,betas,change ] = lda(counts, vocab, words, 
         ratios(epoch) = numChanged / numWords;
         
         if epoch == 1 || mod(epoch,(numEpochs/5)) == 0
-            fprintf('Epoch #%d, ratio: %f\n, change in thetas: %f\n',epoch,ratios(epoch),change(epoch));
+            fprintf('Epoch #%d, ratio: %f, change in thetas: %f\n',epoch,ratios(epoch),change(epoch));
         end
         
         if epoch > 1 && ratios(epoch) < percCutOff && ratios(epoch-1) < percCutOff

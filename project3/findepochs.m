@@ -20,9 +20,12 @@ end
 
 fprintf('Running epoch num search on: %s\n',file);
 
-numEpochList = [100,200,300,500,1000];
+numEpochList = [100,200,300,500];
 numTopics = 5;
 percCutOff = 0.1;
+
+storedBetas = 0.01;
+storedAlphas = 50./numTopics;
 
 nT = size(numEpochList,1);
 times = zeros(nT);
@@ -38,7 +41,7 @@ for numEpochs=numEpochList
     fprintf('Running LDA with %d topics, %.04f percent cutoff\n',numTopics,percCutOff);
 
     tic;
-    [thetas,phis,ratios,alphas,betas] = lda(bag, voc, words, numTopics, numEpochs, percCutOff);
+    [thetas,phis,ratios,alphas,betas] = lda(bag, voc, words, storedAlphas, storedBetas, numTopics, numEpochs, percCutOff);
     times(pidx) = toc;
 
     storedThetas(pidx) = {thetas};
@@ -49,5 +52,5 @@ for numEpochs=numEpochList
     pidx = pidx + 1;
 end
 
-resultsFile = strcat(file,'_xtopics_epoch_results.mat');
-save(resultsFile,'times','storedThetas','storedPhis','storedRatios','voc','numTopics','numEpochList');
+resultsFile = sprintf('%s_%dtopics_epoch_results.mat',file,numTopics);
+save(resultsFile,'times','storedThetas','storedPhis','storedRatios','storedAlphas','storedBetas','voc','numTopics','numEpochList');
