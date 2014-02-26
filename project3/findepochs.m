@@ -2,12 +2,12 @@ prompt = 'Enter 1 to use the Classic400 dataset \nEnter 2 to use the 20Newsgroup
 dataset = input(prompt);
 
 if dataset==1
-    file='classic400.mat';
+    file='classic400';
     load(file);
     bag=classic400;
     voc=classicwordlist;
 else if dataset==2
-        file='20NewsgroupsShort.mat';
+        file='20NewsgroupsShort';
         load(file);
         bag=feaShort;
         voc=vocabShort;
@@ -20,12 +20,12 @@ end
 
 fprintf('Running epoch num search on: %s\n',file);
 
-numEpochList = [100,200,300,500];
+numEpochList = [200];%[100,200,300,500];
 numTopics = 5;
 percCutOff = 0.1;
 
-storedBetas = 0.01;
-storedAlphas = 50./numTopics;
+storedBetas = 0.1;
+storedAlphas = 5./numTopics;
 
 nT = size(numEpochList,1);
 times = zeros(nT);
@@ -52,5 +52,5 @@ for numEpochs=numEpochList
     pidx = pidx + 1;
 end
 
-resultsFile = sprintf('%s_%dtopics_epoch_results.mat',file,numTopics);
+resultsFile = sprintf('%s_%dtopics_200epoch_results.mat',file,numTopics);
 save(resultsFile,'times','storedThetas','storedPhis','storedRatios','storedAlphas','storedBetas','voc','numTopics','numEpochList');

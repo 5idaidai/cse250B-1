@@ -1,12 +1,26 @@
-%function [] = gridsearch(file,bag,voc)
-file='classic400';
-load(file);
-bag=classic400;
-voc=classicwordlist;
+prompt = 'Enter 1 to use the Classic400 dataset \nEnter 2 to use the 20Newsgroups dataset \n';
+dataset = input(prompt);
 
-fprintf('Running grid search on: %s\n',file);
+if dataset==1
+    file='classic400';
+    load(file);
+    bag=classic400;
+    voc=classicwordlist;
+else if dataset==2
+        file='20NewsgroupsShort';
+        load(file);
+        bag=feaShort;
+        voc=vocabShort;
+    else if dataset>2
+            print 'Not a valid dataset';
+            break
+        end
+    end
+end
 
-numEpochs = 300;
+fprintf('Running epoch num search on: %s\n',file);
+
+numEpochs = 200;
 numTopics = 5;
 percCutOff = 0.1;
 
@@ -45,6 +59,6 @@ for alpha=posalphas
     pidx = pidx + 1;
 end
 
-resultsFile = strcat(file,'_alphabetasearch_grid_results.mat');
+resultsFile = sprintf('%s_%dtopics_%depochs_alphabeta_search_results.mat',file,numTopics,numEpochs);
 save(resultsFile,'times','storedThetas','storedPhis','storedRatios','posalphas','posbetas','voc','numEpochs','numTopics','percCutOff');
 %end

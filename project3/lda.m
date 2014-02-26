@@ -31,12 +31,12 @@ function [ thetas,phis,ratios,alphas,betas,change ] = lda(counts, vocab, words, 
     
     for epoch=1:numEpochs
         
-        [z,numChanged] = gibbs(z,words,alphas,betas,n,q,numWords,k,wordsPerDoc);
+        [z,numChanged,n,q] = gibbs(z,words,alphas,betas,n,q,numWords,k,wordsPerDoc);
         
-        [changedThetas,thetas] = checkThetas(z,wordsPerDoc,thetasOld,m,k);
-        change(epoch,:) = sum(changedThetas);
+        %[changedThetas,thetas] = checkThetas(z,wordsPerDoc,thetasOld,m,k);
+        %change(epoch,:) = sum(changedThetas);
         
-        thetasOld = thetas;
+        %thetasOld = thetas;
         
         ratios(epoch) = numChanged / numWords;
         

@@ -1,4 +1,4 @@
-function [ z, numChanged ] = gibbs(z,words,alphas,betas,n,q,numWords,numTopics,wordsPerDoc)
+function [ z, numChanged, n, q ] = gibbs(z,words,alphas,betas,n,q,numWords,numTopics,wordsPerDoc)
 %GIBBS Summary of this function goes here
 %   standard approach to implementing Gibbs sampling iterates over every
 % position of every document, taking the positions in some arbitrary order. For
