@@ -6,10 +6,11 @@ function [q] = calcQ(words,z,vocabSize,numTopics)
     q = zeros([numTopics,vocabSize]);
     
     for w=1:vocabSize
-        widxs=find(words==w);
+        widxs=find(words==words(w));
+        widxs2=widxs(find(widxs~=w));
+        temp=z(widxs2);
         for j=1:numTopics
-            zidxs=find(z(widxs)==j);
-            q(j,w) = size(zidxs,1);
+            q(j,w) = sum(temp==j);
         end
     end
 

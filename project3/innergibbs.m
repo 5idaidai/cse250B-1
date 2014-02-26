@@ -11,6 +11,7 @@ function [ newTopic ] = innergibbs(i, word, topic, m, alphas, betas, q, oldn, nu
     left = q(:,word) + betas(word);
     right = n(m,:)' + alphas;
     
+    denomLeft = zeros(1,numTopics);
     for j=1:numTopics
         denomLeft(j) = sum(q(j,:)'+betas);        
     end

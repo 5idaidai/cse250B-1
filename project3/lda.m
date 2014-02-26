@@ -1,4 +1,4 @@
-function [ thetas,phis,ratios,alphas,betas ] = lda(counts, vocab, words, numTopics, numEpochs, percCutOff)
+function [ thetas,phis,ratios,alphas,betas ] = lda(counts, vocab, words, alpha, beta, numTopics, numEpochs, percCutOff)
 %LDA performs LDA based training on documents
     counts=counts';
 	m=size(counts,2);
@@ -8,8 +8,8 @@ function [ thetas,phis,ratios,alphas,betas ] = lda(counts, vocab, words, numTopi
     numWords = sum(wordsPerDoc); %total # of words in all docs (so sum of all counts in all docs)
 
 	%init alpha & beta -> everything uniformly likely
-	alphas = ones(k,1) * (50/k);
-	betas = ones(V,1) * 0.01;
+	alphas = ones(k,1) * alpha;
+	betas = ones(V,1) * beta;
 
 	%init all z randomly
 	z = randi(k,[numWords,1]);

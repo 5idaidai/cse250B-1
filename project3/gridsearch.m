@@ -1,10 +1,17 @@
-function [] = gridsearch(file,bag,voc)
+%function [] = gridsearch(file,bag,voc)
+file='classic400';
+load(file);
+bag=classic400;
+voc=classicwordlist;
 
 fprintf('Running grid search on: %s\n',file);
 
-numEpochs = 500;
-numTopics = [2,3,4,5,10,15,20];
+numEpochs = 100;
+numTopics = [2];%[2,3,4,5,10];
 percs = [0.1];%[0.02,0.1,0.15,0.2];
+
+beta = 0.1;
+alpha = 5/numTopics;
 
 
 nT = size(numTopics,1);
@@ -24,7 +31,7 @@ for percCutOff=percs
         fprintf('Running LDA with %d topics, %.04f percent cutoff\n',k,percCutOff);
         
         tic;
-        [thetas,phis,ratios,alphas,betas] = lda(bag, voc, words, k, numEpochs, percCutOff);
+        [thetas,phis,ratios,alphas,betas] = lda(bag, voc, words, alpha, beta, k, numEpochs, percCutOff);
         times(pidx,kidx) = toc;
         
         storedThetas(pidx,kidx) = {thetas};
@@ -38,6 +45,13 @@ for percCutOff=percs
     pidx = pidx + 1;
 end
 
-resultsFile = strcat(file,'_xepochs_grid_results.mat');
-save(resultsFile,'times','storedThetas','storedPhis','storedRatios','voc','numEpochs','numTopics','percs');
-end
+temp = storedRatios(pidx-1,kidx-1);
+plot(temp{1});
+temp = storedPhis(pidx-1,kidx-1);
+printTopKWords(temp{1},voc,10);
+
+resultsFile = strcat(file,'_2topics_100epochs_newalphasbetas_grid_results.mat');
+%save(resultsFile,'times','storedThetas','storedPhis','storedRatios','alpha','beta','voc','numEpochs','numTopics','percs');
+%end
+
+%alphabeta_search
