@@ -25,7 +25,7 @@ numTopics = [2,3,4,5,10];
 percCutOff = 0.1;
 
 posbetas = [0.1, 0.05, 0.01];
-posalphas = [50/numTopics, 25/numTopics, 10/numTopics, 5/numTopics];
+posalphas = [50, 25, 10, 5];
 
 nT = size(numTopics,1);
 nB = size(posbetas,1);
@@ -42,13 +42,14 @@ fprintf('\n');
 kidx = 1;
 aidx = 1;
 bidx = 1;
-for alpha=posalphas
+for curalpha=posalphas
     for beta=posbetas
         for k=numTopics
+            alpha=curalpha/k;
             fprintf('Running LDA with %f alpha, %f beta\n',alpha,beta);
 
             tic;
-            [thetas,phis,ratios,alphas,betas] = lda(bag, voc, words, alpha, beta, numTopics, numEpochs, percCutOff);
+            [thetas,phis,ratios,alphas,betas] = lda(bag, voc, words, alpha, beta, k, numEpochs, percCutOff);
             times(aidx,bidx,kidx) = toc;
 
             storedThetas(aidx,bidx,kidx) = {thetas};
@@ -64,6 +65,6 @@ for alpha=posalphas
     aidx = aidx + 1;
 end
 
-resultsFile = sprintf('%s_%dtopics_gridsearch_results.mat',file,numTopics);
+resultsFile = sprintf('%s_%dtopics_gridsearch_results_final.mat',file,numTopics);
 save(resultsFile,'times','storedThetas','storedPhis','storedRatios','posalphas','posbetas','voc','numEpochs','numTopics','percCutOff');
 %end
