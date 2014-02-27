@@ -7,8 +7,8 @@ function [q] = calcQ(words,z,vocabSize,numTopics)
     
     for w=1:vocabSize
         widxs=find(words==words(w));
-        widxs2=widxs(find(widxs~=w));
-        temp=z(widxs2);
+        %widxs2=widxs(find(widxs~=w));
+        temp=z(widxs);
         for j=1:numTopics
             q(j,w) = sum(temp==j);
         end

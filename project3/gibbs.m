@@ -1,4 +1,4 @@
-function [ z, numChanged, n, q ] = gibbs(z,words,alphas,betas,n,q,numWords,numTopics,wordsPerDoc)
+function [ z, numChanged, n, q ] = gibbs(z,words,alphas,betas,n,q,numWords,numTopics,wordsPerDoc,epoch,burnInEpochs,nEpoch)
 %GIBBS Summary of this function goes here
 %   standard approach to implementing Gibbs sampling iterates over every
 % position of every document, taking the positions in some arbitrary order. For
@@ -29,11 +29,17 @@ function [ z, numChanged, n, q ] = gibbs(z,words,alphas,betas,n,q,numWords,numTo
             numChanged = numChanged + 1;
             z(i) = newtopic;
                     
-            q(oldtopic,word) = q(oldtopic,word) - 1;
-            q(newtopic,word) = q(newtopic,word) + 1;
+            if epoch > burnInEpochs && mod(epoch,nEpoch) == 0
+                if q(oldtopic,word) > 1
+                    q(oldtopic,word) = q(oldtopic,word) - 1;
+                    q(newtopic,word) = q(newtopic,word) + 1;
+                end
 
-            n(docnum,oldtopic) = n(docnum,oldtopic) - 1;
-            n(docnum,newtopic) = n(docnum,newtopic) + 1;
+                if n(docnum,oldtopic) > 1
+                    n(docnum,oldtopic) = n(docnum,oldtopic) - 1;
+                    n(docnum,newtopic) = n(docnum,newtopic) + 1;
+                end
+            end
         end
     end
 end

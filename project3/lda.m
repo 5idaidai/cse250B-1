@@ -1,4 +1,4 @@
-function [ thetas,phis,ratios,alphas,betas,change ] = lda(counts, vocab, words, alpha, beta, numTopics, numEpochs, percCutOff)
+function [ thetas,phis,ratios,alphas,betas,change ] = lda(counts, vocab, words, alpha, beta, numTopics, numEpochs, percCutOff, burnInEpochs, nEpoch)
 %LDA performs LDA based training on documents
     counts=counts';
 	m=size(counts,2);
@@ -31,7 +31,7 @@ function [ thetas,phis,ratios,alphas,betas,change ] = lda(counts, vocab, words, 
     
     for epoch=1:numEpochs
         
-        [z,numChanged,n,q] = gibbs(z,words,alphas,betas,n,q,numWords,k,wordsPerDoc);
+        [z,numChanged,n,q] = gibbs(z,words,alphas,betas,n,q,numWords,k,wordsPerDoc,epoch,burnInEpochs,nEpoch);
         
         %[changedThetas,thetas] = checkThetas(z,wordsPerDoc,thetasOld,m,k);
         %change(epoch,:) = sum(changedThetas);
@@ -40,13 +40,13 @@ function [ thetas,phis,ratios,alphas,betas,change ] = lda(counts, vocab, words, 
         
         ratios(epoch) = numChanged / numWords;
         
-        if epoch == 1 || mod(epoch,(numEpochs/5)) == 0
+        if epoch == burnInEpochs+1 || mod(epoch,(numEpochs/5)) == 0
             fprintf('Epoch #%d, ratio: %f, change in thetas: %f\n',epoch,ratios(epoch),change(epoch));
         end
         
-        if epoch > 1 && ratios(epoch) < percCutOff && ratios(epoch-1) < percCutOff
-            fprintf('Percentage changed (%f) less than %f\n',ratios(epoch),percCutOff);
-        end
+        %if epoch > 1 && ratios(epoch) < percCutOff && ratios(epoch-1) < percCutOff
+            %fprintf('Percentage changed (%f) less than %f\n',ratios(epoch),percCutOff);
+        %end
     end
     c=clock;
     fprintf('Finished Gibbs sampling, end time: %d:%d:%.02f\n',c(4),c(5),c(6));

@@ -13,17 +13,15 @@ S=20;
 
 sorted=thetas;
 
-if d >= 4
-    sorted=pca(thetas,'NumComponents',3);
+if d > 4
+    %sorted=pca(thetas,'NumComponents',3);
     scatter3(sorted(:,1),sorted(:,2),sorted(:,3));
-else if d == 3
-    sorted=pca(thetas,'NumComponents',2);
+elseif d == 4
+    scatter3(sorted(:,1),sorted(:,2),sorted(:,3));
+elseif d == 3
     scatter(sorted(:,1),sorted(:,2));
-else if d == 2
-    sorted=pca(thetas,'NumComponents',1);
+elseif d == 2
     scatter(sorted(:,1),sorted(:,2));
-    end
-    end
 end
 
 end
