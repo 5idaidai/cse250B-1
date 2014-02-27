@@ -11,15 +11,17 @@ d=size(thetas,2);
 C = repmat([1 2 4],size(thetas,2));
 S=20;
 
-sorted = zeros(size(thetas));
-[sorted,sidx]=sort(thetas,2,'descend');
+sorted=thetas;
 
 if d >= 4
+    sorted=pca(thetas,'NumComponents',3);
     scatter3(sorted(:,1),sorted(:,2),sorted(:,3));
 else if d == 3
-    scatter3(sorted(:,1),sorted(:,2));
+    sorted=pca(thetas,'NumComponents',2);
+    scatter(sorted(:,1),sorted(:,2));
 else if d == 2
-    scatter3(sorted(:,1),sorted(:,2));
+    sorted=pca(thetas,'NumComponents',1);
+    scatter(sorted(:,1),sorted(:,2));
     end
     end
 end
