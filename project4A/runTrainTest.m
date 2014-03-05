@@ -23,9 +23,30 @@ for i=1:length(allSNum)
     %get sentence
     sent=allSNum(i);
     sent=sent{1,1};
+    numWords=length(sent);
     
     %get meaning vectors for each word
     sentMean = meanings(:,sent);
     
     %greedy tree algorithm
+    numNodes = numWords - 1;
+    %columns: child 1, child 2, meaning vector
+    %0 in child column indicates no child
+    tree = cell(numNodes,3);
+    
+    %for each pair of nodes (starting with leaf nodes i.e. the sentence)
+    err = ones(numWords-1);
+    for j=1:numWords-1
+        %compute RAE error
+        node1=j;
+        node2=j+1;
+        
+        xi = meanings(:,sent(node1));
+        xj = meanings(:,sent(node2));
+        
+        ni = 0;
+        nj = 0;
+        
+        err(j) = raeError( k, xi, xj, ni, nj, W, b, U, c, d );
+    end
 end
