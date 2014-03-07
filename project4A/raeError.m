@@ -1,4 +1,4 @@
-function [ err ] = raeError( k, xi, xj, ni, nj, W, b, U, c, d )
+function [ err, zi, zj ] = raeError( k, xi, xj, ni, nj, W, b, U, c, d )
 %raeError Calculate the square loss at node k
 %   ni/nj = # leaves under node i/j
 
