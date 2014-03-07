@@ -35,7 +35,8 @@ for i=1:length(allSNum)
     tree = cell(numNodes,3);
     
     %for each pair of nodes (starting with leaf nodes i.e. the sentence)
-    err = ones(numWords-1);
+    err = ones(numWords-1,1);
+    k = 1;
     for j=1:numWords-1
         %compute RAE error
         node1=j;
@@ -44,9 +45,11 @@ for i=1:length(allSNum)
         xi = meanings(:,sent(node1));
         xj = meanings(:,sent(node2));
         
-        ni = 0;
-        nj = 0;
+        ni = 1;
+        nj = 1;
         
         err(j) = raeError( k, xi, xj, ni, nj, W, b, U, c, d );
+        k = k + 1;
     end
+    [val,node] = min(err);
 end
