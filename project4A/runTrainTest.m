@@ -34,10 +34,12 @@ for i=1:length(allSNum)
     %0 in child column indicates no child
     tree = cell(numNodes,3);
     
+    %inner loop of tree construction: 
     %for each pair of nodes (starting with leaf nodes i.e. the sentence)
-    err = ones(numWords-1,1);
+    numNodes = numWords - 1;
+    err = ones(numNodes,3);
     k = 1;
-    for j=1:numWords-1
+    for j=1:numNodes
         %compute RAE error
         node1=j;
         node2=j+1;
@@ -48,8 +50,14 @@ for i=1:length(allSNum)
         ni = 1;
         nj = 1;
         
-        err(j) = raeError( k, xi, xj, ni, nj, W, b, U, c, d );
+        err(j,1) = raeError( k, xi, xj, ni, nj, W, b, U, c, d );
+        err(j,2) = node1;
+        err(j,3) = node2;
         k = k + 1;
     end
-    [val,node] = min(err);
+    [val,idx] = min(err(:,1));
+    child1 = err(idx,2);
+    child2 = err(idx,3);
+    numNodes = numNodes - 1;
+    %end inner loop
 end
