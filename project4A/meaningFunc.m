@@ -1,4 +1,4 @@
-function [ xk ] = meaningFunc( xi, xj, k, W, b )
+function [ xk ] = meaningFunc( xi, xj, W, b )
 %meaningFunc applies the meaning function to two children
 
     % W (dx2d) x [xi;xj] (2dx1) = (dx1)
@@ -6,7 +6,7 @@ function [ xk ] = meaningFunc( xi, xj, k, W, b )
     temp = cross + b;
     
     %h function
-    xk = tanh(temp);
+    xk = h(temp);
 
 end
 

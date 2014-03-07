@@ -1,4 +1,4 @@
-function [ err, zi, zj ] = raeError( k, xi, xj, ni, nj, W, b, U, c, d )
+function [ err, zi, zj ] = raeError( xk, xi, xj, ni, nj, U, c, d )
 %raeError Calculate the square loss at node k
 %   ni/nj = # leaves under node i/j
 %   E_1 in the notes
@@ -7,8 +7,8 @@ function [ err, zi, zj ] = raeError( k, xi, xj, ni, nj, W, b, U, c, d )
     nitop = ni / nsum;
     njtop = nj / nsum;
     
-    mean = meaningFunc(xi, xj, k, W, b);
-    z = U * mean - c;
+    %mean = meaningFunc(xi, xj, k, W, b);
+    z = U * xk - c;
     zi = z(1:d);
     zj = z(d+1:end);
     
