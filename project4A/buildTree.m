@@ -12,7 +12,7 @@ function [ sentTree ] = buildTree( sentMean, numWords, W, b, U, c, V, d )
         % 1: meaning vector
         % 2: # leafs under it (for leaf nodes this is 1)
         % The rest are meaningless for leaf nodes
-        % 3: label
+        % 3: predicted label
         % 4: zl vector (predicted meaning vector for left child
         % 5: zr vector (predicted meaning vector for right child
         % 6: RAE error
@@ -58,7 +58,7 @@ function [ sentTree ] = buildTree( sentMean, numWords, W, b, U, c, V, d )
         xj = child2{1};
         xk = meaningFunc(xi,xj,W,b);
         [errk, zi, zj] = raeError( xk, xi, xj, ni, nj, U, c, d );
-        %zk = predictNode(xk,V);
+        zk = predictNode(xk,V);
         
         newnode = cell(6,1);
         newnode{1} = xk;

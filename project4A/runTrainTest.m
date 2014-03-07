@@ -19,7 +19,7 @@ U = rand(2*d,d);
 c = rand(2*d,1);
 
 %init V for prediction
-V = rand(2,d);
+V = rand(1,d);
 
 %iterate through all sentences
 for i=1:length(allSNum)
