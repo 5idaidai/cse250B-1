@@ -1,6 +1,7 @@
 function [ err, zi, zj ] = raeError( k, xi, xj, ni, nj, W, b, U, c, d )
 %raeError Calculate the square loss at node k
 %   ni/nj = # leaves under node i/j
+%   E_1 in the notes
 
     nsum = ni + nj;
     nitop = ni / nsum;
