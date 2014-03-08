@@ -34,13 +34,15 @@ for i=1:length(allSNum)
     sentTree = buildTree(sentMean, numWords, W, b, U, c, V, d);
  
     iterator = sentTree.breadthfirstiterator;
+    
     for i = iterator
         %only iterate through non-leaf nodes for backprop
-        if ~sentTree.get(i).isleaf()
+        check = sentTree.isleaf(i);
+        if check == true
         end
     end
     
     disp(sentTree.tostring());
-    sentTree
+    sentTree;
     pause;
 end
