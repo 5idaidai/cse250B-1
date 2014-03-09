@@ -9,7 +9,8 @@ function [ err, zi, zj ] = raeError( xk, xi, xj, ni, nj, U, c, d )
     zj = z(d+1:end);
     
     %this is with refinement #2
-    err = squareLoss(xi,xj,ni,nj,zi,zj);
+    nsum = ni + nj;
+    err = squareLoss(xi,zi,ni,nsum) + squareLoss(xj,zj,nj,nsum);
 
 end
 
