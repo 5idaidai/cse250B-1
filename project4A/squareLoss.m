@@ -5,7 +5,7 @@ function [ err ] = squareLoss( xi, xj, ni, nj, zi, zj )
     nsum = ni + nj;
     nitop = ni / nsum;
     njtop = nj / nsum;
-    err = nitop * norm(xi - zi,2) + njtop * norm(xj - zj,2);
+    err = nitop * (0.5*((xi - zi)^2)) + njtop * (0.5*((xj - zj)^2));
 
 end
 
