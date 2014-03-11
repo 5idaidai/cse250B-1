@@ -24,3 +24,8 @@ r=checkgrad2(@costLogLoss,1,{rand});
 %h functions
 disp('Checking H functions');
 r=checkgrad2(@costH,rand*10,{});
+
+
+%sigmoid functions
+disp('Checking Sigmoid functions');
+r=checkgrad2(@costSigmoid,rand*10,{});
