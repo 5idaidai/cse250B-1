@@ -130,7 +130,7 @@ function [ sentTree, outputItr, innerItr, inputItr ] ...
     iterator = sentTree.breadthfirstiterator;
     for i = iterator
         node = sentTree.get(i);
-        if (node{5})
+        if (i~=1 && node{5})
             outputItr(outIdx) = i;
             outIdx = outIdx + 1;
         end
