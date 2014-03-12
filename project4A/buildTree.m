@@ -1,6 +1,8 @@
-function [ sentTree, outputItr, innerItr, inputItr ] = buildTree( sentMean, numWords, W, b, U, c, V, d )
-%buildTree Builds the tree of the sentence
-%   greedy tree algorithm
+function [ sentTree, outputItr, innerItr, inputItr ] ...
+        = buildTree( sentMean, numWords, W, U, V, d )
+%buildTree Builds the tree of the sentence, doing the feed foward calcs at
+%the same time
+%   uses greedy tree algorithm
     
     numNodes = numWords;
     %columns: child 1, child 2, meaning vector
@@ -20,6 +22,8 @@ function [ sentTree, outputItr, innerItr, inputItr ] = buildTree( sentMean, numW
         % 7: zr vector (predicted meaning vector for right child
         % 8: RAE error
         % 9: delta vector
+        % 10: el error for left child on output nodes
+        % 11: er error for right child on output nodes
         
         node{1} = sentMean(:,i);
         node{2} = 1;%# leafs
@@ -47,8 +51,8 @@ function [ sentTree, outputItr, innerItr, inputItr ] = buildTree( sentMean, numW
             ni = 1;
             nj = 1;
 
-            xk = meaningFunc(xi,xj,W,b);
-            [err(j,1)] = raeError( xk, xi, xj, ni, nj, U, c, d );
+            xk = meaningFunc(xi,xj,W);
+            [err(j,1)] = raeError( xk, xi, xj, ni, nj, U, d );
             err(j,2) = node1;
             err(j,3) = node2;
             k = k + 1;
@@ -61,19 +65,21 @@ function [ sentTree, outputItr, innerItr, inputItr ] = buildTree( sentMean, numW
         
         xi = child1{1};
         xj = child2{1};
-        [xk,ak] = meaningFunc(xi,xj,W,b);
-        [errk, zi, zj] = raeError( xk, xi, xj, ni, nj, U, c, d );
-        zk = predictNode(xk,V);
-        
+        [xk,ak] = meaningFunc(xi,xj,W);
+        [errk, zl, zr, el, er] = raeError( xk, xi, xj, ni, nj, U, d );
+        pk = predictNode(xk,V);
+
         newnode = cell(7,1);
         newnode{1} = xk;
         newnode{2} = child1{2} + child2{2};
+        newnode{3} = pk;
         newnode{4} = ak;
         newnode{5} = 0;
-        %newnode{3} = zk;
-        newnode{6} = zi;
-        newnode{7} = zj;
+        newnode{6} = zl;
+        newnode{7} = zr;
         newnode{8} = errk;
+        newnode{10} = el;
+        newnode{11} = er;
 
         newtree = tree(newnode);
         newtree = newtree.graft(1,nodelist{child1Idx});
@@ -116,7 +122,8 @@ function [ sentTree, outputItr, innerItr, inputItr ] = buildTree( sentMean, numW
         childs = sentTree.getchildren(idx);
         idx = childs(2);
     end
-        
+       
+    %build output, inner, input node iterators
     outIdx=1;
     iterator = sentTree.breadthfirstiterator;
     for i = iterator
@@ -132,6 +139,7 @@ function [ sentTree, outputItr, innerItr, inputItr ] = buildTree( sentMean, numW
     innerItr = innerItr(~ismember(innerItr,outputItr));
     innerItr = innerItr(~ismember(innerItr,inputItr));
 
+    %debug code
     if 0
         test=sentTree.breadthfirstiterator;
         test1 = sum(ismember(outputItr,test));

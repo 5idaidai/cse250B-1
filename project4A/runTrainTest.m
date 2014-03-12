@@ -21,7 +21,7 @@ U = rand(2*d,d+1);
 %U = [U,c];
 
 %init V for prediction
-V = rand(1,d);
+V = rand(2,d);
 
 %iterate through all sentences
 for i=1:length(allSNum)
@@ -33,22 +33,7 @@ for i=1:length(allSNum)
     %get meaning vectors for each word
     sentMean = meanings(:,sent);
     
-    [sentTree, outputItr, innerItr, inputItr] = buildTree(sentMean, numWords, W, b, U, c, V, d);
- 
-    %feedforward
-    pars = zeros(size(inputItr));
-    for i = inputItr
-        pars(i) = sentTree.getparent(i);
-    end
-    
-    iterator = sentTree.breadthfirstiterator;
-    
-    for i = iterator
-        %only iterate through non-leaf nodes for backprop
-        check = sentTree.isleaf(i);
-        if check == true
-        end
-    end
+    [sentTree, outputItr, innerItr, inputItr] = buildTree(sentMean, numWords, W, U, V, d);
     
     disp(sentTree.tostring());
     sentTree;
