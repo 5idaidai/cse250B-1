@@ -1,4 +1,4 @@
-function [ sentTree ] = buildTree( sentMean, numWords, W, b, U, c, V, d )
+function [ sentTree, outputItr, inputItr ] = buildTree( sentMean, numWords, W, b, U, c, V, d )
 %buildTree Builds the tree of the sentence
 %   greedy tree algorithm
     
@@ -7,7 +7,7 @@ function [ sentTree ] = buildTree( sentMean, numWords, W, b, U, c, V, d )
     %0 in child column indicates no child
     nodelist = cell(size(sentMean,2),1);
     for i=1:numWords;
-        node=cell(7,1);
+        node=cell(9,1);
         %each node contains the following:
         % 1: meaning vector
         % 2: # leafs under it (for leaf nodes this is 1)
@@ -22,8 +22,8 @@ function [ sentTree ] = buildTree( sentMean, numWords, W, b, U, c, V, d )
         % 9: delta vector
         
         node{1} = sentMean(:,i);
-        node{2} = 1;
-        node{7} = 0;
+        node{2} = 1;%# leafs
+        node{5} = 0;%output node?
         nodelist{i} = tree(node);
     end
     
@@ -68,11 +68,11 @@ function [ sentTree ] = buildTree( sentMean, numWords, W, b, U, c, V, d )
         newnode = cell(7,1);
         newnode{1} = xk;
         newnode{2} = child1{2} + child2{2};
+        newnode{5} = 0;
         %newnode{3} = zk;
-        newnode{4} = zi;
-        newnode{5} = zj;
-        newnode{6} = errk;
-        newnode{7} = 0;
+        newnode{6} = zi;
+        newnode{7} = zj;
+        newnode{8} = errk;
 
         newtree = tree(newnode);
         newtree = newtree.graft(1,nodelist{child1Idx});
@@ -98,9 +98,9 @@ function [ sentTree ] = buildTree( sentMean, numWords, W, b, U, c, V, d )
     %mark output nodes
     %first go down left nodes until you hit a leaf
     idx = 1;%start at root node
-    while (~sentTree.isleaf(idx))        
+    while (~sentTree.isleaf(idx))
         node = sentTree.get(idx);
-        node{7} = 1;
+        node{5} = 1;
         sentTree = sentTree.set(idx, node);
         childs = sentTree.getchildren(idx);
         idx = childs(1);
@@ -108,13 +108,28 @@ function [ sentTree ] = buildTree( sentMean, numWords, W, b, U, c, V, d )
     
     %then go down right nodes
     idx = 1;%start at root node
-    while (~sentTree.isleaf(idx))        
+    while (~sentTree.isleaf(idx))
         node = sentTree.get(idx);
-        node{7} = 1;
+        node{5} = 1;
         sentTree = sentTree.set(idx, node);
         childs = sentTree.getchildren(idx);
         idx = childs(2);
     end
+        
+    outIdx=1;
+    inIdx=1;
+    iterator = sentTree.breadthfirstiterator;
+    for i = iterator
+        node = sentTree.get(i);
+        if (node{5})
+            outputItr(outIdx) = i;
+            outIdx = outIdx + 1;
+        elseif node{2}==1%sentTree.isleaf(i)
+            inputItr(inIdx) = i;
+            inIdx = inIdx + 1;
+        end
+    end
+    inputItr=sort(inputItr);
     
     %disp output nodes for debug
     if 0
@@ -122,7 +137,18 @@ function [ sentTree ] = buildTree( sentMean, numWords, W, b, U, c, V, d )
         iterator = sentTree.breadthfirstiterator;
         for i = iterator
             node = sentTree.get(i);
-            na_order = na_order.set(i, node{7});
+            na_order = na_order.set(i, node{5});
+        end
+        disp(na_order.tostring);
+    end
+    %disp nodes idxs for debug
+    if 1
+        na_order = tree(sentTree, 'clear');
+        iterator = sentTree.nodeorderiterator;
+        idx = 1;
+        for i = iterator
+            na_order = na_order.set(i, idx);
+            idx = idx + 1;
         end
         disp(na_order.tostring);
     end

@@ -4,7 +4,7 @@ function [ err, zi, zj ] = raeError( xk, xi, xj, ni, nj, U, c, d )
 %   E_1 in the notes
     
     %mean = meaningFunc(xi, xj, k, W, b);
-    z = U * xk - c;
+    z = U * [xk; -1];
     zi = z(1:d);
     zj = z(d+1:end);
     

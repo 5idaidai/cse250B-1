@@ -11,12 +11,14 @@ d = 20;
 meanings = normrnd(0,1,d,size(words,2));
 
 %init W and b randomly
-W = rand(d,2*d);
-b = rand(d,1);
+W = rand(d,2*d+1);
+%b = rand(d,1);
+%W = [W,b];
 
 %init U and c for backpropagation
-U = rand(2*d,d);
-c = rand(2*d,1);
+U = rand(2*d,d+1);
+%c = rand(2*d,1);
+%U = [U,c];
 
 %init V for prediction
 V = rand(1,d);
@@ -31,8 +33,9 @@ for i=1:length(allSNum)
     %get meaning vectors for each word
     sentMean = meanings(:,sent);
     
-    sentTree = buildTree(sentMean, numWords, W, b, U, c, V, d);
+    [sentTree, outputItr, inputItr] = buildTree(sentMean, numWords, W, b, U, c, V, d);
  
+    %feedforward
     iterator = sentTree.breadthfirstiterator;
     
     for i = iterator
