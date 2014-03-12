@@ -3,13 +3,13 @@ function [ sentTree, outputItr, innerItr, inputItr ] ...
 %buildTree Builds the tree of the sentence, 
 % doing the feed foward calcs at the same time
 %   uses greedy tree algorithm
-    
+    numCells = 11;
     numNodes = numWords;
     %columns: child 1, child 2, meaning vector
     %0 in child column indicates no child
     nodelist = cell(size(sentMean,2),1);
     for i=1:numWords;
-        node=cell(9,1);
+        node=cell(numCells,1);
         %each node contains the following:
         % 1: meaning vector
         % 2: # leafs under it (for leaf nodes this is 1)
@@ -42,36 +42,38 @@ function [ sentTree, outputItr, innerItr, inputItr ] ...
             node1=j;
             node2=j+1;
 
-            childi = nodelist{node1}.Node{1};
-            childj = nodelist{node2}.Node{1};
+            childl = nodelist{node1}.Node{1};
+            childr = nodelist{node2}.Node{1};
             
-            xi = childi{1};
-            xj = childj{1};
+            xl = childl{1};
+            xr = childr{1};
 
-            ni = 1;
-            nj = 1;
+            nl = childl{2};
+            nr = childr{2};
 
-            xk = meaningFunc(xi,xj,W);
-            [err(j,1)] = raeError( xk, xi, xj, ni, nj, U, d );
+            xk = meaningFunc(xl,xr,W);
+            [err(j,1)] = raeError( xk, xl, xr, nl, nr, U, d );
             err(j,2) = node1;
             err(j,3) = node2;
             k = k + 1;
         end    %end inner loop
         [val,idx] = min(err(:,1));
-        child1Idx = err(idx,2);
-        child2Idx = err(idx,3);
-        child1 = nodelist{child1Idx}.Node{1};
-        child2 = nodelist{child2Idx}.Node{1};
+        childlIdx = err(idx,2);
+        childrIdx = err(idx,3);
+        childl = nodelist{childlIdx}.Node{1};
+        childr = nodelist{childrIdx}.Node{1};
         
-        xi = child1{1};
-        xj = child2{1};
-        [xk,ak] = meaningFunc(xi,xj,W);
-        [errk, zl, zr, el, er] = raeError( xk, xi, xj, ni, nj, U, d );
+        xl = childl{1};
+        xr = childr{1};
+        nl = childl{2};
+        nr = childr{2};
+        [xk,ak] = meaningFunc(xl,xr,W);
+        [errk, zl, zr, el, er] = raeError( xk, xl, xr, nl, nr, U, d );
         pk = predictNode(xk,V);
 
-        newnode = cell(7,1);
+        newnode = cell(numCells,1);
         newnode{1} = xk;
-        newnode{2} = child1{2} + child2{2};
+        newnode{2} = nl + nr;
         newnode{3} = pk;
         newnode{4} = ak;
         newnode{5} = 0;
@@ -82,16 +84,16 @@ function [ sentTree, outputItr, innerItr, inputItr ] ...
         newnode{11} = er;
 
         newtree = tree(newnode);
-        newtree = newtree.graft(1,nodelist{child1Idx});
-        newtree = newtree.graft(1,nodelist{child2Idx});
+        newtree = newtree.graft(1,nodelist{childlIdx});
+        newtree = newtree.graft(1,nodelist{childrIdx});
 
         newnodelist = cell(numNodes-1,1);
         for i=1:numNodes
-            if i<child1Idx
+            if i<childlIdx
                 newnodelist{i} = nodelist{i};
-            elseif i==child1Idx
+            elseif i==childlIdx
                 newnodelist{i} = newtree;
-            elseif i>child2Idx
+            elseif i>childrIdx
                 newnodelist{i-1} = nodelist{i};
             end
         end
