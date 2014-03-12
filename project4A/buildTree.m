@@ -7,18 +7,23 @@ function [ sentTree ] = buildTree( sentMean, numWords, W, b, U, c, V, d )
     %0 in child column indicates no child
     nodelist = cell(size(sentMean,2),1);
     for i=1:numWords;
-        node=cell(6,1);
+        node=cell(7,1);
         %each node contains the following:
         % 1: meaning vector
         % 2: # leafs under it (for leaf nodes this is 1)
         % The rest are meaningless for leaf nodes
-        % 3: predicted label
-        % 4: zl vector (predicted meaning vector for left child
-        % 5: zr vector (predicted meaning vector for right child
-        % 6: RAE error
+        % 3: z, predicted label
+        % 4: a, activation
+        % The rest are meaningless for non-output nodes
+        % 5: is output (0=false, 1=true)
+        % 6: zl vector (predicted meaning vector for left child
+        % 7: zr vector (predicted meaning vector for right child
+        % 8: RAE error
+        % 9: delta vector
         
         node{1} = sentMean(:,i);
         node{2} = 1;
+        node{7} = 0;
         nodelist{i} = tree(node);
     end
     
@@ -60,13 +65,14 @@ function [ sentTree ] = buildTree( sentMean, numWords, W, b, U, c, V, d )
         [errk, zi, zj] = raeError( xk, xi, xj, ni, nj, U, c, d );
         zk = predictNode(xk,V);
         
-        newnode = cell(6,1);
+        newnode = cell(7,1);
         newnode{1} = xk;
         newnode{2} = child1{2} + child2{2};
         %newnode{3} = zk;
         newnode{4} = zi;
         newnode{5} = zj;
         newnode{6} = errk;
+        newnode{7} = 0;
 
         newtree = tree(newnode);
         newtree = newtree.graft(1,nodelist{child1Idx});
@@ -88,5 +94,37 @@ function [ sentTree ] = buildTree( sentMean, numWords, W, b, U, c, V, d )
     end
     
     sentTree = nodelist{1};
+    
+    %mark output nodes
+    %first go down left nodes until you hit a leaf
+    idx = 1;%start at root node
+    while (~sentTree.isleaf(idx))        
+        node = sentTree.get(idx);
+        node{7} = 1;
+        sentTree = sentTree.set(idx, node);
+        childs = sentTree.getchildren(idx);
+        idx = childs(1);
+    end
+    
+    %then go down right nodes
+    idx = 1;%start at root node
+    while (~sentTree.isleaf(idx))        
+        node = sentTree.get(idx);
+        node{7} = 1;
+        sentTree = sentTree.set(idx, node);
+        childs = sentTree.getchildren(idx);
+        idx = childs(2);
+    end
+    
+    %disp output nodes for debug
+    if 0
+        na_order = tree(sentTree, 'clear');
+        iterator = sentTree.breadthfirstiterator;
+        for i = iterator
+            node = sentTree.get(i);
+            na_order = na_order.set(i, node{7});
+        end
+        disp(na_order.tostring);
+    end
 end
 
