@@ -61,13 +61,14 @@ function [ sentTree, outputItr, inputItr ] = buildTree( sentMean, numWords, W, b
         
         xi = child1{1};
         xj = child2{1};
-        xk = meaningFunc(xi,xj,W,b);
+        [xk,ak] = meaningFunc(xi,xj,W,b);
         [errk, zi, zj] = raeError( xk, xi, xj, ni, nj, U, c, d );
         zk = predictNode(xk,V);
         
         newnode = cell(7,1);
         newnode{1} = xk;
         newnode{2} = child1{2} + child2{2};
+        newnode{4} = ak;
         newnode{5} = 0;
         %newnode{3} = zk;
         newnode{6} = zi;
