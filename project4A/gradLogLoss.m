@@ -1,8 +1,8 @@
-function [ grad ] = gradLogLoss( t, z)
+function [ grad ] = gradLogLoss(t,r)
 %UNTITLED2 Summary of this function goes here
 %   Detailed explanation goes here
 
-grad = -t/z + (1-t)/(1-z);
+grad = -t./r;
 
 
 end
