@@ -1,4 +1,4 @@
-function [ deltaRoot ] = deltaRoot( tl, zl, tr, zr, Ul, Ur, a, t, p)
+function [ deltaRoot, deltaP ] = deltaRoot( tl, zl, tr, zr, Ul, Ur, a, t, p)
 %UNTITLED4 Summary of this function goes here
 %   Detailed explanation goes here
 

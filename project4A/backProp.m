@@ -1,4 +1,4 @@
-function [ backTreeZ ] = backProp( sentTree, t, outputItr, innerItr, inputItr, U, W, d )
+function [ backTreeZ ] = backProp( sentTree, t, outputItr, innerItr, inputItr, U, W, d, deltaP )
 %UNTITLED5 Summary of this function goes here
 %each node contains the following:
         % 1: meaning vector (zi)
@@ -17,7 +17,7 @@ backTreeZ = tree(sentTree, 'clear');
 backTreeW = tree(sentTree, 'clear');
 backTreeU = tree(sentTree, 'clear');
 
-%set delta value for root
+%set delta values for root
 node = sentTree.get(1);
 children = getchildren(1);
 childR = sentTree.get(max(children));
@@ -34,6 +34,11 @@ Ur = U(d+1:2*d,:);
 deltaRt = deltaRoot(tl, zl, tr, zr, Ul, Ur, a, t, p);
 
 backTreeZ =  backTreeZ.set(1, deltaRt);
+
+deltaW = deltaP*node{1};
+backTreeW = backTreeW.set(1, deltaW);
+
+
 
 
 
