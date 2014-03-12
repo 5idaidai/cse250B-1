@@ -1,11 +1,13 @@
-function [ deltaRoot, deltaP ] = deltaRoot( tl, zl, tr, zr, Ul, Ur, a, t, p)
+function [ deltaRoot, deltaP, dLdGammaL, dLdGammaR ] = deltaRoot( tl, zl, tr, zr, Ul, Ur, a, t, p, V )
 %UNTITLED4 Summary of this function goes here
 %   Detailed explanation goes here
 
-deltaL = gradSquareLoss(tl,zl)*Ul;
-deltaR = gradSquareLoss(tr,zr)*Ur;
+dLdGammaL = gradSquareLoss(tl,zl);
+dLdGammaR = gradSquareLoss(tr,zr);
+deltaL = dLdGammaL'*Ul;
+deltaR = dLdGammaR'*Ur;
 deltaP = gradLogLoss(t,p).*gradSigmoid(a);
-deltaRoot = deltaP + deltaL + deltaR;
+deltaRoot = (deltaP'*V)' + deltaL' + deltaR';
 
 
 end
