@@ -1,7 +1,7 @@
 function [ sentTree, outputItr, innerItr, inputItr ] ...
         = buildTree( sentMean, numWords, W, U, V, d )
-%buildTree Builds the tree of the sentence, doing the feed foward calcs at
-%the same time
+%buildTree Builds the tree of the sentence, 
+% doing the feed foward calcs at the same time
 %   uses greedy tree algorithm
     
     numNodes = numWords;

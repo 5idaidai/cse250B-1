@@ -33,6 +33,8 @@ for i=1:length(allSNum)
     %get meaning vectors for each word
     sentMean = meanings(:,sent);
     
+    %build up sentence binary tree, and perform feed forward
+    %   algorithm at the same time
     [sentTree, outputItr, innerItr, inputItr] = buildTree(sentMean, numWords, W, U, V, d);
     
     disp(sentTree.tostring());
