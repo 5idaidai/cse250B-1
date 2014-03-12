@@ -1,4 +1,4 @@
-function [ sentTree, outputItr, inputItr ] = buildTree( sentMean, numWords, W, b, U, c, V, d )
+function [ sentTree, outputItr, innerItr, inputItr ] = buildTree( sentMean, numWords, W, b, U, c, V, d )
 %buildTree Builds the tree of the sentence
 %   greedy tree algorithm
     
@@ -118,20 +118,27 @@ function [ sentTree, outputItr, inputItr ] = buildTree( sentMean, numWords, W, b
     end
         
     outIdx=1;
-    inIdx=1;
     iterator = sentTree.breadthfirstiterator;
     for i = iterator
         node = sentTree.get(i);
         if (node{5})
             outputItr(outIdx) = i;
             outIdx = outIdx + 1;
-        elseif node{2}==1%sentTree.isleaf(i)
-            inputItr(inIdx) = i;
-            inIdx = inIdx + 1;
         end
     end
-    inputItr=sort(inputItr);
-    
+    inputItr=sentTree.findleaves();
+
+    innerItr = sentTree.breadthfirstiterator;
+    innerItr = innerItr(~ismember(innerItr,outputItr));
+    innerItr = innerItr(~ismember(innerItr,inputItr));
+
+    if 0
+        test=sentTree.breadthfirstiterator;
+        test1 = sum(ismember(outputItr,test));
+        test2 = sum(ismember(innerItr,test));
+        test3 = sum(ismember(inputItr,test));
+    end
+
     %disp output nodes for debug
     if 0
         na_order = tree(sentTree, 'clear');

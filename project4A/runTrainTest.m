@@ -33,9 +33,14 @@ for i=1:length(allSNum)
     %get meaning vectors for each word
     sentMean = meanings(:,sent);
     
-    [sentTree, outputItr, inputItr] = buildTree(sentMean, numWords, W, b, U, c, V, d);
+    [sentTree, outputItr, innerItr, inputItr] = buildTree(sentMean, numWords, W, b, U, c, V, d);
  
     %feedforward
+    pars = zeros(size(inputItr));
+    for i = inputItr
+        pars(i) = sentTree.getparent(i);
+    end
+    
     iterator = sentTree.breadthfirstiterator;
     
     for i = iterator
