@@ -40,4 +40,15 @@ for i=1:length(allSNum)
     disp(sentTree.tostring());
     sentTree;
     pause;
+    
+    %backpropagate
+    t=rand(1);
+    [backTreeZ, backTreeV, backTreeW, backTreeU] = backProp(sentTree, t, outputItr, innerItr, inputItr, U, W, d, V);
+    
+    disp(backTreeZ.tostring());
+    disp(backTreeV.tostring());
+    disp(backTreeW.tostring());
+    disp(backTreeU.tostring());
+    pause;
 end
+

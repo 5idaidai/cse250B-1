@@ -1,4 +1,4 @@
-function [ backTreeZ ] = backProp( sentTree, t, outputItr, innerItr, inputItr, U, W, d )
+function [ backTreeZ, backTreeV, backTreeW, backTreeU ] = backProp( sentTree, t, outputItr, innerItr, inputItr, U, W, d, V )
 %UNTITLED5 Summary of this function goes here
         %each node contains the following:
         % 1: meaning vector (zi)
@@ -22,20 +22,23 @@ backTreeU = tree(sentTree, 'clear');
 
 %set delta values for root
 node = sentTree.get(1);
-children = getchildren(1);
+children = sentTree.getchildren(1);
 childR = sentTree.get(max(children));
-childL = sentTree(min(children));
+childL = sentTree.get(min(children));
 tr = childR{1};
 tl = childL{1};
 zl = node{6};
 zr = node{7};
 a = node{4};
-p = {3};
+p = node{3};
 Ul = U(1:d,:);
 Ur = U(d+1:2*d,:);
+topL = childL{2};
+topR = childR{2};
+bottom = topL+topR;
 
-[ deltaRoot, deltaP, dLdGammaL, dLdGammaR ] = deltaRoot( tl, zl, tr, zr, Ul, Ur, a, t, p, V );
-backTreeZ =  backTreeZ.set(1, deltaRoot);
+[ deltaRt, deltaP, dLdGammaL, dLdGammaR ] = deltaRoot( tl, zl, tr, zr, Ul, Ur, a, t, p, V, topL, topR, bottom);
+backTreeZ =  backTreeZ.set(1, deltaRt);
 
 deltaW = zeros(d,d);
 backTreeW = backTreeW.set(1, deltaW);
@@ -43,9 +46,6 @@ backTreeW = backTreeW.set(1, deltaW);
 deltaV = deltaP*node{1}';
 backTreeV = backTreeV.set(1, deltaV);
 
-topL = childL{2};
-topR = childR{2};
-bottom = topL+topR;
 deltaUL = dLdGammaL*node{1}';
 deltaUR = dLdGammaR*node{1}';
 deltaU = cell(2,1);
@@ -55,27 +55,155 @@ deltaU{2}=deltaUL;
 backTreeU = backTreeU.set(1, deltaU);
 
 %set delta values for all autoencoder nodes
-node = sentTree.get(idx);
-deltak = backTreeZ.get(sentTree.getparent(idx));
-deltaW = deltak*node{1};
-children = getchildren(idx);
-childR = sentTree.get(max(children));
-childL = sentTree(min(children));
-tr = childR{1};
-tl = childL{1};
-zl = node{6};
-zr = node{7};
-a = node{4};
-p = {3};
-%Ul = U(1:d,:);
-%Ur = U(d+1:2*d,:);
-%Wk = ??
+for i=length(outputItr)
+    
+    idx = outputItr(i);
 
-deltaZ = deltaOutput( t, p, tl, zl, tr, zr, deltak, Wk, Ul, Ur, a);
-backTreeZ = backTreeZ.set(idx, deltaZ);
+    node = sentTree.get(idx);
+    deltak = backTreeZ.get(sentTree.getparent(idx));
+    children = sentTree.getchildren(idx);
+    childR = sentTree.get(max(children));
+    childL = sentTree.get(min(children));
+    tr = childR{1};
+    tl = childL{1};
+    zl = node{6};
+    zr = node{7};
+    a = node{4};
+    p = node{3};
+    Ul = U(1:d,:);
+    Ur = U(d+1:2*d,:);
+    topL = childL{2};
+    topR = childR{2};
+    bottom = topL+topR;
+    
+    parent = sentTree.getparent(idx);
+    nodes = sentTree.getchildren(parent);
+    nodeL = sentTree.get(min(nodes));
+    if nodeL==node
+        Wk = W(1:d,:);
+    else
+        Wk = W(d+1:2*d,:);
+    end
+
+    [ delta, deltaP, dLdGammaL, dLdGammaR ] = deltaOutput( t, p, tl, zl, tr, zr, deltak, Wk, Ul, Ur, a, V, topL, topR, bottom);
+    backTreeZ = backTreeZ.set(idx, delta);
+    
+    deltaW = deltak*node{1};
+    backTreeW = backTreeW.set(idx, deltaW);
+
+    deltaV = deltaP*node{1}';
+    backTreeV = backTreeV.set(idx, deltaV);
+
+    deltaUL = dLdGammaL*node{1}';
+    deltaUR = dLdGammaR*node{1}';
+    deltaU = cell(2,1);
+    deltaU{1}=deltaUR;
+    deltaU{2}=deltaUL;
+
+    backTreeU = backTreeU.set(idx, deltaU);
+    
+    
+end
 
 %set delta values for all inner nodes
+for i=length(innerItr)
+    
+    idx = innerItr(i);
+
+    node = sentTree.get(idx);
+    deltak = backTreeZ.get(sentTree.getparent(idx));
+    %children = sentTree.getchildren(idx);
+    %childR = sentTree.get(max(children));
+    %childL = sentTree.get(min(children));
+    %tr = childR{1};
+    %tl = childL{1};
+    %zl = node{6};
+    %zr = node{7};
+    a = node{4};
+    p = {3};
+    %Ul = U(1:d,:);
+    %Ur = U(d+1:2*d,:);
+    
+    parent = sentTree.getparent(idx);
+    nodes = sentTree.getchildren(parent);
+    nodeL = sentTree.get(min(nodes));
+    if nodeL==node
+        Wk = W(1:d,:);
+    else
+        Wk = W(d+1:2*d,:);
+    end
+
+    [ delta, deltaP ] = deltaNonOutput( a, deltak, Wk, t, p );
+    backTreeZ = backTreeZ.set(idx, delta);
+    
+    deltaW = deltak*node{1};
+    backTreeW = backTreeW.set(idx, deltaW);
+
+    deltaV = deltaP*node{1}';
+    backTreeV = backTreeV.set(idx, deltaV);
+
+    %topL = childL{2};
+    %topR = childR{2};
+    %bottom = topL+topR;
+    %deltaUL = dLdGammaL*node{1}';
+    %deltaUR = dLdGammaR*node{1}';
+    %deltaU = cell(2,1);
+    %deltaU{1}=deltaUR;
+    %deltaU{2}=deltaUL;
+
+    %backTreeU = backTreeU.set(idx, deltaU);
+    
+    
+end
+
 %set delta values for all leaf nodes
+for i=length(inputItr)
+    
+    idx = inputItr(i);
+
+    node = sentTree.get(idx);
+    deltak = backTreeZ.get(sentTree.getparent(idx));
+    %children = sentTree.getchildren(idx);
+    %childR = sentTree.get(max(children));
+    %childL = sentTree.get(min(children));
+    %tr = childR{1};
+    %tl = childL{1};
+    %zl = node{6};
+    %zr = node{7};
+    a = node{4};
+    p = {3};
+    %Ul = U(1:d,:);
+    %Ur = U(d+1:2*d,:);
+    
+    parent = sentTree.getparent(idx);
+    nodes = sentTree.getchildren(parent);
+    nodeL = sentTree.get(min(nodes));
+    if nodeL==node
+        Wk = W(1:d,:);
+    else
+        Wk = W(d+1:2*d,:);
+    end
+
+    [ delta, deltaP ] = deltaNonOutput( a, deltak, Wk, t, p );
+    backTreeZ = backTreeZ.set(idx, delta);
+    
+    deltaW = deltak*node{1};
+    backTreeW = backTreeW.set(idx, deltaW);
+
+    deltaV = deltaP*node{1}';
+    backTreeV = backTreeV.set(idx, deltaV);
+
+    %topL = childL{2};
+    %topR = childR{2};
+    %bottom = topL+topR;
+    %deltaUL = dLdGammaL*node{1}';
+    %deltaUR = dLdGammaR*node{1}';
+    %deltaU = cell(2,1);
+    %deltaU{1}=deltaUR;
+    %deltaU{2}=deltaUL;
+
+    %backTreeU = backTreeU.set(idx, deltaU);
+end
 
 
 end
