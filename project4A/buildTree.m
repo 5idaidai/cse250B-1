@@ -133,6 +133,7 @@ function [ sentTree, outputItr, innerItr, inputItr ] ...
        
     %build output, inner, input node iterators
     outIdx=1;
+    outputItr = [];
     iterator = sentTree.breadthfirstiterator;
     for i = iterator
         node = sentTree.get(i);
@@ -144,6 +145,7 @@ function [ sentTree, outputItr, innerItr, inputItr ] ...
     inputItr=sentTree.findleaves();
 
     innerItr = sentTree.breadthfirstiterator;
+    innerItr = innerItr(~ismember(innerItr,1));
     innerItr = innerItr(~ismember(innerItr,outputItr));
     innerItr = innerItr(~ismember(innerItr,inputItr));
 

@@ -16,7 +16,7 @@ deltaPr = (deltaP'*V)';
 dk = (deltak'*Wk)';
 
 %delta value for this node
-delta = (dk + deltaL + deltaR + deltaPr) .* hprime(a);
+delta = hprime(a) .* (dk + deltaL + deltaR + deltaPr);
 
 
 end

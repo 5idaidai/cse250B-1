@@ -1,3 +1,5 @@
+addpath(genpath('tree/'));
+
 %load test data with limit number of short sentences, same vocab
 load('testdata.mat');
 if exist('words','var') == 0
@@ -7,8 +9,13 @@ if exist('allSNum','var') == 0
     load('codeDataMoviesEMNLP/data/rt-polaritydata/RTData_CV1.mat','allSNum','labels');
 end
 
-%init meaning vectors for each word to random values
+%hyperparameters
+trainInput = 0;%don't train input for now
 d = 20;
+lambda = 0.001/length(allSNum);
+alpha = 0.4;
+
+%init meaning vectors for each word to random values
 meanings = normrnd(0,1,d,size(words,2));
 
 %init W and b randomly
@@ -44,12 +51,18 @@ for i=1:length(allSNum)
     %backpropagate
     %t=rand(1);
 
-    [backTreeZ, backTreeV, backTreeW, backTreeU] = backProp(sentTree, t, outputItr, innerItr, inputItr, U, W, d, V);
+    [dV,dW,dU,backTreeZ, backTreeV, backTreeW, backTreeU] =...
+        backProp(sentTree, t, outputItr, innerItr, inputItr, U, W, d, V, trainInput);
     
-    disp(backTreeZ.tostring());
-    disp(backTreeV.tostring());
-    disp(backTreeW.tostring());
-    disp(backTreeU.tostring());
     pause;
+    
+    %Regularized SGD update
+    V = V - lambda*dV - (lambda/2)*(V.^2);
+    newW = W - lambda*dW - (lambda/2)*(W.^2);
+    newU = U - lambda*dU - (lambda/2)*(U.^2);
+    
+    %Don't regularize intercept
+    W = [newW(:,1:end-1),W(:,end)];
+    U = [newU(:,1:end-1),U(:,end)];
 end
 

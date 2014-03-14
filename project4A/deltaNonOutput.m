@@ -8,7 +8,7 @@ deltaPr = (deltaP'*V)';
 dk = (deltak'*Wk)';
 
 sumk = dk + deltaPr;
-delta = hprime(a).* sumk;
+delta = hprime(a) .* sumk;
 
 end
 

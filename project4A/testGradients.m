@@ -14,10 +14,10 @@ p = rand;
 %r=checkgrad2(@costLogLoss,l,{[p,1-p]});
 %assert abs(r-1)<1e-10;
 
-r=checkgrad2(@costLogLoss,0,{0.999999});
-r=checkgrad2(@costLogLoss,1,{0.000001});
-r=checkgrad2(@costLogLoss,0,{0.000001});
-r=checkgrad2(@costLogLoss,1,{0.999999});
+r=checkgrad2(@costLogLoss,0,{0.999});
+r=checkgrad2(@costLogLoss,1,{0.001});
+r=checkgrad2(@costLogLoss,0,{0.001});
+r=checkgrad2(@costLogLoss,1,{0.999});
 r=checkgrad2(@costLogLoss,0,{0.5});
 r=checkgrad2(@costLogLoss,1,{0.5});
 r=checkgrad2(@costLogLoss,0,{rand});
