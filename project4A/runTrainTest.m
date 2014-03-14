@@ -30,6 +30,8 @@ for i=1:length(allSNum)
     sent=allSNum(i);
     sent=sent{1,1};
     numWords=length(sent);
+    t=labels(i);
+    t=[t; 1-t];
     
     %build up sentence binary tree, and perform feed forward
     %   algorithm at the same time
@@ -41,8 +43,7 @@ for i=1:length(allSNum)
     
     %backpropagate
     %t=rand(1);
-    t=labels(i);
-    t=[t; 1-t];
+
     [backTreeZ, backTreeV, backTreeW, backTreeU] = backProp(sentTree, t, outputItr, innerItr, inputItr, U, W, d, V);
     
     disp(backTreeZ.tostring());

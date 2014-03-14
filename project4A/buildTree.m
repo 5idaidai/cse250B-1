@@ -1,9 +1,9 @@
 function [ sentTree, outputItr, innerItr, inputItr ] ...
-        = buildTree( sent, wordMeanings, numWords, W, U, V, d )
+        = buildTree( sent, wordMeanings, numWords, W, U, V, d, t )
 %buildTree Builds the tree of the sentence, 
 % doing the feed foward calcs at the same time
 %   uses greedy tree algorithm
-    numCells = 11;
+    numCells = 13;
     numNodes = numWords;
     %columns: child 1, child 2, meaning vector
     %0 in child column indicates no child
@@ -20,12 +20,13 @@ function [ sentTree, outputItr, innerItr, inputItr ] ...
         % 5: is output (0=false, 1=true)
         % 6: zl vector (predicted meaning vector for left child
         % 7: zr vector (predicted meaning vector for right child
-        % 8: RAE error
+        % 8: RAE error (E1)
         % 9: delta vector
         % 10: el error for left child on output nodes
         % 11: er error for right child on output nodes
         % only for input nodes
         % 12: word index
+        % 13: log loss (E2)
         
         node{12} = sent(i);
         node{1} = wordMeanings(:,node{12});
@@ -73,6 +74,7 @@ function [ sentTree, outputItr, innerItr, inputItr ] ...
         [xk,ak] = meaningFunc(xl,xr,W);
         [errk, zl, zr, el, er] = raeError( xk, xl, xr, nl, nr, U, d );
         pk = predictNode(xk,V);
+        ll = logLoss(t,pk);
 
         newnode = cell(numCells,1);
         newnode{1} = xk;
@@ -85,6 +87,7 @@ function [ sentTree, outputItr, innerItr, inputItr ] ...
         newnode{8} = errk;
         newnode{10} = el;
         newnode{11} = er;
+        newnode{13} = ll;
 
         newtree = tree(newnode);
         newtree = newtree.graft(1,nodelist{childlIdx});
