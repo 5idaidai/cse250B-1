@@ -1,4 +1,4 @@
-function [ backTreeZ, backTreeV, backTreeW, backTreeU ] =...
+function [ dV,dW,dU,backTreeZ, backTreeV, backTreeW, backTreeU ] =...
     backProp( sentTree, t, outputItr, innerItr, inputItr, U, W, d, V, trainInput )
 %UNTITLED5 Summary of this function goes here
         %each node contains the following:
@@ -206,6 +206,24 @@ if trainInput
         %deltaU{2}=deltaUL;
 
         %backTreeU = backTreeU.set(idx, deltaU);
+    end
+end
+    
+disp(backTreeZ.tostring());
+disp(backTreeV.tostring());
+disp(backTreeW.tostring());
+disp(backTreeU.tostring());
+
+iterator = sentTree.breadthfirstiterator;
+dV = zeros(size(V));
+dW = zeros(size(W));
+dU = zeros(size(U));
+
+for i=iterator
+    if ~sentTree.isleaf(i)
+        dV = dV + backTreeV.get(i);
+        dW = dW + backTreeW.get(i);
+        dU = dU + backTreeU.get(i);
     end
 end
 

@@ -1,3 +1,5 @@
+addpath(genpath('tree/'));
+
 %load test data with limit number of short sentences, same vocab
 load('testdata.mat');
 if exist('words','var') == 0
@@ -7,10 +9,13 @@ if exist('allSNum','var') == 0
     load('codeDataMoviesEMNLP/data/rt-polaritydata/RTData_CV1.mat','allSNum','labels');
 end
 
+%hyperparameters
 trainInput = 0;%don't train input for now
+d = 20;
+lambda = 0.001/length(allSNum);
+alpha = 0.4;
 
 %init meaning vectors for each word to random values
-d = 20;
 meanings = normrnd(0,1,d,size(words,2));
 
 %init W and b randomly
@@ -45,13 +50,14 @@ for i=1:length(allSNum)
     %t=rand(1);
     t=labels(i);
     t=[t; 1-t];
-    [backTreeZ, backTreeV, backTreeW, backTreeU] =...
+    [dV,dW,dU,backTreeZ, backTreeV, backTreeW, backTreeU] =...
         backProp(sentTree, t, outputItr, innerItr, inputItr, U, W, d, V, trainInput);
     
-    disp(backTreeZ.tostring());
-    disp(backTreeV.tostring());
-    disp(backTreeW.tostring());
-    disp(backTreeU.tostring());
     pause;
+    
+    %SGD update
+    V = V - labmda*dV - (labmda/2)*(V.^2);
+    W = W - labmda*dW - (labmda/2)*(W.^2);
+    U = U - labmda*dU - (labmda/2)*(U.^2);
 end
 
