@@ -1,7 +1,7 @@
 addpath(genpath('tree/'));
 
 %load test data with limit number of short sentences, same vocab
-%load('testdata.mat');
+load('testdata.mat');
 if exist('words','var') == 0
     load('codeDataMoviesEMNLP/data/rt-polaritydata/vocab.mat');
 end
