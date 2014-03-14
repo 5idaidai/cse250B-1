@@ -1,14 +1,23 @@
-function [ err ] = totalError( sent, nonLeafTree, numNonLeafNodes, label, W, b, U, c, V, alpha )
+function [ totErr ] = totalError( sentTree, outputItr, innerItr, alpha )
 %totalError total error for one sentence s with label t
 %   Detailed explanation goes here
 
-    nodeErr = ones(numNonLeafNodes);
-    for k=1:numNonLeafNodes
-        predicted = predictNode(xk,V);
-        nodeErr(k) = alpha * raeError(k,xi,xj,ni,nj,W,b,U,c,d) + (1-alpha)*labelError(label,predicted);
+    outputErr = zeros(num(outputItr));
+    for idx=[1,outputItr]
+        node=sentTree.get(idx);
+        E1=node{8};
+        E2=node{13};
+        outputErr(idx) = alpha*E1 + (1-alpha)*E2;
     end
     
-    err = sum(nodeErr);
+    innerErr = zeros(num(innerItr));
+    for idx=innerItr
+    node=sentTree.get(idx);
+    E2=node{13};
+    innerErr(idx) = (1-alpha)*E2;
+    end
+    
+    totErr = sum(outerErr,innerErr);
 
 end
 
