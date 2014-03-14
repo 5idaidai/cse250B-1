@@ -25,10 +25,10 @@ node = sentTree.get(1);
 children = sentTree.getchildren(1);
 childR = sentTree.get(max(children));
 childL = sentTree.get(min(children));
-tr = childR{1};
-tl = childL{1};
-zl = node{6};
-zr = node{7};
+tr = [childR{1};1];
+tl = [childL{1};1];
+zl = [node{6};1];
+zr = [node{7};1];
 a = node{4};
 p = node{3};
 Ul = U(1:d,:);
@@ -64,10 +64,10 @@ for i=length(outputItr)
     children = sentTree.getchildren(idx);
     childR = sentTree.get(max(children));
     childL = sentTree.get(min(children));
-    tr = childR{1};
-    tl = childL{1};
-    zl = node{6};
-    zr = node{7};
+    tr = [childR{1};1];
+    tl = [childL{1};1];
+    zl = [node{6};1];
+    zr = [node{7};1];
     a = node{4};
     p = node{3};
     Ul = U(1:d,:);
@@ -78,17 +78,17 @@ for i=length(outputItr)
     
     parent = sentTree.getparent(idx);
     nodes = sentTree.getchildren(parent);
-    nodeL = sentTree.get(min(nodes));
-    if nodeL==node
-        Wk = W(1:d,:);
+    nodeL = min(nodes);
+    if nodeL==idx
+        Wk = W(:,1:d);
     else
-        Wk = W(d+1:2*d,:);
+        Wk = W(:,d+1:2*d);
     end
 
     [ delta, deltaP, dLdGammaL, dLdGammaR ] = deltaOutput( t, p, tl, zl, tr, zr, deltak, Wk, Ul, Ur, a, V, topL, topR, bottom);
     backTreeZ = backTreeZ.set(idx, delta);
     
-    deltaW = deltak*node{1};
+    deltaW = deltak*[node{1};1]';
     backTreeW = backTreeW.set(idx, deltaW);
 
     deltaV = deltaP*node{1}';

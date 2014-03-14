@@ -1,4 +1,5 @@
-
+%load test data with limit number of short sentences, same vocab
+load('testdata.mat');
 if exist('words','var') == 0
     load('codeDataMoviesEMNLP/data/rt-polaritydata/vocab.mat');
 end
@@ -34,9 +35,9 @@ for i=1:length(allSNum)
     %   algorithm at the same time
     [sentTree, outputItr, innerItr, inputItr] = buildTree(sent, meanings, numWords, W, U, V, d);
     
-    disp(sentTree.tostring());
-    sentTree;
-    pause;
+    %disp(sentTree.tostring());
+    %sentTree;
+    %pause;
     
     %backpropagate
     %t=rand(1);

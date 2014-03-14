@@ -3,12 +3,20 @@ function [ delta, deltaP, dLdGammaL, dLdGammaR ] = deltaOutput( t, p, tl, zl, tr
 %   Based on equation from middle of pg.11 in the notes:
 %   deltai=deltaLi/deltari*hprime(ai)
 
+%RAE derivs
 dLdGammaL = gradSquareLoss(tl,zl,topL,bottom);
 dLdGammaR = gradSquareLoss(tr,zr,topR,bottom);
-deltaL = dLdGammaL'*Ul;
-deltaR = dLdGammaR'*Ur;
-deltaP = gradLogLoss(t,p).*gradSigmoid(a);
-delta = ((deltak'*Wk)' + deltaL' + deltaR' + (deltaP'*V)') .* hprime(a);
+deltaL = Ul*dLdGammaL;
+deltaR = Ur*dLdGammaR;
+
+%Prediction derivs
+deltaP = gradLogLoss(t,p).*gradSigmoid(p);
+deltaPr = (deltaP'*V)';
+
+dk = (deltak'*Wk)';
+
+%delta value for this node
+delta = (dk + deltaL + deltaR + deltaPr) .* hprime(a);
 
 
 end

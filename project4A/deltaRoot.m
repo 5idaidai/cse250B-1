@@ -2,12 +2,20 @@ function [ deltaRt, deltaP, dLdGammaL, dLdGammaR ] = deltaRoot( tl, zl, tr, zr, 
 %UNTITLED4 Summary of this function goes here
 %   Detailed explanation goes here
 
+%RAE derivs
 dLdGammaL = gradSquareLoss(tl,zl,topL,bottom);
 dLdGammaR = gradSquareLoss(tr,zr,topR,bottom);
-deltaL = dLdGammaL'*Ul;
-deltaR = dLdGammaR'*Ur;
-deltaP = gradLogLoss(t,p).*gradSigmoid(a);
-deltaRt = (deltaP'*V)' + deltaL' + deltaR';
+deltaL = Ul*dLdGammaL;
+deltaR = Ur*dLdGammaR;
+
+%prediction deriv
+left=gradLogLoss(t,p);
+right=gradSigmoid(p);
+deltaP = left.*right;
+deltaPr = (deltaP'*V)';
+
+%delta value for this node
+deltaRt = deltaPr + deltaL + deltaR;
 
 
 end
