@@ -16,10 +16,10 @@ function [ dV,dW,dU,backTreeZ, backTreeV, backTreeW, backTreeU ] =...
         % 10: el error for left child on output nodes
         % 11: er error for right child on output nodes
 
-backTreeZ = tree(sentTree, 'clear');
-backTreeV = tree(sentTree, 'clear');
-backTreeW = tree(sentTree, 'clear');
-backTreeU = tree(sentTree, 'clear');
+backTreeZ = tree(sentTree, zeros(size(d,1)));
+backTreeV = tree(sentTree, zeros(size(V)));
+backTreeW = tree(sentTree, zeros(size(W)));
+backTreeU = tree(sentTree, zeros(size(U)));
 
 %set delta values for root
 node = sentTree.get(1);
@@ -47,12 +47,7 @@ backTreeW = backTreeW.set(1, deltaW);
 deltaV = deltaP*node{1}';
 backTreeV = backTreeV.set(1, deltaV);
 
-deltaUL = dLdGammaL(1:end-1)*node{1}';
-deltaUR = dLdGammaR(1:end-1)*node{1}';
-deltaC = [dLdGammaL(1:end-1); dLdGammaR(1:end-1)];
-deltaU = [deltaUL; deltaUR];
-deltaU = [deltaU, deltaC];
-
+deltaU = buildDeltaU(node{1},dLdGammaL,dLdGammaR);
 backTreeU = backTreeU.set(1, deltaU);
 
 %set delta values for all autoencoder nodes
@@ -95,12 +90,7 @@ for idx=outputItr
     deltaV = deltaP*node{1}';
     backTreeV = backTreeV.set(idx, deltaV);
 
-    deltaUL = dLdGammaL(1:end-1)*node{1}';
-    deltaUR = dLdGammaR(1:end-1)*node{1}';
-    deltaC = [dLdGammaL(1:end-1); dLdGammaR(1:end-1)];
-    deltaU = [deltaUL; deltaUR];
-    deltaU = [deltaU, deltaC];
-
+    deltaU = buildDeltaU(node{1},dLdGammaL,dLdGammaR);
     backTreeU = backTreeU.set(idx, deltaU);
     
     

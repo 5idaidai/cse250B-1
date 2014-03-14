@@ -55,9 +55,13 @@ for i=1:length(allSNum)
     
     pause;
     
-    %SGD update
-    V = V - labmda*dV - (labmda/2)*(V.^2);
-    W = W - labmda*dW - (labmda/2)*(W.^2);
-    U = U - labmda*dU - (labmda/2)*(U.^2);
+    %Regularized SGD update
+    V = V - lambda*dV - (lambda/2)*(V.^2);
+    newW = W - lambda*dW - (lambda/2)*(W.^2);
+    newU = U - lambda*dU - (lambda/2)*(U.^2);
+    
+    %Don't regularize intercept
+    W = [newW(:,1:end-1),W(:,end)];
+    U = [newU(:,1:end-1),U(:,end)];
 end
 
