@@ -45,21 +45,21 @@ for epoch=1:maxIter
     for i=1:length(allSNum)
         %get sentence
         sent=allSNum(i);
+        sent=sent{1,1};
+        numWords=length(sent);
         
         %skip sentences of less than 2 words because our our neural nets
         %are defined for these
-        if length(sent)<2
+        if numWords<2
             continue;
         end
         
-        sent=sent{1,1};
-        numWords=length(sent);
         t=labels(i);
         t=[t; 1-t];
 
         %build up sentence binary tree, and perform feed forward
         %   algorithm at the same time
-        [sentTree, outputItr, innerItr, inputItr] = buildTree(sent, meanings, numWords, W, U, V, d);
+        [sentTree, outputItr, innerItr, inputItr] = buildTree(sent, meanings, numWords, W, U, V, d, t);
 
         %disp(sentTree.tostring());
         %sentTree;
