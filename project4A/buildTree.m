@@ -3,7 +3,7 @@ function [ sentTree, outputItr, innerItr, inputItr ] ...
 %buildTree Builds the tree of the sentence, 
 % doing the feed foward calcs at the same time
 %   uses greedy tree algorithm
-    numCells = 11;
+    numCells = 12;
     numNodes = numWords;
     %columns: child 1, child 2, meaning vector
     %0 in child column indicates no child
@@ -130,6 +130,7 @@ function [ sentTree, outputItr, innerItr, inputItr ] ...
        
     %build output, inner, input node iterators
     outIdx=1;
+    outputItr = [];
     iterator = sentTree.breadthfirstiterator;
     for i = iterator
         node = sentTree.get(i);
@@ -141,6 +142,7 @@ function [ sentTree, outputItr, innerItr, inputItr ] ...
     inputItr=sentTree.findleaves();
 
     innerItr = sentTree.breadthfirstiterator;
+    innerItr = innerItr(~ismember(innerItr,1));
     innerItr = innerItr(~ismember(innerItr,outputItr));
     innerItr = innerItr(~ismember(innerItr,inputItr));
 

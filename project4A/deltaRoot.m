@@ -15,7 +15,7 @@ deltaP = left.*right;
 deltaPr = (deltaP'*V)';
 
 %delta value for this node
-deltaRt = deltaPr + deltaL + deltaR;
+deltaRt = hprime(a) .* (deltaPr + deltaL + deltaR);
 
 
 end

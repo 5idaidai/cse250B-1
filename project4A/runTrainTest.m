@@ -7,6 +7,8 @@ if exist('allSNum','var') == 0
     load('codeDataMoviesEMNLP/data/rt-polaritydata/RTData_CV1.mat','allSNum','labels');
 end
 
+trainInput = 0;%don't train input for now
+
 %init meaning vectors for each word to random values
 d = 20;
 meanings = normrnd(0,1,d,size(words,2));
@@ -43,7 +45,8 @@ for i=1:length(allSNum)
     %t=rand(1);
     t=labels(i);
     t=[t; 1-t];
-    [backTreeZ, backTreeV, backTreeW, backTreeU] = backProp(sentTree, t, outputItr, innerItr, inputItr, U, W, d, V);
+    [backTreeZ, backTreeV, backTreeW, backTreeU] =...
+        backProp(sentTree, t, outputItr, innerItr, inputItr, U, W, d, V, trainInput);
     
     disp(backTreeZ.tostring());
     disp(backTreeV.tostring());
