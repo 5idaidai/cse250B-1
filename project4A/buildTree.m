@@ -1,5 +1,5 @@
 function [ sentTree, outputItr, innerItr, inputItr ] ...
-        = buildTree( sentMean, numWords, W, U, V, d )
+        = buildTree( sent, wordMeanings, numWords, W, U, V, d )
 %buildTree Builds the tree of the sentence, 
 % doing the feed foward calcs at the same time
 %   uses greedy tree algorithm
@@ -7,7 +7,7 @@ function [ sentTree, outputItr, innerItr, inputItr ] ...
     numNodes = numWords;
     %columns: child 1, child 2, meaning vector
     %0 in child column indicates no child
-    nodelist = cell(size(sentMean,2),1);
+    nodelist = cell(size(sent,2),1);
     for i=1:numWords;
         node=cell(numCells,1);
         %each node contains the following:
@@ -24,8 +24,11 @@ function [ sentTree, outputItr, innerItr, inputItr ] ...
         % 9: delta vector
         % 10: el error for left child on output nodes
         % 11: er error for right child on output nodes
+        % only for input nodes
+        % 12: word index
         
-        node{1} = sentMean(:,i);
+        node{12} = sent(i);
+        node{1} = wordMeanings(:,node{12});
         node{2} = 1;%# leafs
         node{5} = 0;%output node?
         nodelist{i} = tree(node);
