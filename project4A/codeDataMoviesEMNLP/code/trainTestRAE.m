@@ -85,7 +85,7 @@ theta = initializeParameters(params.embedding_size, params.embedding_size, cat_s
 %%%%%%%%%%%%%%%%%%%%%%
 % Parallelize if on cluster
 %%%%%%%%%%%%%%%%%%%%%%
-if isunix && matlabpool('size') == 0
+if 0 && isunix && matlabpool('size') == 0
     numCores = feature('numCores');
     if numCores==16
         numCores=8;

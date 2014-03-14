@@ -1,5 +1,5 @@
 function [ dV,dW,dU,backTreeZ, backTreeV, backTreeW, backTreeU ] =...
-    backProp( sentTree, t, outputItr, innerItr, inputItr, U, W, d, V, trainInput )
+    backProp( sentTree, meanings, t, outputItr, innerItr, inputItr, U, W, d, V, trainInput )
 %UNTITLED5 Summary of this function goes here
         %each node contains the following:
         % 1: meaning vector (zi)
@@ -198,11 +198,14 @@ if trainInput
         %backTreeU = backTreeU.set(idx, deltaU);
     end
 end
-    
-disp(backTreeZ.tostring());
-disp(backTreeV.tostring());
-disp(backTreeW.tostring());
-disp(backTreeU.tostring());
+
+%display the deriv trees (and sizes of matrices)
+if 0
+    disp(backTreeZ.tostring());
+    disp(backTreeV.tostring());
+    disp(backTreeW.tostring());
+    disp(backTreeU.tostring());
+end
 
 iterator = sentTree.breadthfirstiterator;
 dV = zeros(size(V));

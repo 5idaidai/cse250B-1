@@ -165,7 +165,7 @@ function [ sentTree, outputItr, innerItr, inputItr ] ...
         disp(na_order.tostring);
     end
     %disp nodes idxs for debug
-    if 1
+    if 0
         na_order = tree(sentTree, 'clear');
         iterator = sentTree.nodeorderiterator;
         idx = 1;
