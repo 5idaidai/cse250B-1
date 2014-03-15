@@ -56,7 +56,7 @@ function [ sentTree, outputItr, innerItr, inputItr ] ...
             nr = childr{2};
 
             xk = meaningFunc(xl,xr,W);
-            [err(j,1)] = raeError( xk, xl, xr, nl, nr, U, d );
+            [err(j,1)] = raeError( xk, xl, xr, nl, nr, U, d, alpha );
             err(j,2) = node1;
             err(j,3) = node2;
             k = k + 1;
@@ -72,7 +72,7 @@ function [ sentTree, outputItr, innerItr, inputItr ] ...
         nl = childl{2};
         nr = childr{2};
         [xk,ak] = meaningFunc(xl,xr,W);
-        [errk, zl, zr, el, er] = raeError( xk, xl, xr, nl, nr, U, d );
+        [errk, zl, zr, el, er] = raeError( xk, xl, xr, nl, nr, U, d, alpha );
         pk = predictNode(xk,V);
         ll = logLoss(t,pk);
 

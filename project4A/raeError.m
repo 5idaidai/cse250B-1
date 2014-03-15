@@ -1,4 +1,4 @@
-function [ err, zl, zr, el, er ] = raeError( xk, xi, xj, ni, nj, U, d )
+function [ err, zl, zr, el, er ] = raeError( xk, xi, xj, ni, nj, U, d, alpha )
 %raeError Calculate the square loss at node k
 %   ni/nj = # leaves under node i/j
 %   E_1 in the notes
@@ -10,8 +10,8 @@ function [ err, zl, zr, el, er ] = raeError( xk, xi, xj, ni, nj, U, d )
     
     %this is with refinement #2
     nsum = ni + nj;
-    el = squareLoss(xi,zl,ni,nsum);
-    er = squareLoss(xj,zr,nj,nsum);
+    el = squareLoss(xi,zl,ni,nsum,alpha);
+    er = squareLoss(xj,zr,nj,nsum,alpha);
     err = el + er;
 
 end

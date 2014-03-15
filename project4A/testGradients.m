@@ -4,7 +4,8 @@ x=rand(20,1);
 z=rand(20,1);
 num=2;
 denom=4;
-r=checkgrad2(@costSqLoss,x,{z,num,denom});
+alpha=0.1;
+r=checkgrad2(@costSqLoss,x,{z,num,denom,alpha});
 %assert abs(r-1)<1e-10;
 
 %log loss functions

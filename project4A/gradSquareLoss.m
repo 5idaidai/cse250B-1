@@ -1,8 +1,8 @@
-function [ grad ] = gradSquareLoss( x, z, top, bottom )
+function [ grad ] = gradSquareLoss( x, z, top, bottom, alpha )
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 
-grad = 2*(top/bottom)*(x-z);
+grad = alpha*2*(top/bottom)*(x-z);
 
 
 end

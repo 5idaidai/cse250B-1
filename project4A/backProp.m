@@ -41,7 +41,7 @@ topL = childL{2};
 topR = childR{2};
 bottom = topL+topR;
 
-[ deltaRt, deltaP, dLdGammaL, dLdGammaR ] = deltaRoot( tl, zl, tr, zr, Ul, Ur, a, t, p, V, topL, topR, bottom);
+[ deltaRt, deltaP, dLdGammaL, dLdGammaR ] = deltaRoot( tl, zl, tr, zr, Ul, Ur, a, t, p, V, topL, topR, bottom, alpha);
 backTreeZ =  backTreeZ.set(1, deltaRt);
 
 deltaW = deltaRt * [childR{1};childL{1};1]';
@@ -82,10 +82,10 @@ for idx=outputItr
         Wk = W(:,d+1:2*d);
     end
 
-    [ delta, deltaP, dLdGammaL, dLdGammaR ] = deltaOutput( t, p, tl, zl, tr, zr, deltak, Wk, Ul, Ur, a, V, topL, topR, bottom);
+    [ delta, deltaP, dLdGammaL, dLdGammaR ] = deltaOutput( t, p, tl, zl, tr, zr, deltak, Wk, Ul, Ur, a, V, topL, topR, bottom, alpha);
     backTreeZ = backTreeZ.set(idx, delta);
     
-    deltaW = deltaRt * [childR{1};childL{1};1]';
+    deltaW = delta * [childR{1};childL{1};1]';
     dW = dW + deltaW;
 
     deltaV = deltaP*node{1}';
@@ -113,10 +113,10 @@ for idx=innerItr
         Wk = W(:,d+1:2*d);
     end
 
-    [ delta, deltaP ] = deltaNonOutput( a, deltak, Wk, V, t, p );
+    [ delta, deltaP ] = deltaNonOutput( a, deltak, Wk, V, t, p, alpha );
     backTreeZ = backTreeZ.set(idx, delta);
     
-    deltaW = deltaRt * [childR{1};childL{1};1]';
+    deltaW = delta * [childR{1};childL{1};1]';
     dW = dW + deltaW;
 
     deltaV = deltaP*node{1}';
