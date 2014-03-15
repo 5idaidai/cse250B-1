@@ -3,7 +3,7 @@ function [ obj,dx ] = costPredict( t, x, V, alpha )
 %   Detailed explanation goes here
     %t = [ti; 1-ti];
     p = predictNode(x, V);
-    obj = (1-alpha)*logLoss(t, p);
+    obj = logLoss(t, p, alpha);
     %dx = gradSigmoid(p);
     dx = gradPredict(t,p,alpha);
     %dx = dxs(1);

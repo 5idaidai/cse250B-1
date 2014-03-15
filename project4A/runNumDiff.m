@@ -30,12 +30,7 @@ c = zeros(2*d,1);
 U = [U,c];
 
 %init V for prediction
-v1 = rand(1,d);
-v2 = 1-v1;
-V = zeros(2,d);
-V(1,:)=v1;
-V(2,:)=v2;
-%V = rand(1,d);
+V = rand(2,d);
 
 totTic=tic;
 

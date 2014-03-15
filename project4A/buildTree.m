@@ -36,7 +36,7 @@ function [ sentTree, outputItr, innerItr, inputItr ] ...
         
         if trainInput
             pk = predictNode(node{1},V);
-            ll = logLoss(t,pk);
+            ll = logLoss(t,pk,alpha);
 
             node{3} = pk;
             node{13} = ll;
@@ -84,7 +84,7 @@ function [ sentTree, outputItr, innerItr, inputItr ] ...
         [xk,ak] = meaningFunc(xl,xr,W);
         [errk, zl, zr, el, er] = raeError( xk, xl, xr, nl, nr, U, d, alpha );
         pk = predictNode(xk,V);
-        ll = logLoss(t,pk);
+        ll = logLoss(t,pk,alpha);
 
         newnode = cell(numCells,1);
         newnode{1} = xk;

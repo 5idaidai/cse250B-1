@@ -6,17 +6,18 @@ meanings = normrnd(0,1,d,size(words,2));
 numExamples=length(allSNum);
 
 %init W and b randomly
-W = rand(d,2*d);
+%a + (b-a).*rand(100,1)
+W = -1 + (1+1)*rand(d,2*d);
 b = zeros(d,1);
 W = [W,b];
 
 %init U and c for backpropagation
-U = rand(2*d,d);
+U = -1 + (1+1)*rand(2*d,d);
 c = zeros(2*d,1);
 U = [U,c];
 
 %init V for prediction
-V = rand(2,d);
+V = -1 + (1+1)*rand(2,d);
 
 rootPreds = zeros(2,numExamples);
 

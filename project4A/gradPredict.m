@@ -2,8 +2,9 @@ function [ grad ] = gradPredict( t, r, alpha )
 %UNTITLED8 Summary of this function goes here
 %   Detailed explanation goes here
 
-    gradT = (1-alpha)*(t - r);
+    gradT = gradLogLoss(t, r, alpha);
     
-    grad = -gradT.*gradSigmoid(r);
+    grad = gradT.*gradSoftmax(r);
+    %grad = gradT;
 
 end

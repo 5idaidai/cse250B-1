@@ -6,10 +6,7 @@ function [ delta, deltaP ] = deltaInput( deltak, Wk, V, t, p, alpha )
 deltapar = (deltak'*Wk)';
 
 %prediction deriv
-left=gradLogLoss(t,p);
-right=gradSigmoid(p);
-deltaP = left.*right;
-deltaP = (1-alpha)*deltaP;
+deltaP = gradPredict(t,p,alpha);
 deltaPr = (deltaP'*V)';
 
 delta = deltapar + deltaPr;

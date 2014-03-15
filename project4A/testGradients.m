@@ -15,14 +15,14 @@ p = rand;
 %r=checkgrad2(@costLogLoss,l,{[p,1-p]});
 %assert abs(r-1)<1e-10;
 
-r=checkgrad2(@costLogLoss,0,{0.999});
-r=checkgrad2(@costLogLoss,1,{0.001});
-r=checkgrad2(@costLogLoss,0,{0.001});
-r=checkgrad2(@costLogLoss,1,{0.999});
-r=checkgrad2(@costLogLoss,0,{0.5});
-r=checkgrad2(@costLogLoss,1,{0.5});
-r=checkgrad2(@costLogLoss,0,{rand});
-r=checkgrad2(@costLogLoss,1,{rand});
+r=checkgrad2(@costLogLoss,0,{0.9, alpha});
+r=checkgrad2(@costLogLoss,1,{0.1, alpha});
+r=checkgrad2(@costLogLoss,0,{0.1, alpha});
+r=checkgrad2(@costLogLoss,1,{0.9, alpha});
+r=checkgrad2(@costLogLoss,0,{0.5, alpha});
+r=checkgrad2(@costLogLoss,1,{0.5, alpha});
+r=checkgrad2(@costLogLoss,0,{rand, alpha});
+r=checkgrad2(@costLogLoss,1,{rand, alpha});
 
 %h functions
 disp('Checking H functions');
@@ -35,7 +35,7 @@ r=checkgrad2(@costSigmoid,rand*10,{});
 
 %prediction functions
 disp('Checking Prediction functions');
-V = rand(2,20);
+V = -1 + (1+1)*rand(2,20);
 x = rand(20,1);
 t = [1;0];
 r=checkgrad2(@costPredict,t,{x, V, alpha});
