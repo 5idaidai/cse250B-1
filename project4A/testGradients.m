@@ -32,3 +32,10 @@ r=checkgrad2(@costH,rand*10,{});
 %sigmoid functions
 disp('Checking Sigmoid functions');
 r=checkgrad2(@costSigmoid,rand*10,{});
+
+%prediction functions
+disp('Checking Prediction functions');
+V = rand(2,20);
+x = rand(20,1);
+t = [1;0];
+r=checkgrad2(@costPredict,t,{x, V, alpha});

@@ -56,18 +56,18 @@ if numWords>=2
     [sentTree, outputItr, innerItr, inputItr] = buildTree(sent, meanings, numWords, W, U, V, d, t, alpha, trainInput);
 
     %backpropagate
-    [ dW,dU,dV, backTreeZ ] = backProp( sentTree, meanings, t, outputItr, innerItr, inputItr, U, W, V, d, alpha, trainInput );
+    [ dW ] = backProp( sentTree, meanings, t, outputItr, innerItr, inputItr, U, W, V, d, alpha, trainInput );
 
     %Numerical Differentiaton
     E=1e-6;
     [ numDiffW ] = numDiff( outputItr, innerItr, sentTree, W, U, V, d, t, alpha, E, lambda );
 
     %Check derivatives
-    D = sum(sum((numDiffW - dW).^2));
+    D = sum(sum((numDiffW(1:end-1) - dW(1:end-1)).^2));
 else
     i=i+1;
 end
 
 totalTime = toc(totTic);
 fprintf('Checking one tree took %f seconds (aka %f minutes).\n\n',totalTime,totalTime/60);
-fprintf('The Euclidean distance is %f', D);
+fprintf('The Euclidean distance is %f\n', D);

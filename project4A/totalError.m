@@ -17,7 +17,7 @@ function [ totErr ] = totalError( outputItr, innerItr, alpha, numDiffTree, lambd
         innerErr(idx) = (1-alpha)*E2;
     end
     
-    totErr = sum(outputErr)+sum(innerErr) + lambda(1)./2*norm(W) + lambda(2)./2*norm(U) + lambda(3)./2*norm(V)^2;
+    totErr = sum(outputErr)+sum(innerErr) + (lambda(1:3)./2)*([norm(W),norm(U),norm(V)].^2)';
 
 end
 
