@@ -64,7 +64,8 @@ for epoch=1:maxIter
 
         %build up sentence binary tree, and perform feed forward
         %   algorithm at the same time
-        [sentTree, outputItr, innerItr, inputItr] = buildTree(sent, meanings, numWords, W, U, V, d, t, alpha);
+        [sentTree, outputItr, innerItr, inputItr] =...
+            buildTree(sent, meanings, numWords, W, U, V, d, t, alpha, trainInput);
 
         %store root node prediction: for predicting sentence meaning
         root = sentTree.get(1);
@@ -72,7 +73,8 @@ for epoch=1:maxIter
         
         %backpropagate
         if trainInput
-            [dW,dU,dV,backTreeZ,dMeaning] = backProp(sentTree, meanings, t, outputItr, innerItr, inputItr, U, W, V, d, alpha, trainInput);
+            [dW,dU,dV,backTreeZ,dMeaning] =...
+                backProp(sentTree, meanings, t, outputItr, innerItr, inputItr, U, W, V, d, alpha, trainInput);
         else
             [dW,dU,dV] = backProp(sentTree, meanings, t, outputItr, innerItr, inputItr, U, W, V, d, alpha, trainInput);
         end

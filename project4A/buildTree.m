@@ -1,5 +1,5 @@
 function [ sentTree, outputItr, innerItr, inputItr ] ...
-        = buildTree( sent, wordMeanings, numWords, W, U, V, d, t, alpha )
+        = buildTree( sent, wordMeanings, numWords, W, U, V, d, t, alpha, trainInput )
 %buildTree Builds the tree of the sentence, 
 % doing the feed foward calcs at the same time
 %   uses greedy tree algorithm
