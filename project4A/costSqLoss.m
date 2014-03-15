@@ -1,4 +1,4 @@
-function [obj,dx] = costSqLoss(xi, zi, num, denom)
-    obj = squareLoss(xi,zi,num,denom);
-    dx = gradSquareLoss(xi,zi,num,denom);
+function [obj,dx] = costSqLoss(xi, zi, num, denom,alpha)
+    obj = squareLoss(xi,zi,num,denom,alpha);
+    dx = gradSquareLoss(xi,zi,num,denom,alpha);
 end

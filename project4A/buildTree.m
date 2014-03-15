@@ -1,8 +1,9 @@
 function [ sentTree, outputItr, innerItr, inputItr ] ...
-        = buildTree( sent, wordMeanings, numWords, W, U, V, d, t, alpha )
+        = buildTree( sent, wordMeanings, numWords, W, U, V, d, t, alpha, trainInput )
 %buildTree Builds the tree of the sentence, 
 % doing the feed foward calcs at the same time
 %   uses greedy tree algorithm
+
     numCells = 13;
     numNodes = numWords;
     %columns: child 1, child 2, meaning vector
@@ -27,11 +28,20 @@ function [ sentTree, outputItr, innerItr, inputItr ] ...
         % only for input nodes
         % 12: word index
         % 13: log loss (E2)
-        
+                
         node{12} = sent(i);
         node{1} = wordMeanings(:,node{12});
         node{2} = 1;%# leafs
         node{5} = 0;%output node?
+        
+        if trainInput
+            pk = predictNode(node{1},V);
+            ll = logLoss(t,pk);
+
+            node{3} = pk;
+            node{13} = ll;
+        end
+        
         nodelist{i} = tree(node);
     end
     
@@ -56,7 +66,7 @@ function [ sentTree, outputItr, innerItr, inputItr ] ...
             nr = childr{2};
 
             xk = meaningFunc(xl,xr,W);
-            [err(j,1)] = raeError( xk, xl, xr, nl, nr, U, d );
+            [err(j,1)] = raeError( xk, xl, xr, nl, nr, U, d, alpha );
             err(j,2) = node1;
             err(j,3) = node2;
             k = k + 1;
@@ -72,7 +82,7 @@ function [ sentTree, outputItr, innerItr, inputItr ] ...
         nl = childl{2};
         nr = childr{2};
         [xk,ak] = meaningFunc(xl,xr,W);
-        [errk, zl, zr, el, er] = raeError( xk, xl, xr, nl, nr, U, d );
+        [errk, zl, zr, el, er] = raeError( xk, xl, xr, nl, nr, U, d, alpha );
         pk = predictNode(xk,V);
         ll = logLoss(t,pk);
 
