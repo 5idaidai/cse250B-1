@@ -64,12 +64,12 @@ for epoch=1:maxIter
         end
         
         %Regularized SGD update
-        newW = W - lambda(1)*dW;
-        newU = U - lambda(2)*dU;
-        V = V - lambda(3)*dV;
+        newW = W + lambda(1)*dW;
+        newU = U + lambda(2)*dU;
+        V = V + lambda(3)*dV;
         
         if trainInput
-            meanings = meanings - lambda(4)*dMeaning;
+            meanings = meanings + lambda(4)*dMeaning;
         end
 
         %Don't regularize intercept
@@ -87,7 +87,7 @@ plot(epochTimes);
 pred = zeros(numExamples,1);
 rootPreds(2,:)=1-rootPreds(1,:);
 for i=1:numExamples
-     pred(i)=find(rootPreds(:,1)>0.5)-1;
+     pred(i)=find(rootPreds(:,i)>0.5)-1;
 end
 
 end

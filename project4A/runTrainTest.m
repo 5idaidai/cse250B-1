@@ -17,12 +17,11 @@ lambda = [1e-05, 0.0001, 1e-07, 0.01];
 alpha = 0.2;
 maxIter = 70;
 
-[rootPreds] = trainNN( words, allSNum, labels, d, lambda, alpha, maxIter, trainInput );
+[pred] = trainNN( words, allSNum, labels, d, lambda, alpha, maxIter, trainInput );
 
 %Accuracy
 %dec_val = sigmoid(W*rootPreds' + b(:,ones(numExamples,1)));
 %pred = 1*(dec_val > 0.5);
-gold = labels;
-[prec_train, recall_train, acc_train, f1_train] = getAccuracy(pred, gold);
+[prec_train, recall_train, acc_train, f1_train] = getAccuracy(pred, labels);
 
 fprintf('Training Accuracy: %.3f\n',acc_train);
