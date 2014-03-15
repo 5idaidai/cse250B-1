@@ -1,4 +1,5 @@
 addpath(genpath('tree/'));
+addpath(genpath('codeDataMoviesEMNLP/code'));
 
 %load test data with limit number of short sentences, same vocab
 load('testdata.mat');
@@ -36,9 +37,9 @@ totTic=tic;
 epochTimes=zeros(maxIter,1);
 
 for epoch=1:maxIter
-    %if epoch==1 || mod(epoch,10)==0
+    if epoch==1 || mod(epoch,10)==0
         disp(epoch);    
-    %end
+    end
     eTic = tic;
     
     %iterate through all sentences
