@@ -59,15 +59,15 @@ for epoch=1:maxIter
 
         %build up sentence binary tree, and perform feed forward
         %   algorithm at the same time
-        [sentTree, outputItr, innerItr, inputItr] = buildTree(sent, meanings, numWords, W, U, V, d, t);
+        [sentTree, outputItr, innerItr, inputItr] = buildTree(sent, meanings, numWords, W, U, V, d, t, alpha);
 
         %backpropagate
-        [dW,dU,dV] = backProp(sentTree, meanings, t, outputItr, innerItr, inputItr, U, W, d, V, trainInput);
+        [dW,dU,dV] = backProp(sentTree, meanings, t, outputItr, innerItr, inputItr, U, W, V, d, alpha, trainInput);
 
         %Regularized SGD update
-        newW = W - lambda(1)*dW - (lambda(1)/2)*(W.^2);
-        newU = U - lambda(2)*dU - (lambda(2)/2)*(U.^2);
-        V = V - lambda(3)*dV - (lambda(3)/2)*(V.^2);
+        newW = W - lambda(1)*dW;
+        newU = U - lambda(2)*dU;
+        V = V - lambda(3)*dV;
 
         %Don't regularize intercept
         W = [newW(:,1:end-1),W(:,end)];
