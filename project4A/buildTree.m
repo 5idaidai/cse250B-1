@@ -27,11 +27,20 @@ function [ sentTree, outputItr, innerItr, inputItr ] ...
         % only for input nodes
         % 12: word index
         % 13: log loss (E2)
-        
+                
         node{12} = sent(i);
         node{1} = wordMeanings(:,node{12});
         node{2} = 1;%# leafs
         node{5} = 0;%output node?
+        
+        if trainInput
+            pk = predictNode(node{1},V);
+            ll = logLoss(t,pk);
+
+            node{3} = pk;
+            node{13} = ll;
+        end
+        
         nodelist{i} = tree(node);
     end
     
