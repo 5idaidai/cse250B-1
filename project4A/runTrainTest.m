@@ -12,7 +12,7 @@ end
 %hyperparameters
 trainInput = 0;%don't train input for now
 d = 20;
-lambda = 0.001/length(allSNum);
+lambda = [1e-05, 0.0001, 1e-07, 0.01];
 alpha = 0.4;
 maxIter = 70;
 
@@ -20,14 +20,14 @@ maxIter = 70;
 meanings = normrnd(0,1,d,size(words,2));
 
 %init W and b randomly
-W = rand(d,2*d+1);
-%b = rand(d,1);
-%W = [W,b];
+W = rand(d,2*d);
+b = zeros(d,1);
+W = [W,b];
 
 %init U and c for backpropagation
-U = rand(2*d,d+1);
-%c = rand(2*d,1);
-%U = [U,c];
+U = rand(2*d,d);
+c = zeros(2*d,1);
+U = [U,c];
 
 %init V for prediction
 V = rand(2,d);
@@ -61,18 +61,13 @@ for epoch=1:maxIter
         %   algorithm at the same time
         [sentTree, outputItr, innerItr, inputItr] = buildTree(sent, meanings, numWords, W, U, V, d, t);
 
-        %disp(sentTree.tostring());
-        %sentTree;
-        %pause;
-
         %backpropagate
-        [dV,dW,dU,backTreeZ, backTreeV, backTreeW, backTreeU] =...
-            backProp(sentTree, meanings, t, outputItr, innerItr, inputItr, U, W, d, V, trainInput);
+        [dW,dU,dV] = backProp(sentTree, meanings, t, outputItr, innerItr, inputItr, U, W, d, V, trainInput);
 
         %Regularized SGD update
-        V = V - lambda*dV - (lambda/2)*(V.^2);
-        newW = W - lambda*dW - (lambda/2)*(W.^2);
-        newU = U - lambda*dU - (lambda/2)*(U.^2);
+        newW = W - lambda(1)*dW - (lambda(1)/2)*(W.^2);
+        newU = U - lambda(2)*dU - (lambda(2)/2)*(U.^2);
+        V = V - lambda(3)*dV - (lambda(3)/2)*(V.^2);
 
         %Don't regularize intercept
         W = [newW(:,1:end-1),W(:,end)];
