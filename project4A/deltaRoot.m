@@ -9,7 +9,7 @@ deltaL = Ul*dLdGammaL;
 deltaR = Ur*dLdGammaR;
 
 %prediction deriv
-deltaP = gradPredict(t,p,alpha);
+deltaP = gradPredict(t,p,V*a,alpha);
 deltaPr = (deltaP'*V)';
 
 %delta value for this node

@@ -20,6 +20,7 @@ U = [U,c];
 V = -1 + (1+1)*rand(2,d);
 
 rootPreds = zeros(2,numExamples);
+dM = zeros(size(meanings));
 
 %Training
 totTic=tic;
@@ -70,12 +71,16 @@ for epoch=1:maxIter
         V = V + lambda(3)*dV;
         
         if trainInput
-            meanings = meanings + lambda(4)*dMeaning;
+            dM = dM + dMeaning;
         end
 
         %Don't regularize intercept
         W = [newW(:,1:end-1),W(:,end)];
         U = [newU(:,1:end-1),U(:,end)];
+    end
+    
+    if trainInput
+        meanings = meanings + lambda(4)*dM;
     end
     
     epochTimes(epoch) = toc(eTic);    
@@ -90,5 +95,13 @@ rootPreds(2,:)=1-rootPreds(1,:);
 for i=1:numExamples
      pred(i)=find(rootPreds(:,i)>0.5)-1;
 end
+
+    %Numerical Differentiaton
+    E=1e-6;
+    [ numDiffW ] = numDiff( outputItr, innerItr, sentTree, W, U, V, d, t, alpha, E, lambda );
+
+    %Check derivatives
+    D = sum(sum((numDiffW(1:end-1) - dW(1:end-1)).^2));
+    fprintf('The Euclidean distance is %f\n', D);
 
 end

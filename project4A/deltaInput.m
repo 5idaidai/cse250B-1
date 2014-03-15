@@ -1,4 +1,4 @@
-function [ delta, deltaP ] = deltaInput( deltak, Wk, V, t, p, alpha )
+function [ delta, deltaP ] = deltaInput( a, deltak, Wk, V, t, p, alpha )
 %UNTITLED2 Summary of this function goes here
 %   Equation 4 from the notes (pg. 12)
 
@@ -6,7 +6,7 @@ function [ delta, deltaP ] = deltaInput( deltak, Wk, V, t, p, alpha )
 deltapar = (deltak'*Wk)';
 
 %prediction deriv
-deltaP = gradPredict(t,p,alpha);
+deltaP = gradPredict(t,p,V*a,alpha);
 deltaPr = (deltaP'*V)';
 
 delta = deltapar + deltaPr;

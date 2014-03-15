@@ -30,12 +30,12 @@ c = zeros(2*d,1);
 U = [U,c];
 
 %init V for prediction
-V = rand(2,d);
+V = rand(1,d);
 
 totTic=tic;
 
 
-i=randi(length(allSNum),1);
+i=3;%randi(length(allSNum),1);
 sent=allSNum(i);
 sent=sent{1,1};
 numWords=length(sent);
@@ -44,7 +44,7 @@ numWords=length(sent);
 %are defined for these
 if numWords>=2
     t=labels(i);
-    t=[t; 1-t];
+    %t=[t; 1-t];
 
     %build up sentence binary tree, and perform feed forward
     %algorithm at the same time

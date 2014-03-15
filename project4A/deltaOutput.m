@@ -10,7 +10,7 @@ deltaL = Ul*dLdGammaL;
 deltaR = Ur*dLdGammaR;
 
 %Prediction derivs
-deltaP = gradPredict(t,p,alpha);
+deltaP = gradPredict(t,p,V*a,alpha);
 deltaPr = (deltaP'*V)';
 
 dk = (deltak'*Wk)';

@@ -32,11 +32,12 @@ function [ sentTree, outputItr, innerItr, inputItr ] ...
         node{12} = sent(i);
         node{1} = wordMeanings(:,node{12});
         node{2} = 1;%# leafs
+        node{4} = node{1};%activation for input nodes is the same as their meaning vector
         node{5} = 0;%output node?
         
         if trainInput
-            pk = predictNode(node{1},V);
-            ll = logLoss(t,pk,alpha);
+            [pk,ak] = predictNode(node{1},V);
+            ll = predError(t,pk,alpha);
 
             node{3} = pk;
             node{13} = ll;
@@ -84,7 +85,7 @@ function [ sentTree, outputItr, innerItr, inputItr ] ...
         [xk,ak] = meaningFunc(xl,xr,W);
         [errk, zl, zr, el, er] = raeError( xk, xl, xr, nl, nr, U, d, alpha );
         pk = predictNode(xk,V);
-        ll = logLoss(t,pk,alpha);
+        ll = predError(t,pk,alpha);
 
         newnode = cell(numCells,1);
         newnode{1} = xk;
