@@ -3,6 +3,7 @@ function [ sentTree, outputItr, innerItr, inputItr ] ...
 %buildTree Builds the tree of the sentence, 
 % doing the feed foward calcs at the same time
 %   uses greedy tree algorithm
+
     numCells = 13;
     numNodes = numWords;
     %columns: child 1, child 2, meaning vector
