@@ -30,7 +30,12 @@ c = zeros(2*d,1);
 U = [U,c];
 
 %init V for prediction
-V = rand(2,d);
+v1 = rand(1,d);
+v2 = 1-v1;
+V = zeros(2,d);
+V(1,:)=v1;
+V(2,:)=v2;
+%V = rand(1,d);
 
 totTic=tic;
 
@@ -42,20 +47,20 @@ numWords=length(sent);
 
 %skip sentences of less than 2 words because our our neural nets
 %are defined for these
-if numWords<2
+if numWords>=2
     t=labels(i);
     t=[t; 1-t];
 
     %build up sentence binary tree, and perform feed forward
-    %   algorithm at the same time
-    [sentTree, outputItr, innerItr, inputItr] = buildTree(sent, meanings, numWords, W, U, V, d, t, alpha);
+    %algorithm at the same time
+    [sentTree, outputItr, innerItr, inputItr] = buildTree(sent, meanings, numWords, W, U, V, d, t, alpha, trainInput);
 
     %backpropagate
     [ dW,dU,dV, backTreeZ ] = backProp( sentTree, meanings, t, outputItr, innerItr, inputItr, U, W, V, d, alpha, trainInput );
 
     %Numerical Differentiaton
     E=1e-6;
-    [ numDiffW ] = numDiff( outputItr, innerItr, sentTree, W, U, V, d, t, alpha, E );
+    [ numDiffW ] = numDiff( outputItr, innerItr, sentTree, W, U, V, d, t, alpha, E, lambda );
 
     %Check derivatives
     D = sum(sum((numDiffW - dW).^2));
