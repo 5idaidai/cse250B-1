@@ -1,4 +1,4 @@
-function [ numDiffTree ] = fwdPropNumDiff( outputItr, innerItr, sentTree, W, U, V, d, t )
+function [ numDiffTree ] = fwdPropNumDiff( outputItr, innerItr, sentTree, W, U, V, d, t, alpha )
 %UNTITLED3 Summary of this function goes here
         %each node contains the following:
         % 1: meaning vector
@@ -41,7 +41,7 @@ for i=depth-1:-1:1
 
             [xk,ak] = meaningFunc(xl,xr,W);
 
-            [E1, zl, zr, el, er] = raeError( xk, xl, xr, nl, nr, U, d );
+            [ E1, zl, zr, el, er ] = raeError( xk, xl, xr, nl, nr, U, d, alpha );
             pk = predictNode(xk,V);
             E2 = logLoss(t,pk);
 
@@ -74,7 +74,7 @@ for i=depth-1:-1:1
 
             [xk,ak] = meaningFunc(xl,xr,W);
 
-            [E1, zl, zr, el, er] = raeError( xk, xl, xr, nl, nr, U, d );
+            [ E1, zl, zr, el, er ] = raeError( xk, xl, xr, nl, nr, U, d, alpha );
             pk = predictNode(xk,V);
             E2 = logLoss(t,pk);
 

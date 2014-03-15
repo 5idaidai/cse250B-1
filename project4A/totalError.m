@@ -1,4 +1,4 @@
-function [ totErr ] = totalError( outputItr, innerItr, alpha, numDiffTree )
+function [ totErr ] = totalError( outputItr, innerItr, alpha, numDiffTree, lambda, W, U, V )
 %totalError total error for one sentence s with label t
 %   Detailed explanation goes here
 
@@ -17,7 +17,7 @@ function [ totErr ] = totalError( outputItr, innerItr, alpha, numDiffTree )
         innerErr(idx) = (1-alpha)*E2;
     end
     
-    totErr = sum(outputErr)+sum(innerErr);
+    totErr = sum(outputErr)+sum(innerErr) + lambda(1)./2*norm(W) + lambda(2)./2*norm(U) + lambda(3)./2*norm(V)^2;
 
 end
 
