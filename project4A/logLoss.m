@@ -4,7 +4,8 @@ function [ err ] = logLoss( label, predicted )
 %   Detailed explanation goes here
 
     %log loss error
-    err = -sum(label .* log(predicted));
+    %err = -sum(label .* log(predicted));
+    err = -mean(label.*log(predicted) + (1-label).*(1-log(predicted)));
 
 end
 

@@ -9,7 +9,8 @@ deltaL = Ul*dLdGammaL;
 deltaR = Ur*dLdGammaR;
 
 %prediction deriv
-left=gradLogLoss(t,p);
+%left=gradLogLoss(t,p);
+left=gradSquareLoss(t,p,1,1,alpha);
 right=gradSigmoid(p);
 deltaP = left.*right;
 deltaP = (1-alpha)*deltaP;

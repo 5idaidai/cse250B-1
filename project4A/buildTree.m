@@ -84,7 +84,7 @@ function [ sentTree, outputItr, innerItr, inputItr ] ...
         [xk,ak] = meaningFunc(xl,xr,W);
         [errk, zl, zr, el, er] = raeError( xk, xl, xr, nl, nr, U, d, alpha );
         pk = predictNode(xk,V);
-        ll = logLoss(t,pk);
+        %ll = logLoss(t,pk);
 
         newnode = cell(numCells,1);
         newnode{1} = xk;
@@ -97,7 +97,7 @@ function [ sentTree, outputItr, innerItr, inputItr ] ...
         newnode{8} = errk;
         newnode{10} = el;
         newnode{11} = er;
-        newnode{13} = ll;
+        %newnode{13} = ll;
 
         newtree = tree(newnode);
         newtree = newtree.graft(1,nodelist{childlIdx});
