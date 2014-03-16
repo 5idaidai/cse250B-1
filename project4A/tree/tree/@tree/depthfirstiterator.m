@@ -43,7 +43,34 @@ function IDs = depthfirstiterator(obj, startNode, sorted)
         sorted = false;
     end
 
-    IDs = recurse(startNode);
+    %IDs = recurse(startNode);
+    
+    IDs2 = zeros(1,length(obj.Parent));
+    visited = zeros(length(obj.Parent),1);
+    curIdx = 1;
+    curNode=startNode;
+    IDs2(curIdx) = curNode;
+    visited(curIdx) = 1;
+    curIdx = curIdx + 1;
+    
+    while (curIdx<=length(obj.Parent))
+        idxs=find(obj.Parent==curNode);
+        if ~isempty(idxs)
+            curNode = idxs(1);
+            if ~visited(curNode)
+                IDs2(curIdx) = curNode;
+                visited(curNode) = 1;
+                curIdx = curIdx + 1;
+            end
+        else
+            idxs = find(visited==0);
+            curNode = idxs(1);
+            IDs2(curIdx) = curNode;
+            curIdx = curIdx + 1;
+            visited(curNode) = 1;
+        end
+    end
+    IDs = IDs2;
 
     function val = recurse(node)
         
