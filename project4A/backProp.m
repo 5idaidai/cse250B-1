@@ -152,20 +152,22 @@ if trainInput
         deltaV = deltaP*node{1}';
         dV = dV + deltaV;
         
+        wordIdx=node{12};
         tempM=dMeaning';
         [i,j,k] = find(tempM);
-        if isempty(i)
+        if ismember(wordIdx,i)
+            tempM(wordIdx,:) = tempM(wordIdx,:) + delta';
+        else
             newrows=[1:20]';
-            newcol=ones(20,1)*node{12};
+            newcol=ones(20,1)*wordIdx;
             newvals=delta;
             newi = [i;newcol];
             newj = [j;newrows];
             newk = [k;newvals];
             tempM = sparse(newi,newj,newk);
-        else
-            tempM(node{12},:) = tempM(node{12},:) + delta';
         end
         dMeaning=tempM';
+        length(nonzeros(dMeaning))
     end
 end
 

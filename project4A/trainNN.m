@@ -20,7 +20,9 @@ U = [U,c];
 V = -1 + (1+1)*rand(2,d);
 
 rootPreds = zeros(2,numExamples);
-dM = zeros(size(meanings));
+if trainInput
+    dM = sparse(size(meanings,1),size(meanings,2));
+end
 
 %Training
 totTic=tic;
