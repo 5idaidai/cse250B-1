@@ -76,7 +76,6 @@ for i=1:10
     fprintf('BOW Testing Accuracy: %.3f\n',bowRes(i,3+4));
     accs(i,5)=bowRes(i,3);
     accs(i,6)=bowRes(i,3+4);
-    i = i+1;
    
     filename=sprintf('tenFoldData-%.0f.mat',i);
     save(filename);
