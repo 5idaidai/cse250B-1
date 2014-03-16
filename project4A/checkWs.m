@@ -16,13 +16,9 @@ meanings = ones(1,3);
 
 %init W randomly
 W = [.2,.4];
-b = 0;
-W = [W,b];
 
 %init U and c for backpropagation
-U = rand(2,1);
-c = zeros(2,1);
-U = [U,c];
+U = ones(2,1);
 
 %init V for prediction
 % v1 = rand(1,d);
@@ -45,7 +41,7 @@ if numWords>=2
     %algorithm at the same time
     [sentTree, outputItr, innerItr, inputItr] = buildTree(sent, meanings, numWords, W, U, V, d, t, alpha, trainInput);
     disp(sentTree.tostring);
-    pause;
+    %pause;
 
     %backpropagate
     [ dW ] = backProp( sentTree, meanings, t, outputItr, innerItr, inputItr, U, W, V, d, alpha, trainInput );

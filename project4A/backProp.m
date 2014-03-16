@@ -1,4 +1,4 @@
-function [ dW,dU,dV, backTreeZ, dMeaning ] =...
+function [ dW, backTreeZ ] =...
     backProp( sentTree, meanings, t, outputItr, innerItr, inputItr, U, W, V, d, alpha, trainInput )
 %UNTITLED5 Summary of this function goes here
         %each node contains the following:
@@ -19,10 +19,7 @@ function [ dW,dU,dV, backTreeZ, dMeaning ] =...
         % 12: word index
         % 13: log loss (E2)
         
-dV = zeros(size(V));
 dW = zeros(size(W));
-dU = zeros(size(U));
-dMeaning = zeros(size(meanings));
 backTreeZ = tree(sentTree, zeros(size(d,1)));
 
 %set delta values for root
@@ -30,29 +27,14 @@ node = sentTree.get(1);
 children = sentTree.getchildren(1);
 childR = sentTree.get(max(children));
 childL = sentTree.get(min(children));
-tr = [childR{1};1];
-tl = [childL{1};1];
-zl = [node{6};1];
-zr = [node{7};1];
 a = node{4};
 p = node{3};
-Ul = U(1,:);%U(1:d,:);
-Ur = U(2,:);%U(d+1:2*d,:);
-topL = childL{2};
-topR = childR{2};
-bottom = topL+topR;
 
-[ deltaRt, deltaP, dLdGammaL, dLdGammaR ] = deltaRoot( tl, zl, tr, zr, Ul, Ur, a, t, p, V, topL, topR, bottom, alpha);
+[ deltaRt] = deltaRoot( t, p );
 backTreeZ =  backTreeZ.set(1, deltaRt);
 
-deltaW = deltaRt * [childR{1};childL{1};1]';
+deltaW = deltaRt * [childR{1};childL{1}]';
 dW = dW + deltaW;
-
-deltaV = deltaP*node{1}';
-dV = dV + deltaV;
-
-deltaU = buildDeltaU(node{1},dLdGammaL,dLdGammaR);
-dU = dU + deltaU;
 
 %set delta values for all autoencoder nodes
 for idx=outputItr    
@@ -62,95 +44,22 @@ for idx=outputItr
     children = sentTree.getchildren(idx);
     childR = sentTree.get(max(children));
     childL = sentTree.get(min(children));
-    tr = [childR{1};1];
-    tl = [childL{1};1];
-    zl = [node{6};1];
-    zr = [node{7};1];
-    a = node{4};
-    p = node{3};
-    Ul = U(1,:);%U(1:d,:);
-    Ur = U(2,:);%U(d+1:2*d,:);
-    topL = childL{2};
-    topR = childR{2};
-    bottom = topL+topR;
+    a = node{1};
     
     parent = sentTree.getparent(idx);
     nodes = sentTree.getchildren(parent);
     nodeL = min(nodes);
     if nodeL==idx
-        %Wk = W(:,1:d);
-        Wk = W(:,1);
+        Wk = W(:,1:d);
     else
-        %Wk = W(:,d+1:2*d);
-        Wk = W(:,2);
+        Wk = W(:,d+1:2*d);
     end
 
-    [ delta, deltaP, dLdGammaL, dLdGammaR ] = deltaOutput( t, p, tl, zl, tr, zr, deltak, Wk, Ul, Ur, a, V, topL, topR, bottom, alpha);
+    [ delta ] = deltaOutput( a, deltak, Wk );
     backTreeZ = backTreeZ.set(idx, delta);
     
-    deltaW = delta * [childR{1};childL{1};1]';
-    dW = dW + deltaW;
-
-    deltaV = deltaP*node{1}';
-    dV = dV + deltaV;
-
-    %deltaU = buildDeltaU(node{1},dLdGammaL,dLdGammaR);
-    %dU = dU + deltaU;    
-end
-
-%set delta values for all inner nodes
-for idx=innerItr    
-
-    node = sentTree.get(idx);
-    paridx = sentTree.getparent(idx);
-    deltak = backTreeZ.get(paridx);
-    a = node{4};
-    p = node{3};
-    
-    parent = sentTree.getparent(idx);
-    nodes = sentTree.getchildren(parent);
-    nodeL = min(nodes);
-    if nodeL==idx
-        %Wk = W(:,1:d);
-        Wk = W(:,1);
-    else
-        %Wk = W(:,d+1:2*d);
-        Wk = W(:,2);
-    end
-    
-    [ delta, deltaP ] = deltaNonOutput( a, deltak, Wk, V, t, p, alpha );
-    backTreeZ = backTreeZ.set(idx, delta);
-    
-    deltaW = delta * [childR{1};childL{1};1]';
-    dW = dW + deltaW;
-
-    deltaV = deltaP*node{1}';
-    dV = dV + deltaV;
-end
-
-if trainInput
-    %set delta values for all leaf nodes
-    for idx=inputItr
-
-        node = sentTree.get(idx);
-        deltak = backTreeZ.get(sentTree.getparent(idx));
-        p = node{3};
-
-        parent = sentTree.getparent(idx);
-        nodes = sentTree.getchildren(parent);
-        nodeL = min(nodes);
-        if nodeL==idx
-            Wk = W(:,1:d);
-        else
-            Wk = W(:,d+1:2*d);
-        end
-
-        [ delta, deltaP ] = deltaInput( deltak, Wk, V, t, p, alpha );
-        deltaV = deltaP*node{1}';
-        dV = dV + deltaV;
-        
-        dMeaning(:,node{12}) = dMeaning(:,node{12}) + delta;
-    end
+    deltaW = delta .* [childL{1};childR{1}];
+    dW = dW + deltaW;  
 end
 
 end
