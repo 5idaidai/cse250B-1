@@ -19,7 +19,7 @@ U = [U,c];
 %init V for prediction
 V = -1 + (1+1)*rand(1,d);
 
-rootPreds = zeros(1,numExamples);
+rootPreds = zeros(numExamples,1);
 if trainInput
     dM = sparse(size(meanings,1),size(meanings,2));
 end

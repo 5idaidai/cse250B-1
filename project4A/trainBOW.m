@@ -8,7 +8,7 @@ numExamples=length(data);
 %init V for prediction
 V = -1 + (1+1)*rand(1,d);
 
-runPreds = zeros(1,numExamples);
+runPreds = zeros(numExamples,1);
 dM = zeros(size(meanings));
 
 %Training

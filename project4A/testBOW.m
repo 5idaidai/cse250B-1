@@ -3,7 +3,7 @@ function [ pred, totalTime ] = testBOW( data, labels, d, alpha, V, meanings )
 
     numExamples=length(data);
 
-    runPreds = zeros(2,numExamples);
+    runPreds = zeros(numExamples,1);
 
     %Training
     totTic=tic;
@@ -21,8 +21,7 @@ function [ pred, totalTime ] = testBOW( data, labels, d, alpha, V, meanings )
             continue;
         end
 
-        tl=labels(i);
-        t=[tl; 1-tl];
+        t=labels(i);
 
         %Run Bag of Words predictions on each sentence
         [ BOWlist ] = bagOfWords( sent, meanings, numWords, V, t, alpha );
@@ -35,7 +34,7 @@ function [ pred, totalTime ] = testBOW( data, labels, d, alpha, V, meanings )
         end
         aveMeaning=mean(wordMeaning,2);
         p = predictNode(aveMeaning,V);
-        runPreds(:,i)=p;
+        runPreds(i)=p;
     end
 
     totalTime = toc(totTic);
