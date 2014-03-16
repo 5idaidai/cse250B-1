@@ -13,21 +13,22 @@ d = 20;
 lambda = [1e-05, 0.0001, 1e-07, 0.01];
 alphas = 0.2;
 maxIter = 70;
+numfolds = 10;
 
 Labels = num2cell(labels');
 AllSNum = [allSNum,Labels];
 
 totalsize=length(allSNum);
 ordering = randperm(totalsize);
-numInFold=floor(totalsize/10);
+numInFold=floor(totalsize/numfolds);
 
 startidx=1;
 stopidx=numInFold;
 
-accs = zeros(length(alphas),6);
-bowRes = zeros(length(alphas),8);
-nnRes = zeros(length(alphas),8);
-nnWsRes = zeros(length(alphas),8);
+accs = zeros(numfolds,6);
+bowRes = zeros(numfolds,8);
+nnRes = zeros(numfolds,8);
+nnWsRes = zeros(numfolds,8);
 
 for i=1:10
     testidxs=ordering(startidx:stopidx);
@@ -38,44 +39,44 @@ for i=1:10
     trainidxs=~ismember(ordering,testidxs);
     trainidxs=ordering(trainidxs);
     training = AllSNum(trainidxs,:);
-    dataTraining = training(:,1);
-    labelsTraining = cell2mat(training(:,2));
+    dataTrain = training(:,1);
+    labelsTrain = cell2mat(training(:,2));
     
     %run without training input
     [pred, ~, ~, ~, W, U, V, meanings] = trainNN( words, dataTrain, labelsTrain, d, lambda, alpha, maxIter, 0 );
     [ predTest, ~, ~ ] = testNN( words, dataTest, labelsTest, d, lambda, alpha, maxIter, W, U, V, meanings );
     
     %Accuracy
-    nnRes(aidx,1:4) = getAccuracy(pred, labelsTrain);
-    nnRes(aidx,5:8) = getAccuracy(predTest, labelsTest);
-    fprintf('NN Training Accuracy: %.3f\n',nnRes(aidx,3));
-    fprintf('NN Testing Accuracy: %.3f\n',nnRes(aidx,3+4));
-    accs(aidx,1)=nnRes(aidx,3);
-    accs(aidx,2)=nnRes(aidx,3+4);
+    nnRes(i,1:4) = getAccuracy(pred, labelsTrain);
+    nnRes(i,5:8) = getAccuracy(predTest, labelsTest);
+    fprintf('NN Training Accuracy: %.3f\n',nnRes(i,3));
+    fprintf('NN Testing Accuracy: %.3f\n',nnRes(i,3+4));
+    accs(i,1)=nnRes(i,3);
+    accs(i,2)=nnRes(i,3+4);
     
     %run with training input
     [predWM, ~, ~, ~, W, U, V, meanings] = trainNN( words, dataTrain, labelsTrain, d, lambda, alpha, maxIter, 1 );
     [ predTestWM, ~, ~ ] = testNN( words, dataTest, labelsTest, d, lambda, alpha, maxIter, W, U, V, meanings );
     
     %Accuracy
-    nnWsRes(aidx,1:4) = getAccuracy(predWM, labelsTrain);
-    nnWsRes(aidx,5:8) = getAccuracy(predTestWM, labelsTest);
-    fprintf('NN w/ Training Accuracy: %.3f\n',nnWsRes(aidx,3));
-    fprintf('NN w/ Testing Accuracy: %.3f\n',nnWsRes(aidx,3+4));
-    accs(aidx,3)=nnWsRes(aidx,3);
-    accs(aidx,4)=nnWsRes(aidx,3+4);
+    nnWsRes(i,1:4) = getAccuracy(predWM, labelsTrain);
+    nnWsRes(i,5:8) = getAccuracy(predTestWM, labelsTest);
+    fprintf('NN w/ Training Accuracy: %.3f\n',nnWsRes(i,3));
+    fprintf('NN w/ Testing Accuracy: %.3f\n',nnWsRes(i,3+4));
+    accs(i,3)=nnWsRes(i,3);
+    accs(i,4)=nnWsRes(i,3+4);
         
     [predBOW, ~, ~, V, meanings] = trainBOW( words, dataTrain, labelsTrain, d, lambda, alpha, maxIter );
     [ predTestBOW, ~ ] = testBOW( dataTest, labelsTest, d, alpha, V, meanings );
     
     %Accuracy
-    bowRes(aidx,1:4) = getAccuracy(predBOW, labelsTrain);
-    bowRes(aidx,5:8) = getAccuracy(predTestBOW, labelsTest);
-    fprintf('BOW Training Accuracy: %.3f\n',bowRes(aidx,3));
-    fprintf('BOW Testing Accuracy: %.3f\n',bowRes(aidx,3+4));
-    accs(aidx,5)=bowRes(aidx,3);
-    accs(aidx,6)=bowRes(aidx,3+4);
-    aidx = aidx+1;
+    bowRes(i,1:4) = getAccuracy(predBOW, labelsTrain);
+    bowRes(i,5:8) = getAccuracy(predTestBOW, labelsTest);
+    fprintf('BOW Training Accuracy: %.3f\n',bowRes(i,3));
+    fprintf('BOW Testing Accuracy: %.3f\n',bowRes(i,3+4));
+    accs(i,5)=bowRes(i,3);
+    accs(i,6)=bowRes(i,3+4);
+    i = i+1;
    
     filename=sprintf('tenFoldData-%.0f.mat',i);
     save(filename);
