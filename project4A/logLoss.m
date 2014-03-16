@@ -7,5 +7,6 @@ function [ err ] = logLoss( y, y_pred, alpha )
     %err = (1-alpha)*-sum(y.*log(y_pred)+(1-y).*log(1-y_pred));
     err = (1-alpha)*-sum(y.*log(y_pred));
 
+
 end
 

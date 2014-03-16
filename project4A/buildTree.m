@@ -87,6 +87,7 @@ function [ sentTree, outputItr, innerItr, inputItr ] ...
         pk = predictNode(xk,V);
         E2 = predError(t,pk,alpha);
 
+
         newnode = cell(numCells,1);
         newnode{1} = xk;
         newnode{2} = nl + nr;
