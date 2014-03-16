@@ -31,8 +31,6 @@ function [ dV, BOWlist, dMeaning ] = backPropBOW( BOWlist, V, alpha, t, meanings
         node = BOWlist{i,2};
         parent = BOWlist{i,1};
         delta = parent{4};
-        deltaV = deltaP*node{1}';
-        dV = dV + deltaV;
         
         dMeaning(:,node{5}) = dMeaning(:,node{5}) + delta;
     end      
