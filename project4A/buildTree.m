@@ -1,4 +1,4 @@
-function [ sentTree, outputItr, innerItr, inputItr ] ...
+function [ sentTree, outputItr, innerItr, inputItr, sentCost ] ...
         = buildTree( sent, wordMeanings, numWords, W, U, V, d, t, alpha, trainInput )
 %buildTree Builds the tree of the sentence, 
 % doing the feed foward calcs at the same time
@@ -124,12 +124,27 @@ function [ sentTree, outputItr, innerItr, inputItr ] ...
     
     %mark output nodes (the ones with RAE nodes on them)
     %first go down left nodes until you hit a leaf
-    idx = 1;%start at root node
+    %build output node iterators
+    %also compute total cost
+    idx = 1;%start at root node    
+    outIdx=1;
+    outputItr = [];
+    sentCost = 0;
     while (~sentTree.isleaf(idx))
         node = sentTree.get(idx);
         node{5} = 1;
         sentTree = sentTree.set(idx, node);
         childs = sentTree.getchildren(idx);
+
+        E1 = node{8};
+        E2 = node{13};
+        sentCost = sentCost + (alpha*E1 + (1-alpha)*E2);
+        
+        if idx~=1
+            outputItr(outIdx) = idx;
+            outIdx = outIdx + 1;
+        end
+        
         idx = childs(1);
     end
     
@@ -139,27 +154,34 @@ function [ sentTree, outputItr, innerItr, inputItr ] ...
         node = sentTree.get(idx);
         node{5} = 1;
         sentTree = sentTree.set(idx, node);
+        
+        if idx~=1   
+            E1 = node{8};
+            E2 = node{13};
+            sentCost = sentCost + (alpha*E1 + (1-alpha)*E2);
+            
+            outputItr(outIdx) = idx;
+            outIdx = outIdx + 1;
+        end
+        
         childs = sentTree.getchildren(idx);
         idx = childs(2);
     end
-       
-    %build output, inner, input node iterators
-    outIdx=1;
-    outputItr = [];
-    iterator = sentTree.breadthfirstiterator;
-    for i = iterator
-        node = sentTree.get(i);
-        if (i~=1 && node{5})
-            outputItr(outIdx) = i;
-            outIdx = outIdx + 1;
-        end
-    end
+    
+    %build inner, input node iterators
+    %also compute total cost
     inputItr=sentTree.findleaves();
 
     innerItr = sentTree.breadthfirstiterator;
     innerItr = innerItr(~ismember(innerItr,1));
     innerItr = innerItr(~ismember(innerItr,outputItr));
     innerItr = innerItr(~ismember(innerItr,inputItr));
+    
+    for i = innerItr
+        node = sentTree.get(i);
+        E2 = node{13};
+        sentCost = sentCost + ((1-alpha)*E2);
+    end
 
     %debug code
     if 0

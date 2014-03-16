@@ -54,9 +54,9 @@ for epoch=1:maxIter
 
         %build up sentence binary tree, and perform feed forward
         %   algorithm at the same time
-        [sentTree, outputItr, innerItr, inputItr] =...
+        [sentTree, outputItr, innerItr, inputItr, sentCost] =...
             buildTree(sent, meanings, numWords, W, U, V, d, t, alpha, trainInput);
-        sentCost = totalError(outputItr,innerItr,alpha,sentTree);
+        %sentCost = totalError(outputItr,innerItr,alpha,sentTree);
         
         %store root node prediction: for predicting sentence meaning
         root = sentTree.get(1);
