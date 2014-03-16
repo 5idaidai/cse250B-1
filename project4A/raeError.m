@@ -5,8 +5,8 @@ function [ err, zl, zr, el, er ] = raeError( xk, xi, xj, ni, nj, U, d, alpha )
     
     %mean = meaningFunc(xi, xj, k, W, b);
     z = U * [xk; -1];
-    zl = z(1,:);%z(1:d);
-    zr = z(2,:);%z(d+1:end);
+    zl = z(1:d);
+    zr = z(d+1:end);
     
     %this is with refinement #2
     nsum = ni + nj;

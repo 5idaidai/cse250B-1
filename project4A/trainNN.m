@@ -1,4 +1,4 @@
-function [ pred, totalTime, epochTimes ] = trainNN( words, allSNum, labels, d, lambda, alpha, maxIter, trainInput )
+function [ pred, totalTime, epochTimes, totalCosts ] = trainNN( words, allSNum, labels, d, lambda, alpha, maxIter, trainInput )
 %trainNN build and train the neural network
 
 %init meaning vectors for each word to random values
@@ -25,13 +25,17 @@ dM = zeros(size(meanings));
 %Training
 totTic=tic;
 epochTimes=zeros(maxIter,1);
+oldCost = 1;
+totalCosts = zeros(maxIter,1);
 
 for epoch=1:maxIter
     if epoch==1 || mod(epoch,maxIter/5)==0
         disp(epoch);    
     end
+        
     eTic = tic;
     
+    totalCost = 0;
     %iterate through all sentences
     for i=1:numExamples
         %get sentence
@@ -50,9 +54,10 @@ for epoch=1:maxIter
 
         %build up sentence binary tree, and perform feed forward
         %   algorithm at the same time
-        [sentTree, outputItr, innerItr, inputItr] =...
+        [sentTree, outputItr, innerItr, inputItr, sentCost] =...
             buildTree(sent, meanings, numWords, W, U, V, d, t, alpha, trainInput);
-
+        %sentCost = totalError(outputItr,innerItr,alpha,sentTree);
+        
         %store root node prediction: for predicting sentence meaning
         root = sentTree.get(1);
         rootPreds(:,i) = root{3};
@@ -77,13 +82,24 @@ for epoch=1:maxIter
         %Don't regularize intercept
         W = [newW(:,1:end-1),W(:,end)];
         U = [newU(:,1:end-1),U(:,end)];
+        
+        totalCost = totalCost + sentCost;
     end
-    
+
     if trainInput
         meanings = meanings + lambda(4)*dM;
     end
+        
+    totalCost = totalCost + (lambda(1:3)./2)*([norm(W), norm(U), norm(V)].^2)';
+    totalCosts(epoch) = totalCost;
     
-    epochTimes(epoch) = toc(eTic);    
+    epochTimes(epoch) = toc(eTic);
+        
+    if abs(totalCost - oldCost) <= 1e-8
+        fprintf('Converged in %d epochs\n',epoch);
+        break;
+    end
+    oldCost = totalCost;
 end
 
 totalTime = toc(totTic);

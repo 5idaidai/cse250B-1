@@ -10,8 +10,11 @@ if exist('allSNum','var') == 0
     load('codeDataMoviesEMNLP/data/rt-polaritydata/RTData_CV1.mat','allSNum','labels');
 end
 
-%allSNum = allSNum(1:20);
-%labels = labels(1:20);
+% numSamples = ceil(length(allSNum)*.1);
+% [data,idx] = datasample(allSNum,numSamples,'Replace',false);
+% sampledLabels = labels(idx);
+data = allSNum;
+sampledLabels = labels;
 
 %BOW or NN?
 method='BOW';%'NN';
@@ -24,10 +27,11 @@ alpha = 0.2;
 maxIter = 1;
 
 if strcmp(method,'BOW')==1
-    [pred] = trainBOW( words, allSNum, labels, d, lambda, alpha, maxIter );
+    [pred] = trainBOW( words, data, sampledLabels, d, lambda, alpha, maxIter );
 else
-    [pred] = trainNN( words, allSNum, labels, d, lambda, alpha, maxIter, trainInput );
+    [pred, totalTime, epochTimes, totalCosts] = trainNN( words, data, sampledLabels, d, lambda, alpha, maxIter, trainInput );
 end
+
 
 %Accuracy
 %dec_val = sigmoid(W*rootPreds' + b(:,ones(numExamples,1)));
