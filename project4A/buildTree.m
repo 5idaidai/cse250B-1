@@ -37,10 +37,10 @@ function [ sentTree, outputItr, innerItr, inputItr ] ...
         
         if trainInput
             [pk,ak] = predictNode(node{1},V);
-            ll = predError(t,pk,alpha);
+            E2 = predError(t,pk,alpha);
 
             node{3} = pk;
-            node{13} = ll;
+            node{13} = E2;
         end
         
         nodelist{i} = tree(node);
@@ -83,9 +83,9 @@ function [ sentTree, outputItr, innerItr, inputItr ] ...
         nl = childl{2};
         nr = childr{2};
         [xk,ak] = meaningFunc(xl,xr,W);
-        [errk, zl, zr, el, er] = raeError( xk, xl, xr, nl, nr, U, d, alpha );
+        [E1, zl, zr, el, er] = raeError( xk, xl, xr, nl, nr, U, d, alpha );
         pk = predictNode(xk,V);
-        ll = predError(t,pk,alpha);
+        E2 = predError(t,pk,alpha);
 
         newnode = cell(numCells,1);
         newnode{1} = xk;
@@ -95,10 +95,10 @@ function [ sentTree, outputItr, innerItr, inputItr ] ...
         newnode{5} = 0;
         newnode{6} = zl;
         newnode{7} = zr;
-        newnode{8} = errk;
+        newnode{8} = E1;
         newnode{10} = el;
         newnode{11} = er;
-        newnode{13} = ll;
+        newnode{13} = E2;
 
         newtree = tree(newnode);
         newtree = newtree.graft(1,nodelist{childlIdx});
@@ -121,7 +121,7 @@ function [ sentTree, outputItr, innerItr, inputItr ] ...
     
     sentTree = nodelist{1};
     
-    %mark output nodes
+    %mark output nodes (the ones with RAE nodes on them)
     %first go down left nodes until you hit a leaf
     idx = 1;%start at root node
     while (~sentTree.isleaf(idx))
