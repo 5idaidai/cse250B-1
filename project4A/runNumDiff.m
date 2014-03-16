@@ -55,7 +55,7 @@ if numWords>=2
     
 
     %Numerical Differentiaton
-    A = (-1:.5:2);
+    A = (-2:.25:1);
     E = 10.^A;
     E = sort(E);
     Diff=zeros(length(E),1);
@@ -74,3 +74,4 @@ end
 totalTime = toc(totTic);
 fprintf('Checking one tree took %f seconds (aka %f minutes).\n\n',totalTime,totalTime/60);
 fprintf('The Euclidean distance is %f\n', D);
+plot(Diff);

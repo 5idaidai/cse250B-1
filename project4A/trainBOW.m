@@ -69,7 +69,9 @@ totalTime = toc(totTic);
 fprintf('SGD_BOW took %f seconds (aka %f minutes).\n\n',totalTime,totalTime/60);
 % plot(epochTimes);
 
-pred = runPreds;
+predd = runPreds>0.5;
+pred = zeros(size(predd));
+pred = pred + predd;
 
 end
 

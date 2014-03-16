@@ -41,11 +41,9 @@ function [ pred, totalTime ] = testBOW( data, labels, d, alpha, V, meanings )
     totalTime = toc(totTic);
     fprintf('SGD_BOW took %f seconds (aka %f minutes) to test.\n\n',totalTime,totalTime/60);
 
-    pred = zeros(numExamples,1);
-    runPreds(2,:)=1-runPreds(1,:);
-    for i=1:numExamples
-         pred(i)=find(runPreds(:,i)>0.5)-1;
-    end
+    predd = runPreds>0.5;
+    pred = zeros(size(predd));
+    pred = pred + predd;
 
 end
 
