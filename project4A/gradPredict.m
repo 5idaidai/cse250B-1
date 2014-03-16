@@ -3,7 +3,7 @@ function [ grad ] = gradPredict( t, r, a, alpha )
 %   Detailed explanation goes here
 
     %gradT = gradLogLoss(t, r, alpha);
-    gradT = gradSquareLoss(r, t, 1, 1, 1-alpha);
+    gradT = gradSquareLoss(t, r, 1, 1, 1-alpha);
     %gradSig = gradSoftmax(a);
     gradSig = gradSigmoid(a);
     
