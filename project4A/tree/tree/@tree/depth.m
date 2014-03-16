@@ -5,12 +5,11 @@ function d = depth(obj)
 % The depth of a tree can be seen as the maximum number of edges between
 % any leaf and the root.
 
-    dt = obj.depthtree;
-    it = dt.depthfirstiterator;
+    [dt,it] = obj.depthtree;
     
     d = 0;
     for i = it
-        d = max(d, dt.get(i));
+        d = max(d, dt.Node{i});
     end
     
 end
