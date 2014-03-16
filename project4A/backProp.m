@@ -164,10 +164,10 @@ if trainInput
             newi = [i;newcol];
             newj = [j;newrows];
             newk = [k;newvals];
-            tempM = sparse(newi,newj,newk);
+            totalVals = nnz(tempM) + length(newvals);
+            tempM = sparse(newi,newj,newk,size(tempM,1),size(tempM,2),totalVals);
         end
         dMeaning=tempM';
-        length(nonzeros(dMeaning))
     end
 end
 
