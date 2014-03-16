@@ -85,6 +85,17 @@ for i=1:10
     
 end
 
+mse = zeros(6,3);
+
+mse(1,:) = sampleMeanVarSE(accs(:,1));
+mse(2,:) = sampleMeanVarSE(accs(:,2));
+
+mse(3,:) = sampleMeanVarSE(accs(:,3));
+mse(4,:) = sampleMeanVarSE(accs(:,4));
+
+mse(5,:) = sampleMeanVarSE(accs(:,5));
+mse(6,:) = sampleMeanVarSE(accs(:,6));
+
 filename=sprintf('tenFoldValidResults.mat');
 save(filename);
 
