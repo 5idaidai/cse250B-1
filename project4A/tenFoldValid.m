@@ -24,6 +24,7 @@ numInFold=floor(totalsize/numfolds);
 
 startidx=1;
 stopidx=numInFold;
+numTestSamples = floor(numInFold * .1);
 
 accs = zeros(numfolds,6);
 bowRes = zeros(numfolds,8);
@@ -31,13 +32,13 @@ nnRes = zeros(numfolds,8);
 nnWsRes = zeros(numfolds,8);
 
 for i=1:10
-    testidxs=ordering(startidx:stopidx);
+    teststop = startidx+numTestSamples;
+    testidxs=ordering(startidx:teststop);    
     testing = AllSNum(testidxs,:);
     dataTest = testing(:,1);
     labelsTest = cell2mat(testing(:,2));
 
-    trainidxs=~ismember(ordering,testidxs);
-    trainidxs=ordering(trainidxs);
+    trainidxs=ordering(teststop+1:stopidx);
     training = AllSNum(trainidxs,:);
     dataTrain = training(:,1);
     labelsTrain = cell2mat(training(:,2));

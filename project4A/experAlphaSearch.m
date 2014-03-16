@@ -24,7 +24,7 @@ labelsTrain = labels(ordering(lastidx:numSamples));
 d = 20;
 lambda = [1e-05, 0.0001, 1e-07, 0.01];
 alphas = (0:0.1:1);
-maxIter = 70;
+maxIter = 40;
 
 accs = zeros(length(alphas),6);
 bowRes = zeros(length(alphas),8);
@@ -70,7 +70,7 @@ for alpha=alphas
     aidx = aidx+1;
 end
 
-filename=sprintf('alphaSearchResults.mat');
+filename=sprintf('alphaSearchResults_goodcode.mat');
 save(filename);
 
 figure;
