@@ -22,14 +22,16 @@ function [ dW,dU,dV, backTreeZ, dMeaning ] =...
 dV = zeros(size(V));
 dW = zeros(size(W));
 dU = zeros(size(U));
-dMeaning = zeros(size(meanings));
+if trainInput
+    dMeaning = sparse(size(meanings,1),size(meanings,2));
+end
 backTreeZ = tree(sentTree, zeros(size(d,1)));
 
 %set delta values for root
-node = sentTree.get(1);
+node = sentTree.Node{1};
 children = sentTree.getchildren(1);
-childR = sentTree.get(max(children));
-childL = sentTree.get(min(children));
+childR = sentTree.Node{max(children)};
+childL = sentTree.Node{min(children)};
 tr = [childR{1};1];
 tl = [childL{1};1];
 zl = [node{6};1];
@@ -57,11 +59,11 @@ dU = dU + deltaU;
 %set delta values for all autoencoder nodes
 for idx=outputItr    
 
-    node = sentTree.get(idx);
+    node = sentTree.Node{idx};
     deltak = backTreeZ.get(sentTree.getparent(idx));
     children = sentTree.getchildren(idx);
-    childR = sentTree.get(max(children));
-    childL = sentTree.get(min(children));
+    childR = sentTree.Node{max(children)};
+    childL = sentTree.Node{min(children)};
     tr = [childR{1};1];
     tl = [childL{1};1];
     zl = [node{6};1];
@@ -101,7 +103,7 @@ end
 %set delta values for all inner nodes
 for idx=innerItr    
 
-    node = sentTree.get(idx);
+    node = sentTree.Node{idx};
     paridx = sentTree.getparent(idx);
     deltak = backTreeZ.get(paridx);
     a = node{4};
@@ -132,7 +134,7 @@ if trainInput
     %set delta values for all leaf nodes
     for idx=inputItr
 
-        node = sentTree.get(idx);
+        node = sentTree.Node{idx};
         deltak = backTreeZ.get(sentTree.getparent(idx));
         a = node{4};
         p = node{3};
@@ -150,7 +152,20 @@ if trainInput
         deltaV = deltaP*node{1}';
         dV = dV + deltaV;
         
-        dMeaning(:,node{12}) = dMeaning(:,node{12}) + delta;
+        tempM=dMeaning';
+        [i,j,k] = find(tempM);
+        if isempty(i)
+            newrows=[1:20]';
+            newcol=ones(20,1)*node{12};
+            newvals=delta;
+            newi = [i;newcol];
+            newj = [j;newrows];
+            newk = [k;newvals];
+            tempM = sparse(newi,newj,newk);
+        else
+            tempM(node{12},:) = tempM(node{12},:) + delta';
+        end
+        dMeaning=tempM';
     end
 end
 

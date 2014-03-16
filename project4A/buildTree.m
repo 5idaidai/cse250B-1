@@ -36,7 +36,7 @@ function [ sentTree, outputItr, innerItr, inputItr, sentCost ] ...
         node{5} = 0;%output node?
         
         if trainInput
-            [pk,ak] = predictNode(node{1},V);
+            pk = predictNode(node{1},V);
             E2 = predError(t,pk,alpha);
 
             node{3} = pk;
@@ -72,7 +72,7 @@ function [ sentTree, outputItr, innerItr, inputItr, sentCost ] ...
             err(j,3) = node2;
             k = k + 1;
         end    %end inner loop
-        [val,idx] = min(err(:,1));
+        [~,idx] = min(err(:,1));
         childlIdx = err(idx,2);
         childrIdx = err(idx,3);
         childl = nodelist{childlIdx}.Node{1};

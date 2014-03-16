@@ -17,7 +17,7 @@ data = allSNum;
 sampledLabels = labels;
 
 %hyperparameters
-trainInput = 0;%don't train input for now
+trainInput = 1;%don't train input for now
 d = 20;
 lambda = [1e-05, 0.0001, 1e-07, 0.01];
 alpha = 0.2;

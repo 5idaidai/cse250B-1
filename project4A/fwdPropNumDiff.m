@@ -20,17 +20,18 @@ function [ numDiffTree ] = fwdPropNumDiff( outputItr, innerItr, sentTree, W, U, 
     numDiffTree = sentTree;
 
     %Start at the level above the leaves and work toward the root
-    depth = sentTree.depth;
-    flat = sentTree.flatten;
+    %depth = sentTree.depth;
+    [flat,depth] = sentTree.flatten;
     for i=depth:-1:1
         level = flat{i,1};
         idx=level;
         %Iterate through inner nodes first
-        for j=innerItr(ismember(innerItr,idx))
-            node = sentTree.get(j);
+        iitr=innerItr(ismember(innerItr,idx));
+        for j=iitr
+            node = sentTree.Node{j};
             children = sentTree.getchildren(j);
-            childr = sentTree.get(max(children));
-            childl = sentTree.get(min(children));
+            childr = sentTree.Node{max(children)};
+            childl = sentTree.Node{min(children)};
 
             xl = childl{1};
             xr = childr{1};
@@ -56,15 +57,16 @@ function [ numDiffTree ] = fwdPropNumDiff( outputItr, innerItr, sentTree, W, U, 
             node{11} = er;
             node{13} = E2;
             
-            numDiffTree = numDiffTree.set(j,node);
+            numDiffTree.Node{j}=node;
         end
         
         %Iterate through outer nodes
-        for k=[outputItr(ismember(outputItr,idx))]
-            node = sentTree.get(k);
+        oitr=outputItr(ismember(outputItr,idx));
+        for k=oitr
+            node = sentTree.Node{k};
             children = sentTree.getchildren(k);
-            childr = sentTree.get(max(children));
-            childl = sentTree.get(min(children));
+            childr = sentTree.Node{max(children)};
+            childl = sentTree.Node{min(children)};
 
             xl = childl{1};
             xr = childr{1};
@@ -90,15 +92,15 @@ function [ numDiffTree ] = fwdPropNumDiff( outputItr, innerItr, sentTree, W, U, 
             node{11} = er;
             node{13} = E2;
 
-            numDiffTree = numDiffTree.set(k,node);
+            numDiffTree.Node{k}=node;
         end
         
         if i==1 %at root level
             k = 1;
-            node = sentTree.get(k);
+            node = sentTree.Node{k};
             children = sentTree.getchildren(k);
-            childr = sentTree.get(max(children));
-            childl = sentTree.get(min(children));
+            childr = sentTree.Node{max(children)};
+            childl = sentTree.Node{min(children)};
 
             xl = childl{1};
             xr = childr{1};
@@ -124,7 +126,7 @@ function [ numDiffTree ] = fwdPropNumDiff( outputItr, innerItr, sentTree, W, U, 
             node{11} = er;
             node{13} = E2;
 
-            numDiffTree = numDiffTree.set(k,node);
+            numDiffTree.Node{k}=node;
         end
     end
 end
