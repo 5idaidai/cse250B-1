@@ -10,6 +10,9 @@ if exist('allSNum','var') == 0
     load('codeDataMoviesEMNLP/data/rt-polaritydata/RTData_CV1.mat','allSNum','labels');
 end
 
+%allSNum = allSNum(1:20);
+%labels = labels(1:20);
+
 %hyperparameters
 trainInput = 0;%don't train input for now
 d = 20;

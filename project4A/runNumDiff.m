@@ -30,17 +30,12 @@ c = zeros(2*d,1);
 U = [U,c];
 
 %init V for prediction
-v1 = rand(1,d);
-v2 = 1-v1;
-V = zeros(2,d);
-V(1,:)=v1;
-V(2,:)=v2;
-%V = rand(1,d);
+V = rand(1,d);
 
 totTic=tic;
 
 
-i=randi(length(allSNum),1);
+i=3;%randi(length(allSNum),1);
 sent=allSNum(i);
 sent=sent{1,1};
 numWords=length(sent);
@@ -48,8 +43,9 @@ numWords=length(sent);
 %skip sentences of less than 2 words because our our neural nets
 %are defined for these
 if numWords>=2
-    tl=labels(i);
-    t=[tl; -tl];
+    t=labels(i);
+    %t=[t; 1-t];
+
 
     %build up sentence binary tree, and perform feed forward
     %algorithm at the same time

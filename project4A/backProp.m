@@ -45,7 +45,7 @@ bottom = topL+topR;
 [ deltaRt, deltaP, dLdGammaL, dLdGammaR ] = deltaRoot( tl, zl, tr, zr, Ul, Ur, a, t, p, V, topL, topR, bottom, alpha);
 backTreeZ =  backTreeZ.set(1, deltaRt);
 
-deltaW = deltaRt * [childR{1};childL{1};1]';
+deltaW = deltaRt * [childL{1};childR{1};1]';
 dW = dW + deltaW;
 
 deltaV = deltaP*node{1}';
@@ -88,7 +88,7 @@ for idx=outputItr
     [ delta, deltaP, dLdGammaL, dLdGammaR ] = deltaOutput( t, p, tl, zl, tr, zr, deltak, Wk, Ul, Ur, a, V, topL, topR, bottom, alpha);
     backTreeZ = backTreeZ.set(idx, delta);
     
-    deltaW = delta * [childR{1};childL{1};1]';
+    deltaW = deltaRt * [childL{1};childR{1};1]';
     dW = dW + deltaW;
 
     deltaV = deltaP*node{1}';
@@ -121,7 +121,7 @@ for idx=innerItr
     [ delta, deltaP ] = deltaNonOutput( a, deltak, Wk, V, t, p, alpha );
     backTreeZ = backTreeZ.set(idx, delta);
     
-    deltaW = delta * [childR{1};childL{1};1]';
+    deltaW = deltaRt * [childL{1};childR{1};1]';
     dW = dW + deltaW;
 
     deltaV = deltaP*node{1}';
@@ -134,6 +134,7 @@ if trainInput
 
         node = sentTree.get(idx);
         deltak = backTreeZ.get(sentTree.getparent(idx));
+        a = node{4};
         p = node{3};
 
         parent = sentTree.getparent(idx);
@@ -145,7 +146,7 @@ if trainInput
             Wk = W(:,d+1:2*d);
         end
 
-        [ delta, deltaP ] = deltaInput( deltak, Wk, V, t, p, alpha );
+        [ delta, deltaP ] = deltaInput( a, deltak, Wk, V, t, p, alpha );
         deltaV = deltaP*node{1}';
         dV = dV + deltaV;
         
