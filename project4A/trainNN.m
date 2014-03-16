@@ -108,9 +108,9 @@ totalTime = toc(totTic);
 fprintf('SGD_NN took %f seconds (aka %f minutes).\n\n',totalTime,totalTime/60);
 %plot(epochTimes);
 
-figure;
-title('Total Cost per Epoch');
-plot(totalCosts);
+% figure;
+% title('Total Cost per Epoch');
+% plot(totalCosts);
 
 pred = zeros(numExamples,1);
 rootPreds(2,:)=1-rootPreds(1,:);

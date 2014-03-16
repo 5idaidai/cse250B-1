@@ -1,20 +1,9 @@
-function [ pred, totalTime, epochTimes ] = trainBOW( words, allSNum, labels, d, lambda, alpha, maxIter )
+function [ pred, totalTime, epochTimes, V, meanings ] = trainBOW( words, data, labels, d, lambda, alpha, maxIter )
 %trainNN build and train the neural network
 
 %init meaning vectors for each word to random values
 meanings = normrnd(0,1,d,size(words,2));
-numExamples=length(allSNum);
-
-%init W and b randomly
-%a + (b-a).*rand(100,1)
-W = -1 + (1+1)*rand(d,2*d);
-b = zeros(d,1);
-W = [W,b];
-
-%init U and c for backpropagation
-U = -1 + (1+1)*rand(2*d,d);
-c = zeros(2*d,1);
-U = [U,c];
+numExamples=length(data);
 
 %init V for prediction
 V = -1 + (1+1)*rand(2,d);
@@ -35,7 +24,7 @@ for epoch=1:maxIter
     %iterate through all sentences
     for i=1:numExamples
         %get sentence
-        sent=allSNum(i);
+        sent=data(i);
         sent=sent{1,1};
         numWords=length(sent);
         
@@ -79,7 +68,7 @@ end
 
 totalTime = toc(totTic);
 fprintf('SGD_BOW took %f seconds (aka %f minutes).\n\n',totalTime,totalTime/60);
-plot(epochTimes);
+% plot(epochTimes);
 
 pred = zeros(numExamples,1);
 runPreds(2,:)=1-runPreds(1,:);
