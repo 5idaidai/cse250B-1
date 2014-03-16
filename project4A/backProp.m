@@ -38,8 +38,8 @@ zl = [node{6};1];
 zr = [node{7};1];
 a = node{4};
 p = node{3};
-Ul = U(1,:);%U(1:d,:);
-Ur = U(2,:);%U(d+1:2*d,:);
+Ul = U(1:d,:);
+Ur = U(d+1:2*d,:);
 topL = childL{2};
 topR = childR{2};
 bottom = topL+topR;
@@ -70,8 +70,8 @@ for idx=outputItr
     zr = [node{7};1];
     a = node{4};
     p = node{3};
-    Ul = U(1,:);%U(1:d,:);
-    Ur = U(2,:);%U(d+1:2*d,:);
+    Ul = U(1:d,:);
+    Ur = U(d+1:2*d,:);
     topL = childL{2};
     topR = childR{2};
     bottom = topL+topR;
@@ -80,11 +80,11 @@ for idx=outputItr
     nodes = sentTree.getchildren(parent);
     nodeL = min(nodes);
     if nodeL==idx
-        %Wk = W(:,1:d);
-        Wk = W(:,1);
+        Wk = W(:,1:d);
+
     else
-        %Wk = W(:,d+1:2*d);
-        Wk = W(:,2);
+        Wk = W(:,d+1:2*d);
+
     end
 
     [ delta, deltaP, dLdGammaL, dLdGammaR ] = deltaOutput( t, p, tl, zl, tr, zr, deltak, Wk, Ul, Ur, a, V, topL, topR, bottom, alpha);
@@ -113,11 +113,9 @@ for idx=innerItr
     nodes = sentTree.getchildren(parent);
     nodeL = min(nodes);
     if nodeL==idx
-        %Wk = W(:,1:d);
-        Wk = W(:,1);
+        Wk = W(:,1:d);
     else
-        %Wk = W(:,d+1:2*d);
-        Wk = W(:,2);
+        Wk = W(:,d+1:2*d);
     end
     
     [ delta, deltaP ] = deltaNonOutput( a, deltak, Wk, V, t, p, alpha );
