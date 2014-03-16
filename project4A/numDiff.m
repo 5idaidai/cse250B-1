@@ -16,7 +16,7 @@ for i=1:d
         [ numDiffTreeWminusE ] = fwdPropNumDiff( outputItr, innerItr, sentTree, WminusE, U, V, d, t, alpha );
         [ totErrWminusE ] = totalError( outputItr, innerItr, alpha, numDiffTreeWminusE );
 
-        newDeltaW=(totErrWplusE-totErrWminusE) / (2*E);
+        newDeltaW=(totErrWplusE-totErrWminusE) / (2*E) + 3*(E^2);
         numDiffW(i,j)=newDeltaW;
     end
 end     
