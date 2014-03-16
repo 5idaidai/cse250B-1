@@ -17,9 +17,9 @@ c = zeros(2*d,1);
 U = [U,c];
 
 %init V for prediction
-V = -1 + (1+1)*rand(2,d);
+V = -1 + (1+1)*rand(1,d);
 
-rootPreds = zeros(2,numExamples);
+rootPreds = zeros(1,numExamples);
 if trainInput
     dM = sparse(size(meanings,1),size(meanings,2));
 end
@@ -51,8 +51,7 @@ for epoch=1:maxIter
             continue;
         end
         
-        tl=labels(i);
-        t=[tl; 1-tl];
+        t=labels(i);
 
         %build up sentence binary tree, and perform feed forward
         %   algorithm at the same time
@@ -62,7 +61,7 @@ for epoch=1:maxIter
         
         %store root node prediction: for predicting sentence meaning
         root = sentTree.get(1);
-        rootPreds(:,i) = root{3};
+        rootPreds(i) = root{3};
         
         %backpropagate
         if trainInput
@@ -112,10 +111,8 @@ fprintf('SGD_NN took %f seconds (aka %f minutes).\n\n',totalTime,totalTime/60);
 % title('Total Cost per Epoch');
 % plot(totalCosts);
 
-pred = zeros(numExamples,1);
-rootPreds(2,:)=1-rootPreds(1,:);
-for i=1:numExamples
-     pred(i)=find(rootPreds(:,i)>0.5)-1;
-end
+predd = rootPreds>0.5;
+pred = zeros(size(predd));
+pred = pred + predd;
 
 end

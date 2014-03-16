@@ -44,7 +44,6 @@ numWords=length(sent);
 %are defined for these
 if numWords>=2
     t=labels(i);
-    %t=[t; 1-t];
 
     %build up sentence binary tree, and perform feed forward
     %algorithm at the same time

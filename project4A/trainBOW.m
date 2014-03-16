@@ -6,9 +6,9 @@ meanings = normrnd(0,1,d,size(words,2));
 numExamples=length(data);
 
 %init V for prediction
-V = -1 + (1+1)*rand(2,d);
+V = -1 + (1+1)*rand(1,d);
 
-runPreds = zeros(2,numExamples);
+runPreds = zeros(1,numExamples);
 dM = zeros(size(meanings));
 
 %Training
@@ -34,8 +34,7 @@ for epoch=1:maxIter
             continue;
         end
         
-        tl=labels(i);
-        t=[tl; 1-tl];
+        t=labels(i);
 
         %Run Bag of Words predictions on each sentence
         [ BOWlist ] = bagOfWords( sent, meanings, numWords, V, t, alpha );
@@ -51,7 +50,7 @@ for epoch=1:maxIter
         end
         aveMeaning=mean(wordMeaning,2);
         p = predictNode(aveMeaning,V);
-        runPreds(:,i)=p;
+        runPreds(i)=p;
         
         %Regularized SGD update
         V = V + lambda(3)*dV;
@@ -70,11 +69,7 @@ totalTime = toc(totTic);
 fprintf('SGD_BOW took %f seconds (aka %f minutes).\n\n',totalTime,totalTime/60);
 % plot(epochTimes);
 
-pred = zeros(numExamples,1);
-runPreds(2,:)=1-runPreds(1,:);
-for i=1:numExamples
-     pred(i)=find(runPreds(:,i)>0.5)-1;
-end
+pred = runPreds;
 
 end
 

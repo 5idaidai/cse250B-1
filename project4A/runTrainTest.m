@@ -36,7 +36,7 @@ alpha = 0.2;
 maxIter = 70;
 
 if strcmp(method,'BOW')==1
-    [pred] = trainBOW( words, dataTrain, labelsTrain, d, lambda, alpha, maxIter );
+    [ pred, totalTime, epochTimes, V, meanings ] = trainBOW( words, dataTrain, labelsTrain, d, lambda, alpha, maxIter );
     [ predTest, ~ ] = testBOW( dataTest, labelsTest, d, alpha, V, meanings );
     
 else
@@ -50,3 +50,10 @@ end
 
 fprintf('Training Accuracy: %.3f\n',acc_train);
 fprintf('Testing Accuracy: %.3f\n',acc_test);
+
+[ posidxs, poswords, negidxs, negwords] = top10Words(words, meanings, V);
+
+disp('Top 10 Pos Words');
+poswords
+disp('Top 10 Neg Words');
+negwords
