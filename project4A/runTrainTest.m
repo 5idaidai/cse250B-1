@@ -28,6 +28,5 @@ maxIter = 70;
 %Accuracy
 %dec_val = sigmoid(W*rootPreds' + b(:,ones(numExamples,1)));
 %pred = 1*(dec_val > 0.5);
-[prec_train, recall_train, acc_train, f1_train] = getAccuracy(pred, labels);
-
+[prec_train, recall_train, acc_train, f1_train] = getAccuracy(pred, sampledLabels);
 fprintf('Training Accuracy: %.3f\n',acc_train);
