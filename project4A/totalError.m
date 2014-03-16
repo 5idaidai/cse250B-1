@@ -7,7 +7,7 @@ function [ totErr ] = totalError( outputItr, innerItr, alpha, numDiffTree, lambd
         node = numDiffTree.get(idx);
         E1 = node{8};
         E2 = node{13};
-        outputErr(idx) = alpha*E1 + (1-alpha)*E2;
+        outputErr(idx) = E2;%alpha*E1 + (1-alpha)*E2;
     end
     
     innerErr = zeros(length(innerItr),1);

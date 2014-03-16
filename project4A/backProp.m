@@ -28,12 +28,12 @@ children = sentTree.getchildren(1);
 childR = sentTree.get(max(children));
 childL = sentTree.get(min(children));
 a = node{4};
-p = node{3};
+p = node{1};
 
 [ deltaRt] = deltaRoot( t, p );
 backTreeZ =  backTreeZ.set(1, deltaRt);
 
-deltaW = deltaRt * [childR{1};childL{1}]';
+deltaW = deltaRt * [childL{1};childR{1}]';
 dW = dW + deltaW;
 
 %set delta values for all autoencoder nodes
@@ -50,15 +50,15 @@ for idx=outputItr
     nodes = sentTree.getchildren(parent);
     nodeL = min(nodes);
     if nodeL==idx
-        Wk = W(:,1:d);
+        Wk = W(1);
     else
-        Wk = W(:,d+1:2*d);
+        Wk = W(2);
     end
 
     [ delta ] = deltaOutput( a, deltak, Wk );
     backTreeZ = backTreeZ.set(idx, delta);
     
-    deltaW = delta .* [childL{1};childR{1}];
+    deltaW = delta * [childL{1};childR{1}]';
     dW = dW + deltaW;  
 end
 

@@ -72,7 +72,7 @@ function [ numDiffTree ] = fwdPropNumDiff( outputItr, innerItr, sentTree, W, U, 
             nl = childl{2};
             nr = childr{2};
 
-            [xk,ak] = meaningFunc(xl,xr,W);
+            [xk,ak] = meaningFunc(xl,xr,W,0);
 
             [ E1, zl, zr, el, er ] = raeError( xk, xl, xr, nl, nr, U, d, alpha );
             pk = predictNode(xk,V);
@@ -106,11 +106,12 @@ function [ numDiffTree ] = fwdPropNumDiff( outputItr, innerItr, sentTree, W, U, 
             nl = childl{2};
             nr = childr{2};
 
-            [xk,ak] = meaningFunc(xl,xr,W);
+            [xk,ak] = meaningFunc(xl,xr,W,1);
 
             [ E1, zl, zr, el, er ] = raeError( xk, xl, xr, nl, nr, U, d, alpha );
             pk = predictNode(xk,V);
             E2 = (1-alpha)*logLoss(t,pk);
+            E2 = squareLoss(t,xk,1,1,1);
 
             node{1} = xk;
             node{2} = nl + nr;

@@ -3,7 +3,7 @@ function [ delta ] = deltaOutput( a, deltak, Wk )
 %   Based on equation from middle of pg.11 in the notes:
 %   deltai=deltaLi/deltari*hprime(ai)
 
-dk = (deltak'*Wk)';
+dk = (deltak*Wk);
 
 %delta value for this node
 delta = hprime(a) .* (dk);
