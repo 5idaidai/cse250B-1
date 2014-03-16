@@ -52,13 +52,22 @@ if numWords>=2
 
     %backpropagate
     [ dW ] = backProp( sentTree, meanings, t, outputItr, innerItr, inputItr, U, W, V, d, alpha, trainInput );
+    %dW = dW * lambda(1);
+    
 
     %Numerical Differentiaton
-    E=1e-6;
-    [ numDiffW ] = numDiff( outputItr, innerItr, sentTree, W, U, V, d, t, alpha, E, lambda );
-
-    %Check derivatives
-    D = sum(sum((numDiffW(1:end-1) - dW(1:end-1)).^2));
+    A = (-1:.5:2);
+    E = 10.^A;
+    E = sort(E);
+    Diff=zeros(length(E),1);
+    for i=1:length(E)
+        e=E(i);
+        [ numDiffW ] = numDiff( outputItr, innerItr, sentTree, W, U, V, d, t, alpha, e, lambda );
+        %numDiffW = numDiffW * lambda(1);
+        %Check derivatives
+        D = sum(sum((numDiffW(1:end-1) - dW(1:end-1)).^2));
+        Diff(i)=D;
+    end
 else
     i=i+1;
 end
