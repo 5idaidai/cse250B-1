@@ -11,13 +11,14 @@ end
 
 totalsize=length(allSNum);
 ordering = randperm(totalsize);
-numSamplesTest = ceil(totalsize*.1);
+numSamples = ceil(totalsize*.1);
+numSamplesTest = ceil(numSamples*.1);
 dataTest = allSNum(ordering(1:numSamplesTest));
 labelsTest = labels(ordering(1:numSamplesTest));
 
 lastidx=numSamplesTest+1;
-dataTrain = allSNum(ordering(lastidx:end));
-labelsTrain = labels(ordering(lastidx:end));
+dataTrain = allSNum(ordering(lastidx:numSamples));
+labelsTrain = labels(ordering(lastidx:numSamples));
 
 %hyperparameters
 d = 20;
