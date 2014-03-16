@@ -10,8 +10,11 @@ if exist('allSNum','var') == 0
     load('codeDataMoviesEMNLP/data/rt-polaritydata/RTData_CV1.mat','allSNum','labels');
 end
 
-%allSNum = allSNum(1:20);
-%labels = labels(1:20);
+% numSamples = ceil(length(allSNum)*.1);
+% [data,idx] = datasample(allSNum,numSamples,'Replace',false);
+% sampledLabels = labels(idx);
+data = allSNum;
+sampledLabels = labels;
 
 %hyperparameters
 trainInput = 0;%don't train input for now
@@ -20,7 +23,7 @@ lambda = [1e-05, 0.0001, 1e-07, 0.01];
 alpha = 0.2;
 maxIter = 70;
 
-[pred] = trainNN( words, allSNum, labels, d, lambda, alpha, maxIter, trainInput );
+[pred, totalTime, epochTimes, totalCosts] = trainNN( words, data, sampledLabels, d, lambda, alpha, maxIter, trainInput );
 
 %Accuracy
 %dec_val = sigmoid(W*rootPreds' + b(:,ones(numExamples,1)));

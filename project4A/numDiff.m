@@ -9,12 +9,12 @@ for i=1:d
         WplusE=W;
         WplusE(i,j)=W(i,j)+E;
         [ numDiffTreeWplusE ] = fwdPropNumDiff( outputItr, innerItr, sentTree, WplusE, U, V, d, t, alpha );
-        [ totErrWplusE ] = totalError( outputItr, innerItr, alpha, numDiffTreeWplusE, lambda, WplusE, U, V );
+        [ totErrWplusE ] = totalError( outputItr, innerItr, alpha, numDiffTreeWplusE );
 
         WminusE=W;
         WminusE(i,j)=W(i,j)-E;
         [ numDiffTreeWminusE ] = fwdPropNumDiff( outputItr, innerItr, sentTree, WminusE, U, V, d, t, alpha );
-        [ totErrWminusE ] = totalError( outputItr, innerItr, alpha, numDiffTreeWminusE, lambda, WminusE, U, V );
+        [ totErrWminusE ] = totalError( outputItr, innerItr, alpha, numDiffTreeWminusE );
 
         newDeltaW=(totErrWplusE-totErrWminusE) / (2*E);
         numDiffW(i,j)=newDeltaW;

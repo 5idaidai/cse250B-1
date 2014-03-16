@@ -1,4 +1,4 @@
-function [ totErr ] = totalError( outputItr, innerItr, alpha, numDiffTree, lambda, W, U, V )
+function [ totErr ] = totalError( outputItr, innerItr, alpha, numDiffTree )
 %totalError total error for one sentence s with label t
 %   Detailed explanation goes here
 
