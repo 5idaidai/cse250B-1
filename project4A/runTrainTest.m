@@ -16,14 +16,22 @@ end
 data = allSNum;
 sampledLabels = labels;
 
+%BOW or NN?
+method='BOW';%'NN';
+
 %hyperparameters
 trainInput = 1;%don't train input for now
 d = 20;
 lambda = [1e-05, 0.0001, 1e-07, 0.01];
 alpha = 0.2;
-maxIter = 70;
+maxIter = 1;
 
-[pred, totalTime, epochTimes, totalCosts] = trainNN( words, data, sampledLabels, d, lambda, alpha, maxIter, trainInput );
+if strcmp(method,'BOW')==1
+    [pred] = trainBOW( words, data, sampledLabels, d, lambda, alpha, maxIter );
+else
+    [pred, totalTime, epochTimes, totalCosts] = trainNN( words, data, sampledLabels, d, lambda, alpha, maxIter, trainInput );
+end
+
 
 %Accuracy
 %dec_val = sigmoid(W*rootPreds' + b(:,ones(numExamples,1)));
