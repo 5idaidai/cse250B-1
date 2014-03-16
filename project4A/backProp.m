@@ -90,14 +90,14 @@ for idx=outputItr
     [ delta, deltaP, dLdGammaL, dLdGammaR ] = deltaOutput( t, p, tl, zl, tr, zr, deltak, Wk, Ul, Ur, a, V, topL, topR, bottom, alpha);
     backTreeZ = backTreeZ.set(idx, delta);
     
-    deltaW = deltaRt * [childL{1};childR{1};1]';
+    deltaW = delta * [childL{1};childR{1};1]';
     dW = dW + deltaW;
 
     deltaV = deltaP*node{1}';
     dV = dV + deltaV;
 
-    %deltaU = buildDeltaU(node{1},dLdGammaL,dLdGammaR);
-    %dU = dU + deltaU;    
+    deltaU = buildDeltaU(node{1},dLdGammaL,dLdGammaR);
+    dU = dU + deltaU;    
 end
 
 %set delta values for all inner nodes
@@ -121,7 +121,7 @@ for idx=innerItr
     [ delta, deltaP ] = deltaNonOutput( a, deltak, Wk, V, t, p, alpha );
     backTreeZ = backTreeZ.set(idx, delta);
     
-    deltaW = deltaRt * [childL{1};childR{1};1]';
+    deltaW = delta * [childL{1};childR{1};1]';
     dW = dW + deltaW;
 
     deltaV = deltaP*node{1}';

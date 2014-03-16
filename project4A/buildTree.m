@@ -1,5 +1,5 @@
 function [ sentTree, outputItr, innerItr, inputItr, sentCost ] ...
-        = buildTree( sent, wordMeanings, numWords, W, U, V, d, t, alpha, trainInput )
+        = buildTree( sent, wordMeanings, numWords, W, U, V, d, t, alpha, trainInput, training )
 %buildTree Builds the tree of the sentence, 
 % doing the feed foward calcs at the same time
 %   uses greedy tree algorithm
@@ -139,68 +139,74 @@ function [ sentTree, outputItr, innerItr, inputItr, sentCost ] ...
         E1 = node{8};
         E2 = node{13};
         sentCost = sentCost + (alpha*E1 + (1-alpha)*E2);
-        
+
         if idx~=1
             outputItr(outIdx) = idx;
             outIdx = outIdx + 1;
         end
-        
+
         idx = childs(1);
     end
-    
+
     %then go down right nodes
     idx = 1;%start at root node
     while (~sentTree.isleaf(idx))
         node = sentTree.get(idx);
         node{5} = 1;
         sentTree = sentTree.set(idx, node);
-        
+
         if idx~=1   
             E1 = node{8};
             E2 = node{13};
             sentCost = sentCost + (alpha*E1 + (1-alpha)*E2);
-            
+
             outputItr(outIdx) = idx;
             outIdx = outIdx + 1;
         end
-        
+
         childs = sentTree.getchildren(idx);
         idx = childs(2);
     end
-    
-    %build inner, input node iterators
-    %also compute total cost
-    inputItr=sentTree.findleaves();
 
-    innerItr = sentTree.breadthfirstiterator;
-    innerItr = innerItr(~ismember(innerItr,1));
-    innerItr = innerItr(~ismember(innerItr,outputItr));
-    innerItr = innerItr(~ismember(innerItr,inputItr));
-    
-    for i = innerItr
-        node = sentTree.get(i);
-        E2 = node{13};
-        sentCost = sentCost + ((1-alpha)*E2);
-    end
+    if training
+        %build inner, input node iterators
+        %also compute total cost
+        inputItr=sentTree.findleaves();
 
-    %debug code
-    if 0
-        test=sentTree.breadthfirstiterator;
-        test1 = sum(ismember(outputItr,test));
-        test2 = sum(ismember(innerItr,test));
-        test3 = sum(ismember(inputItr,test));
-    end
+        innerItr = sentTree.breadthfirstiterator;
+        innerItr = innerItr(~ismember(innerItr,1));
+        innerItr = innerItr(~ismember(innerItr,outputItr));
+        innerItr = innerItr(~ismember(innerItr,inputItr));
 
-    %disp output nodes for debug
-    if 0
-        na_order = tree(sentTree, 'clear');
-        iterator = sentTree.breadthfirstiterator;
-        for i = iterator
+        for i = innerItr
             node = sentTree.get(i);
-            na_order = na_order.set(i, node{5});
+            E2 = node{13};
+            sentCost = sentCost + ((1-alpha)*E2);
         end
-        disp(na_order.tostring);
+
+        %debug code
+        if 0
+            test=sentTree.breadthfirstiterator;
+            test1 = sum(ismember(outputItr,test));
+            test2 = sum(ismember(innerItr,test));
+            test3 = sum(ismember(inputItr,test));
+        end
+
+        %disp output nodes for debug
+        if 0
+            na_order = tree(sentTree, 'clear');
+            iterator = sentTree.breadthfirstiterator;
+            for i = iterator
+                node = sentTree.get(i);
+                na_order = na_order.set(i, node{5});
+            end
+            disp(na_order.tostring);
+        end
+    else
+        innerItr = [];
+        inputItr = [];
     end
+    
     %disp nodes idxs for debug
     if 0
         na_order = tree(sentTree, 'clear');

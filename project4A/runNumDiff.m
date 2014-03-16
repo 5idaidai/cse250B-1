@@ -48,7 +48,7 @@ if numWords>=2
 
     %build up sentence binary tree, and perform feed forward
     %algorithm at the same time
-    [sentTree, outputItr, innerItr, inputItr] = buildTree(sent, meanings, numWords, W, U, V, d, t, alpha, trainInput);
+    [sentTree, outputItr, innerItr, inputItr] = buildTree(sent, meanings, numWords, W, U, V, d, t, alpha, trainInput, 1);
 
     %backpropagate
     [ dW ] = backProp( sentTree, meanings, t, outputItr, innerItr, inputItr, U, W, V, d, alpha, trainInput );

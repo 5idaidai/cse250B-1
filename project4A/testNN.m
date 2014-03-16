@@ -28,7 +28,7 @@ for i=1:numExamples
     %build up sentence binary tree, and perform feed forward
     %   algorithm at the same time
     [sentTree, ~, ~, ~, sentCost] =...
-        buildTree(sent, meanings, numWords, W, U, V, d, t, alpha, 0);
+        buildTree(sent, meanings, numWords, W, U, V, d, t, alpha, 0, 0);
 
     %store root node prediction: for predicting sentence meaning
     root = sentTree.get(1);
