@@ -2,7 +2,7 @@ addpath(genpath('tree/'));
 addpath(genpath('codeDataMoviesEMNLP/code'));
 
 %load test data with limit number of short sentences, same vocab
-load('testdata.mat');
+% load('testdata.mat');
 if exist('words','var') == 0
     load('codeDataMoviesEMNLP/data/rt-polaritydata/vocab.mat');
 end
@@ -10,11 +10,16 @@ if exist('allSNum','var') == 0
     load('codeDataMoviesEMNLP/data/rt-polaritydata/RTData_CV1.mat','allSNum','labels');
 end
 
-% numSamples = ceil(length(allSNum)*.1);
-% [data,idx] = datasample(allSNum,numSamples,'Replace',false);
-% sampledLabels = labels(idx);
-data = allSNum;
-sampledLabels = labels;
+numSamplesTrain = ceil(length(allSNum)*.002);
+[dataTrain,idx] = datasample(allSNum,numSamplesTrain,'Replace',false);
+labelsTrain = labels(idx);
+
+numSamplesTest = ceil(length(allSNum)*.002);
+[dataTest,idxTest] = datasample(allSNum,numSamplesTest,'Replace',false);
+labelsTest = labels(idxTest);
+
+% data = allSNum;
+% sampledLabels = labels;
 
 %BOW or NN?
 %method='BOW';
@@ -28,14 +33,15 @@ alpha = 0.2;
 maxIter = 70;
 
 if strcmp(method,'BOW')==1
-    [pred] = trainBOW( words, data, sampledLabels, d, lambda, alpha, maxIter );
+    [pred] = trainBOW( words, dataTrain, labelsTrain, d, lambda, alpha, maxIter );
 else
-    [pred, totalTime, epochTimes, totalCosts] = trainNN( words, data, sampledLabels, d, lambda, alpha, maxIter, trainInput );
+    [pred, totalTime, epochTimes, totalCosts, W, U, V, meanings] = trainNN( words, dataTrain, labelsTrain, d, lambda, alpha, maxIter, trainInput );
+    [ predTest, totalTimeTest, totalCostTest ] = testNN( words, dataTest, labelsTest, d, lambda, alpha, maxIter, W, U, V, meanings );
 end
 
-
 %Accuracy
-%dec_val = sigmoid(W*rootPreds' + b(:,ones(numExamples,1)));
-%pred = 1*(dec_val > 0.5);
-[prec_train, recall_train, acc_train, f1_train] = getAccuracy(pred, sampledLabels);
+[prec_train, recall_train, acc_train, f1_train] = getAccuracy(pred, labelsTrain);
+[prec_test, recall_test, acc_test, f1_test] = getAccuracy(predTest, labelsTest);
+
 fprintf('Training Accuracy: %.3f\n',acc_train);
+fprintf('Testing Accuracy: %.3f\n',acc_test);

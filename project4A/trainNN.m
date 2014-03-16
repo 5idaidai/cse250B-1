@@ -1,4 +1,4 @@
-function [ pred, totalTime, epochTimes, totalCosts ] = trainNN( words, allSNum, labels, d, lambda, alpha, maxIter, trainInput )
+function [ pred, totalTime, epochTimes, totalCosts, W, U, V, meanings ] = trainNN( words, allSNum, labels, d, lambda, alpha, maxIter, trainInput )
 %trainNN build and train the neural network
 
 %init meaning vectors for each word to random values
