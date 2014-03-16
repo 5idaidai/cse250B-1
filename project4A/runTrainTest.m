@@ -10,13 +10,16 @@ if exist('allSNum','var') == 0
     load('codeDataMoviesEMNLP/data/rt-polaritydata/RTData_CV1.mat','allSNum','labels');
 end
 
-numSamplesTrain = ceil(length(allSNum)*.002);
-[dataTrain,idx] = datasample(allSNum,numSamplesTrain,'Replace',false);
-labelsTrain = labels(idx);
+totalsize=length(allSNum);
+ordering = randperm(totalsize);
+numSamplesTrain = ceil(totalsize*.002);
+dataTrain = allSNum(ordering(1:numSamplesTrain));
+labelsTrain = labels(ordering(1:numSamplesTrain));
 
-numSamplesTest = ceil(length(allSNum)*.002);
-[dataTest,idxTest] = datasample(allSNum,numSamplesTest,'Replace',false);
-labelsTest = labels(idxTest);
+lastidx=numSamplesTrain;
+numSamplesTest = ceil(totalsize*.002);
+dataTest = allSNum(ordering(lastidx:lastidx+numSamplesTest));
+labelsTest = labels(ordering(lastidx:lastidx+numSamplesTest));
 
 % data = allSNum;
 % sampledLabels = labels;
@@ -30,7 +33,7 @@ trainInput = 0;%don't train input for now
 d = 20;
 lambda = [1e-05, 0.0001, 1e-07, 0.01];
 alpha = 0.2;
-maxIter = 70;
+maxIter = 30;
 
 if strcmp(method,'BOW')==1
     [pred] = trainBOW( words, dataTrain, labelsTrain, d, lambda, alpha, maxIter );
