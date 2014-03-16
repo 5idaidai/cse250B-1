@@ -17,14 +17,15 @@ data = allSNum;
 sampledLabels = labels;
 
 %BOW or NN?
-method='BOW';%'NN';
+%method='BOW';
+method='NN';
 
 %hyperparameters
-trainInput = 1;%don't train input for now
+trainInput = 0;%don't train input for now
 d = 20;
 lambda = [1e-05, 0.0001, 1e-07, 0.01];
 alpha = 0.2;
-maxIter = 1;
+maxIter = 70;
 
 if strcmp(method,'BOW')==1
     [pred] = trainBOW( words, data, sampledLabels, d, lambda, alpha, maxIter );

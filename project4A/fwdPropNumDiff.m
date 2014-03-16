@@ -57,7 +57,7 @@ function [ numDiffTree ] = fwdPropNumDiff( outputItr, innerItr, sentTree, W, U, 
             node{11} = er;
             node{13} = E2;
             
-            numDiffTree.Node{j}=node;
+            numDiffTree = numDiffTree.set(j,node);
         end
         
         %Iterate through outer nodes
@@ -92,7 +92,7 @@ function [ numDiffTree ] = fwdPropNumDiff( outputItr, innerItr, sentTree, W, U, 
             node{11} = er;
             node{13} = E2;
 
-            numDiffTree.Node{k}=node;
+            numDiffTree = numDiffTree.set(k,node);
         end
         
         if i==1 %at root level
@@ -126,7 +126,7 @@ function [ numDiffTree ] = fwdPropNumDiff( outputItr, innerItr, sentTree, W, U, 
             node{11} = er;
             node{13} = E2;
 
-            numDiffTree.Node{k}=node;
+            numDiffTree = numDiffTree.set(k,node);
         end
     end
 end
